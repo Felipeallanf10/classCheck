@@ -12,9 +12,9 @@ const createProfessorSchema = z.object({
 const querySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
-  search: z.string().optional(),
-  materia: z.string().optional(),
-  ativo: z.coerce.boolean().optional()
+  search: z.string().nullish(),
+  materia: z.string().nullish(),
+  ativo: z.coerce.boolean().nullish()
 })
 
 export async function GET(request: NextRequest) {
