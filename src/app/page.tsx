@@ -1,100 +1,88 @@
+// app/page.tsx
+'use client'
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Smile, BookOpen, Calendar, Star } from "lucide-react"
+import { GraficoHumor } from "@/components/GraficoHumor"
+import { CalendarioEventos } from "@/components/CalendarioEventos"
+import { DrawerAvaliacao } from "@/components/DrawerAvaliacao"
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+
 export default function Home() {
   return (
-    <main className="w-96 h-[812px] bg-gray-200 font-['Poppins'] relative">
-      {/* Header */}
-      <header className="h-20 bg-sky-950 flex items-center justify-between px-4">
-        <button className="w-8 h-8">
-          <img src="/lg_menu.svg" alt="Menu" />
-        </button>
-        
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-zinc-100/95 rounded-lg flex justify-center items-center p-1">
-            <img src="/notifications.svg" alt="" />
-          </div>
-          <div className="w-8 h-8 bg-zinc-100/95 rounded-lg flex justify-center items-center p-1">
-            <img src="/config.svg" alt="" />
-          </div>
-          <div className="w-12 h-12 relative">
-            <div className="w-12 h-12 bg-zinc-700 rounded-full" />
-            <img
-              className="w-12 h-12 absolute top-0 left-0 rounded-full"
-              src="/perfil.jpg"
-              alt="Avatar"
-            />
-          </div>
-        </div>
-      </header>
+      <SidebarInset>
+        <main className="min-h-screen bg-background text-foreground">
+          {/* Conteúdo principal */}
+          <div className="flex-1 p-4 lg:p-8 mx-auto space-y-6 pb-20">
+            {/* Header com Toggle de Tema */}
+            <SidebarTrigger className="-ml-1" />
 
-      {/* Main Content */}
-      <div className="h-[calc(812px-5rem-4.5rem)] overflow-y-auto p-5 space-y-6">
-        {/* Humor Card */}
-        <section className="w-full h-28 bg-sky-950 rounded-lg p-4 relative">
-          <div className="flex flex-col">
-            <h2 className="text-white text-4xl font-medium font-['Poppins'] leading-9">
-              Como está o seu <span className="text-yellow-400 font-bold text-4xl font-['Poppins'] leading-9">humor</span> hoje?
-            </h2>
-          </div>
-          <div className="absolute right-12 bottom-6 w-9 h-9 shadow-[0_0_20px_4px_rgba(211,25,148,0.1)]">
-            <img src="/emoji-happy.png" className="w-9 h-9" />
-          </div>
-        </section>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-4">
-          <section className="h-32 bg-sky-950 rounded-lg p-4 flex flex-col justify-between">
-            <h3 className="text-white text-5xl font-medium text-center">7</h3>
-            <p className="text-white text-base font-medium text-center">Avaliações</p>
-          </section>
-          <section className="h-32 bg-sky-950 rounded-lg p-4 flex flex-col justify-between">
-            <h3 className="text-white text-5xl font-medium text-center">24</h3>
-            <p className="text-white text-base font-medium text-center">Aulas</p>
-          </section>
-        </div>
-
-        {/* Subject Cards */}
-        <div className="space-y-4">
-          {[
-            { title: "Matemática", subtitle: "Aulas" },
-            { title: "Gramática", subtitle: "Aulas" },
-            { title: "História", subtitle: "Aulas" },
-          ].map((subject, index) => (
-            <section key={index} className="h-28 bg-sky-950 rounded-lg p-4 flex flex-col justify-between">
-              <div className="flex justify-between p-6 items-end">
-                <div>
-                  <p className="text-white text-[10px] font-medium">{subject.subtitle}</p>
-                  <h3 className="text-white text-2xl font-medium">{subject.title}</h3>
-                </div>
-                
-                <img src="/heart.svg" alt="heart" className="w-5 h-5"/>
+            <header className="flex flex-wrap justify-between items-center py-4 px-4 sm:px-4 md:px-8 lg:px-10 xl:px-20">
+              <h1 className="text-3xl font-bold md:text-4xl lg:text-5xl">Dashboard do Aluno</h1>
+              <div className="flex gap-2 md:gap-4 lg:gap-6">
+                <DrawerAvaliacao/>
               </div>
+            </header>
+
+            {/* Grid de Cards */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-sky-700 dark:text-sky-400">
+                    <Smile className="w-5 h-5" />
+                    Humor do Dia
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Você se sente hoje: 😊</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-pink-700 dark:text-pink-400">
+                    <BookOpen className="w-5 h-5" />
+                    Aulas Avaliadas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">3 aulas avaliadas esta semana</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                    <Calendar className="w-5 h-5" />
+                    Próximos Eventos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Nenhum evento nos próximos dias</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+                    <Star className="w-5 h-5" />
+                    Aulas Favoritas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">2 aulas salvas para revisar depois</p>
+                </CardContent>
+              </Card>
             </section>
-          ))}
-        </div>
-      </div>
 
-      {/* Floating Action Button */}
-      <button className="fixed bottom-24 right-4 w-12 h-12 z-50">
-        <div className="w-14 h-14 bg-violet-950 rounded-full shadow-[0px_8px_24px_0px_rgba(130,87,229,0.25)] flex items-center justify-center">
-          <div className="w-7 h-7 relative">
-            <img src="/chat-teardrop-dots-regular-24px.svg" alt="" />
-        </div>
-        </div>
-      </button>
-
-      {/* Footer */}
-      <footer className="fixed bottom-0 w-96 h-18 bg-sky-950">
-        <div className="h-0.5 w-full bg-zinc-700" />
-        <nav className="h-full flex items-center justify-center">
-          <div className="flex gap-6">
-            <img src="/dashboard.svg" alt="" />
-            <img src="/star.svg" alt="" />
-            <img src="/home.svg" alt="" />
-            <img src="/search.svg" alt="" />
-            <img src="/configuration.svg" alt="" />
+            <section className="hidden md:grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+              <GraficoHumor />
+              <CalendarioEventos />
+            </section>
           </div>
-        </nav>
-      </footer>
-    </main>
-  );
+        </main>
+      </SidebarInset>
+
+  )
 }
-  
