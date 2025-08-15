@@ -1,0 +1,377 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-08-15T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_01",
+      "_type": "request",
+      "parentId": "fld_usuarios",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/usuarios",
+      "name": "GET - Listar Usuários",
+      "description": "Lista todos os usuários cadastrados no sistema",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_02",
+      "_type": "request",
+      "parentId": "fld_usuarios",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/usuarios",
+      "name": "POST - Criar Usuário",
+      "description": "Cria um novo usuário no sistema",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Carlos Silva\",\n  \"email\": \"carlos@exemplo.com\",\n  \"role\": \"ALUNO\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_03",
+      "_type": "request",
+      "parentId": "fld_professores",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/professores",
+      "name": "GET - Listar Professores",
+      "description": "Lista todos os professores com paginação",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_04",
+      "_type": "request",
+      "parentId": "fld_professores",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/professores?page=1&limit=5&search=Ana",
+      "name": "GET - Buscar Professores",
+      "description": "Lista professores com filtros de busca",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "5"
+        },
+        {
+          "name": "search",
+          "value": "Ana"
+        }
+      ],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115150,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_05",
+      "_type": "request",
+      "parentId": "fld_professores",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/professores",
+      "name": "POST - Criar Professor",
+      "description": "Cria um novo professor no sistema",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Prof. Ana Costa\",\n  \"email\": \"ana.costa@escola.com\",\n  \"materia\": \"Matemática\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_06",
+      "_type": "request",
+      "parentId": "fld_professores",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/professores/1",
+      "name": "GET - Professor por ID",
+      "description": "Busca professor específico por ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115075,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_07",
+      "_type": "request",
+      "parentId": "fld_professores",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/professores/1",
+      "name": "PUT - Atualizar Professor",
+      "description": "Atualiza dados de um professor",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nome\": \"Prof. Ana Costa Silva\",\n  \"materia\": \"Matemática Avançada\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115050,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_08",
+      "_type": "request",
+      "parentId": "fld_aulas",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/aulas",
+      "name": "GET - Listar Aulas",
+      "description": "Lista todas as aulas com paginação",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_09",
+      "_type": "request",
+      "parentId": "fld_aulas",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/aulas",
+      "name": "POST - Criar Aula",
+      "description": "Cria uma nova aula no sistema",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Álgebra Linear - Introdução\",\n  \"descricao\": \"Conceitos básicos de álgebra linear e matrizes\",\n  \"materia\": \"Matemática\",\n  \"dataHora\": \"2025-08-16T14:00:00.000Z\",\n  \"duracao\": 90,\n  \"professorId\": 1,\n  \"sala\": \"Sala 101\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_10",
+      "_type": "request",
+      "parentId": "fld_aulas",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "url": "{{ _.base_url }}/aulas/1",
+      "name": "GET - Aula por ID",
+      "description": "Busca aula específica por ID",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "{{ _.content_type }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1692115075,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_usuarios",
+      "_type": "request_group",
+      "parentId": "wrk_classcheck",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "name": "👥 Usuários",
+      "description": "Endpoints para gerenciamento de usuários",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1692115200
+    },
+    {
+      "_id": "fld_professores",
+      "_type": "request_group",
+      "parentId": "wrk_classcheck",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "name": "👨‍🏫 Professores",
+      "description": "Endpoints para gerenciamento de professores",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1692115100
+    },
+    {
+      "_id": "fld_aulas",
+      "_type": "request_group",
+      "parentId": "wrk_classcheck",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "name": "📚 Aulas",
+      "description": "Endpoints para gerenciamento de aulas",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1692115000
+    },
+    {
+      "_id": "wrk_classcheck",
+      "_type": "workspace",
+      "parentId": null,
+      "modified": 1692115200,
+      "created": 1692115200,
+      "name": "ClassCheck API",
+      "description": "Collection completa das APIs do projeto ClassCheck",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_classcheck",
+      "_type": "environment",
+      "parentId": "wrk_classcheck",
+      "modified": 1692115200,
+      "created": 1692115200,
+      "name": "ClassCheck - Local",
+      "data": {
+        "base_url": "http://localhost:3000/api",
+        "content_type": "application/json"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "content_type"]
+      },
+      "color": "#3b82f6",
+      "isPrivate": false,
+      "metaSortKey": 1692115200
+    }
+  ]
+}

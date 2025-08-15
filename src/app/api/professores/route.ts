@@ -10,11 +10,11 @@ const createProfessorSchema = z.object({
 })
 
 const querySchema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(10),
-  search: z.string().nullish(),
-  materia: z.string().nullish(),
-  ativo: z.coerce.boolean().nullish()
+  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
+  limit: z.string().optional().transform(val => val ? parseInt(val) : 10),
+  search: z.string().optional(),
+  materia: z.string().optional(),
+  ativo: z.string().optional().transform(val => val === 'true' ? true : val === 'false' ? false : undefined)
 })
 
 export async function GET(request: NextRequest) {

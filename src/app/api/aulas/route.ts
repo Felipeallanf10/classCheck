@@ -16,14 +16,14 @@ const createAulaSchema = z.object({
 })
 
 const querySchema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(10),
-  search: z.string().nullish(),
-  materia: z.string().nullish(),
-  professorId: z.coerce.number().nullish(),
-  status: StatusAula.nullish(),
-  dataInicio: z.string().datetime().nullish(),
-  dataFim: z.string().datetime().nullish()
+  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
+  limit: z.string().optional().transform(val => val ? parseInt(val) : 10),
+  search: z.string().optional(),
+  materia: z.string().optional(),
+  professorId: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  status: z.string().optional(),
+  dataInicio: z.string().optional(),
+  dataFim: z.string().optional()
 })
 
 export async function GET(request: NextRequest) {
