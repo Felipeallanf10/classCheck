@@ -15,32 +15,20 @@ const createAulaSchema = z.object({
   sala: z.string().optional()
 })
 
-const querySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
-  limit: z.string().optional().transform(val => val ? parseInt(val) : 10),
-  search: z.string().optional(),
-  materia: z.string().optional(),
-  professorId: z.string().optional().transform(val => val ? parseInt(val) : undefined),
-  status: z.string().optional(),
-  dataInicio: z.string().optional(),
-  dataFim: z.string().optional()
-})
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const query = querySchema.parse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      search: searchParams.get('search'),
-      materia: searchParams.get('materia'),
-      professorId: searchParams.get('professorId'),
-      status: searchParams.get('status'),
-      dataInicio: searchParams.get('dataInicio'),
-      dataFim: searchParams.get('dataFim')
-    })
+    
+    // Parse manual dos parâmetros
+    const page = parseInt(searchParams.get('page') || '1') || 1
+    const limit = parseInt(searchParams.get('limit') || '10') || 10
+    const search = searchParams.get('search') || undefined
+    const materia = searchParams.get('materia') || undefined
+    const professorId = searchParams.get('professorId') ? parseInt(searchParams.get('professorId')!) : undefined
+    const status = searchParams.get('status') || undefined
+    const dataInicio = searchParams.get('dataInicio') || undefined
+    const dataFim = searchParams.get('dataFim') || undefined
 
-    const { page, limit, search, materia, professorId, status, dataInicio, dataFim } = query
     const skip = (page - 1) * limit
 
     // Construir filtros dinâmicos

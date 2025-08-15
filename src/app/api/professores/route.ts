@@ -9,24 +9,17 @@ const createProfessorSchema = z.object({
   avatar: z.string().url().optional()
 })
 
-const querySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val) : 1),
-  limit: z.string().optional().transform(val => val ? parseInt(val) : 10),
-  search: z.string().optional(),
-  materia: z.string().optional(),
-  ativo: z.string().optional().transform(val => val === 'true' ? true : val === 'false' ? false : undefined)
-})
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const { page, limit, search, materia, ativo } = querySchema.parse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      search: searchParams.get('search'),
-      materia: searchParams.get('materia'),
-      ativo: searchParams.get('ativo')
-    })
+    
+    // Parse manual dos parâmetros
+    const page = parseInt(searchParams.get('page') || '1') || 1
+    const limit = parseInt(searchParams.get('limit') || '10') || 10
+    const search = searchParams.get('search') || undefined
+    const materia = searchParams.get('materia') || undefined
+    const ativoParam = searchParams.get('ativo')
+    const ativo = ativoParam === 'true' ? true : ativoParam === 'false' ? false : undefined
 
     const skip = (page - 1) * limit
 
@@ -88,13 +81,6 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Parâmetros inválidos', details: error.errors },
-        { status: 400 }
-      )
-    }
-
     console.error('Erro ao buscar professores:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
