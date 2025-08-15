@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClassCheck — Relatório Projeto Completo v3.0</title>
+  <meta name="description" content="Relatório completo e interativo do projeto ClassCheck com progresso real, arquitetura implementada e distribuição de tarefas.">
+  <style>
+    :root{
+      --bg: #0a0e1a;
+      --panel: #111827;
+      --soft: #1f2937;
+      --card: #374151;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --brand: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #4b5563;
+      --accent: #8b5cf6;
+      --shadow: 0 10px 25px rgba(0,0,0,.25);
+      --radius: 12px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f8fafc; --panel: #ffffff; --soft: #f1f5f9; --card: #e2e8f0; --text: #0f172a;
+        --muted: #64748b; --brand: #2563eb; --success: #059669; --warning: #d97706; --danger: #dc2626;
+        --border: #cbd5e1; --accent: #7c3aed; --shadow: 0 4px 15px rgba(0,0,0,.1);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font: 14px/1.6 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text); background: linear-gradient(135deg, var(--bg), var(--soft));
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    
+    /* READONLY PROTECTION */
+    input, textarea, select, button[data-action] {
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, var(--panel), var(--card));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: var(--shadow);
+    }
+    .header h1 { font-size: 2.5em; font-weight: 800; margin-bottom: 10px; color: var(--brand); }
+    .header .subtitle { font-size: 1.1em; color: var(--muted); margin-bottom: 20px; }
+    .header .meta { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+    .header .meta div { display: flex; flex-direction: column; align-items: center; }
+    .header .meta strong { color: var(--text); font-size: 1.1em; }
+    .header .meta span { color: var(--muted); font-size: 0.9em; }
+    
+    /* NAVIGATION */
+    .nav-tabs {
+      display: flex; gap: 2px; margin-bottom: 30px; background: var(--soft); 
+      padding: 4px; border-radius: var(--radius); border: 1px solid var(--border);
+    }
+    .nav-tab {
+      flex: 1; padding: 12px 20px; text-align: center; border-radius: 8px;
+      cursor: pointer; transition: all 0.2s; font-weight: 600; color: var(--muted);
+    }
+    .nav-tab.active { background: var(--brand); color: white; }
+    .nav-tab:not(.active):hover { background: var(--card); color: var(--text); }
+    
+    /* CONTENT SECTIONS */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* CARDS */
+    .card {
+      background: linear-gradient(135deg, var(--panel), var(--card));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow);
+    }
+    .card h3 { margin-bottom: 15px; color: var(--brand); font-size: 1.3em; }
+    
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card {
+      background: linear-gradient(135deg, var(--card), var(--soft));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; text-align: center; position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+    }
+    .stat-value { font-size: 2.2em; font-weight: 800; margin: 10px 0; }
+    .stat-label { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.8em; letter-spacing: 0.5px; }
+    .stat-description { color: var(--muted); font-size: 0.9em; margin-top: 8px; }
+    
+    /* PROGRESS BARS */
+    .progress-bar {
+      width: 100%; height: 12px; background: var(--soft); border-radius: 6px;
+      overflow: hidden; position: relative; margin: 10px 0; border: 1px solid var(--border);
+    }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), var(--brand)); transition: width 0.6s ease; }
+    
+    /* PHASE CARDS */
+    .phases-grid { display: grid; gap: 20px; }
+    .phase-card {
+      background: linear-gradient(135deg, var(--panel), var(--card));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+    }
+    .phase-header {
+      padding: 20px; background: linear-gradient(135deg, var(--brand), var(--accent));
+      color: white; display: flex; justify-content: space-between; align-items: center;
+    }
+    .phase-title { font-weight: 700; font-size: 1.2em; }
+    .phase-status { padding: 4px 12px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 0.85em; }
+    .phase-body { padding: 20px; }
+    .phase-description { color: var(--muted); margin-bottom: 15px; line-height: 1.6; }
+    
+    /* TASK LISTS */
+    .task-list { display: grid; gap: 12px; }
+    .task-item {
+      display: flex; align-items: center; gap: 15px; padding: 15px;
+      background: var(--soft); border: 1px solid var(--border); border-radius: 8px;
+      transition: all 0.2s; position: relative;
+    }
+    .task-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .task-checkbox {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: bold; color: white;
+    }
+    .task-checkbox.done { background: var(--success); }
+    .task-checkbox.progress { background: var(--warning); }
+    .task-checkbox.todo { background: var(--muted); }
+    .task-content { flex: 1; }
+    .task-title { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .task-meta { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+    .task-owner { color: var(--muted); font-size: 0.9em; }
+    
+    /* BADGES */
+    .badge {
+      padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .badge.priority-high { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    .badge.priority-medium { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .badge.priority-low { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .badge.tech { background: rgba(59, 130, 246, 0.2); color: var(--brand); }
+    .badge.status { background: rgba(139, 92, 246, 0.2); color: var(--accent); }
+    
+    /* ARCHITECTURE DIAGRAM */
+    .arch-diagram {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+      margin: 20px 0; padding: 20px; background: var(--soft); border-radius: var(--radius);
+    }
+    .arch-layer { text-align: center; padding: 15px; background: var(--panel); border-radius: 8px; border: 1px solid var(--border); }
+    .arch-layer h4 { margin-bottom: 10px; color: var(--brand); }
+    .arch-tech { display: flex; flex-direction: column; gap: 8px; }
+    
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 15px; top: 0; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .timeline-item {
+      position: relative; margin-bottom: 30px; padding: 15px; background: var(--card);
+      border-radius: var(--radius); border: 1px solid var(--border);
+    }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -22px; top: 20px;
+      width: 12px; height: 12px; border-radius: 50%; background: var(--brand); border: 2px solid var(--bg);
+    }
+    .timeline-date { color: var(--brand); font-weight: 600; font-size: 0.9em; }
+    .timeline-title { font-weight: 600; margin: 5px 0; }
+    .timeline-desc { color: var(--muted); font-size: 0.9em; }
+    
+    /* TEAM SECTION */
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .member-card {
+      text-align: center; padding: 25px; background: linear-gradient(135deg, var(--card), var(--soft));
+      border: 1px solid var(--border); border-radius: var(--radius);
+    }
+    .member-avatar {
+      width: 80px; height: 80px; border-radius: 50%; background: var(--brand);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;
+      font-size: 2em; color: white; font-weight: bold;
+    }
+    .member-name { font-weight: 700; font-size: 1.2em; margin-bottom: 8px; }
+    .member-role { color: var(--muted); margin-bottom: 15px; }
+    .member-skills { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-tabs { flex-direction: column; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .arch-diagram { grid-template-columns: 1fr; }
+      .header .meta { flex-direction: column; gap: 15px; }
+    }
+    
+    /* PRINT STYLES */
+    @media print {
+      .nav-tabs { display: none; }
+      .tab-content { display: block !important; }
+      body { background: white; color: black; }
+      .card { break-inside: avoid; }
+    }
+    
+    /* ANIMATIONS */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.6s ease-out; }
+    
+    /* READONLY INDICATORS */
+    .readonly-badge {
+      position: fixed; top: 20px; right: 20px; z-index: 1000;
+      background: var(--danger); color: white; padding: 8px 16px;
+      border-radius: 20px; font-size: 0.8em; font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <div class="readonly-badge">📋 SOMENTE LEITURA</div>
+  
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header fade-in">
+      <h1>🎓 ClassCheck</h1>
+      <p class="subtitle">Sistema de Avaliação e Feedback Educacional</p>
+      <div class="meta">
+        <div><strong>Next.js 15</strong><span>React 19 + TypeScript</span></div>
+        <div><strong>Docker</strong><span>Ambiente Containerizado</span></div>
+        <div><strong>Prisma + MySQL</strong><span>ORM + Banco Relacional</span></div>
+        <div><strong>Atualizado</strong><span id="lastUpdate">15/08/2025</span></div>
+      </div>
+    </div>
+    
+    <!-- NAVIGATION TABS -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-tab="overview">📊 Visão Geral</div>
+      <div class="nav-tab" data-tab="progress">📈 Progresso</div>
+      <div class="nav-tab" data-tab="architecture">🏗️ Arquitetura</div>
+      <div class="nav-tab" data-tab="team">👥 Equipe</div>
+      <div class="nav-tab" data-tab="timeline">📅 Cronograma</div>
+    </div>
+    
+    <!-- TAB: OVERVIEW -->
+    <div class="tab-content active" id="overview">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--success);">85%</div>
+          <div class="stat-label">Fase 1 Completa</div>
+          <div class="stat-description">Infraestrutura + Banco configurado</div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 85%;"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--brand);">6</div>
+          <div class="stat-label">Tabelas Criadas</div>
+          <div class="stat-description">Schema Prisma completo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--warning);">15</div>
+          <div class="stat-label">Páginas Planejadas</div>
+          <div class="stat-description">Interface completa</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" style="color: var(--accent);">3</div>
+          <div class="stat-label">Serviços Docker</div>
+          <div class="stat-description">App + DB + phpMyAdmin</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🎯 Sobre o ClassCheck</h3>
+        <p style="color: var(--muted); line-height: 1.6; margin-bottom: 15px;">
+          Sistema web para avaliação educacional que permite alunos avaliarem aulas e professores, 
+          registrarem humor diário e receberem feedback. Professores acessam relatórios detalhados 
+          e a diretoria visualiza métricas consolidadas através de dashboards interativos.
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <span class="badge tech">PWA Ready</span>
+          <span class="badge tech">Responsive Design</span>
+          <span class="badge tech">Real-time Analytics</span>
+          <span class="badge tech">Multi-role System</span>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🚀 Status Atual - Infraestrutura Completa</h3>
+        <div style="display: grid; gap: 15px;">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--soft); border-radius: 8px;">
+            <div class="task-checkbox done">✓</div>
+            <div><strong>Docker Environment</strong> - Containers funcionando (app:3000, db:3307, phpmyadmin:8080)</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--soft); border-radius: 8px;">
+            <div class="task-checkbox done">✓</div>
+            <div><strong>Prisma ORM</strong> - Schema completo, migrações aplicadas, seed executado</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--soft); border-radius: 8px;">
+            <div class="task-checkbox done">✓</div>
+            <div><strong>API Foundation</strong> - Endpoint /api/usuarios implementado com validação Zod</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--soft); border-radius: 8px;">
+            <div class="task-checkbox done">✓</div>
+            <div><strong>Database Tools</strong> - Prisma Studio (localhost:5555) para gestão visual</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TAB: PROGRESS -->
+    <div class="tab-content" id="progress">
+      <div class="phases-grid">
+        <!-- FASE 1 -->
+        <div class="phase-card">
+          <div class="phase-header">
+            <div class="phase-title">Fase 1: Infraestrutura & Banco</div>
+            <div class="phase-status">✅ COMPLETA</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Configuração completa do ambiente Docker com Next.js, MySQL e Prisma ORM. 
+              Schema de banco implementado com 6 tabelas principais e relacionamentos.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 100%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">1.1 Docker Environment Setup</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Completo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Dockerfile multi-stage para Next.js + TypeScript</li>
+                      <li>docker-compose.yml com 3 serviços (app, db, phpmyadmin)</li>
+                      <li>Volumes persistentes para MySQL</li>
+                      <li>Network customizada para isolamento</li>
+                      <li>Health checks para dependências</li>
+                      <li>Hot reload funcionando com volumes</li>
+                      <li>Variáveis de ambiente configuradas</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">1.2 Prisma ORM Configuration</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Completo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Schema.prisma com 6 modelos principais</li>
+                      <li>Relacionamentos entre tabelas (1:N, N:N)</li>
+                      <li>Enums para TipoHumor, Role, StatusAula</li>
+                      <li>Índices únicos e constraints</li>
+                      <li>Configuração do cliente Prisma</li>
+                      <li>Conexão com MySQL via DATABASE_URL</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">1.3 Database Migration & Seed</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge status">Completo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Migração inicial com todas as tabelas</li>
+                      <li>Seed script com dados de exemplo</li>
+                      <li>Usuários de teste (alunos, professores)</li>
+                      <li>Aulas de exemplo com avaliações</li>
+                      <li>Registros de humor históricos</li>
+                      <li>Eventos de calendário</li>
+                      <li>Prisma Studio configurado (porta 5555)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">1.4 Development Tools Setup</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge status">Completo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>phpMyAdmin (localhost:8080)</li>
+                      <li>Scripts npm para banco (generate, migrate, studio)</li>
+                      <li>Credenciais de acesso documentadas</li>
+                      <li>Documentação PROXIMOS_PASSOS.md</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 2 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--warning), #f59e0b);">
+            <div class="phase-title">Fase 2: APIs REST & Backend</div>
+            <div class="phase-status">🚧 EM ANDAMENTO (25%)</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Implementação completa das APIs REST para todas as entidades do sistema com validação, autenticação e testes.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 25%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">2.1 API Base & Usuários</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Completo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>GET /api/usuarios - Listar usuários</li>
+                      <li>POST /api/usuarios - Criar usuário</li>
+                      <li>Validação Zod para campos obrigatórios</li>
+                      <li>Error handling padronizado</li>
+                      <li>Cliente Prisma integrado</li>
+                    </ul>
+                  </div>
+                  <div style="margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">⏳ Pendentes:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>PUT /api/usuarios/[id] - Atualizar usuário</li>
+                      <li>DELETE /api/usuarios/[id] - Remover usuário</li>
+                      <li>GET /api/usuarios/[id] - Buscar por ID</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.2 API Professores</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Próximo</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>GET /api/professores - Listar professores</li>
+                      <li>POST /api/professores - Criar professor</li>
+                      <li>PUT /api/professores/[id] - Atualizar dados</li>
+                      <li>DELETE /api/professores/[id] - Desativar</li>
+                      <li>GET /api/professores/[id]/aulas - Aulas do professor</li>
+                      <li>Validação Zod específica (matéria, email)</li>
+                      <li>Upload de avatar (opcional)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.3 API Aulas</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>GET /api/aulas - Listar com filtros (data, matéria, professor)</li>
+                      <li>POST /api/aulas - Criar nova aula</li>
+                      <li>PUT /api/aulas/[id] - Atualizar aula</li>
+                      <li>DELETE /api/aulas/[id] - Cancelar aula</li>
+                      <li>GET /api/aulas/[id] - Detalhes + avaliações</li>
+                      <li>POST /api/aulas/[id]/favoritar - Favoritar aula</li>
+                      <li>Validação de conflitos de horário</li>
+                      <li>Status management (AGENDADA → EM_ANDAMENTO → CONCLUIDA)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.4 API Avaliações</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>POST /api/avaliacoes - Criar avaliação (humor + nota + feedback)</li>
+                      <li>GET /api/avaliacoes - Listar com filtros</li>
+                      <li>PUT /api/avaliacoes/[id] - Editar avaliação</li>
+                      <li>GET /api/avaliacoes/usuario/[id] - Histórico do usuário</li>
+                      <li>GET /api/avaliacoes/aula/[id] - Avaliações da aula</li>
+                      <li>GET /api/avaliacoes/stats - Agregações para relatórios</li>
+                      <li>Validação: uma avaliação por usuário/aula</li>
+                      <li>Campos: humor (enum), nota (1-5), feedback (text)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.5 API Humor & Bem-estar</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>POST /api/humor - Registrar humor diário</li>
+                      <li>GET /api/humor/usuario/[id] - Histórico do usuário</li>
+                      <li>GET /api/humor/dashboard - Dados para gráficos</li>
+                      <li>GET /api/humor/trends - Tendências por período</li>
+                      <li>PUT /api/humor/[id] - Editar registro</li>
+                      <li>Validação: um registro por usuário/dia</li>
+                      <li>Agregações por turma, período</li>
+                      <li>Alertas para humor muito baixo</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.6 API Eventos & Calendário</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>GET /api/eventos - Listar eventos por período</li>
+                      <li>POST /api/eventos - Criar evento</li>
+                      <li>PUT /api/eventos/[id] - Atualizar evento</li>
+                      <li>DELETE /api/eventos/[id] - Remover evento</li>
+                      <li>GET /api/calendario - View completa do mês</li>
+                      <li>Tipos: AULA, PROVA, EVENTO, FERIADO, REUNIAO</li>
+                      <li>Integração com aulas automáticas</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 3 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--muted), #6b7280);">
+            <div class="phase-title">Fase 3: Frontend & Interface</div>
+            <div class="phase-status">⏳ AGUARDANDO</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Desenvolvimento completo das 15 páginas principais com componentes reutilizáveis, integração com APIs e experiência do usuário otimizada.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 10%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox progress">⚡</div>
+                <div class="task-content">
+                  <div class="task-title">3.1 Design System & Componentes Base</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Ambos</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">shadcn/ui</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(245, 158, 11, 0.1); border-radius: 6px; border-left: 4px solid var(--warning);">
+                    <strong style="color: var(--warning);">⚡ Em Progresso:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Header com navegação e perfil</li>
+                      <li>Sidebar responsiva</li>
+                      <li>Footer informativo</li>
+                    </ul>
+                  </div>
+                  <div style="margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Pendentes:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Tokens de design (cores, espaçamentos, tipografia)</li>
+                      <li>Componente Card reutilizável</li>
+                      <li>Botões com variants (primary, secondary, danger)</li>
+                      <li>Inputs com validação visual</li>
+                      <li>Modais e Drawers</li>
+                      <li>Loading states e Skeletons</li>
+                      <li>Toast notifications</li>
+                      <li>Theme provider (dark/light mode)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.2 Páginas de Autenticação</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">React Hook Form</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>/login - Formulário com email/senha</li>
+                      <li>/cadastro - Registro com validação</li>
+                      <li>Validação em tempo real com Zod</li>
+                      <li>Error states e feedback visual</li>
+                      <li>Loading states durante submit</li>
+                      <li>Redirecionamento pós-login</li>
+                      <li>Recuperação de senha (link)</li>
+                      <li>Responsividade mobile-first</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.3 Home & Landing Page</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Hero Section</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Hero section com CTAs</li>
+                      <li>Seção de features principais</li>
+                      <li>Depoimentos/testimonials</li>
+                      <li>FAQ expandível</li>
+                      <li>Links para login/cadastro</li>
+                      <li>Seção "Como funciona"</li>
+                      <li>Footer com contatos</li>
+                      <li>Otimização SEO básica</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.4 Páginas de Avaliação (Core)</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">Forms + Charts</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>/avaliacoes - Lista de aulas para avaliar</li>
+                      <li>/avaliacoes/[id] - Formulário de avaliação</li>
+                      <li>Escala Likert (1-5 estrelas) para nota</li>
+                      <li>Seletor de humor com emojis</li>
+                      <li>Campo de feedback/comentários</li>
+                      <li>Preview antes de submeter</li>
+                      <li>Confirmação de envio</li>
+                      <li>Histórico de avaliações feitas</li>
+                      <li>Filtros por data/matéria</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.5 Questionários Socioemocionais</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Multi-step Form</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>/questionarios - Dashboard dos questionários</li>
+                      <li>Questionário de humor diário</li>
+                      <li>Questionário de bem-estar semanal</li>
+                      <li>Progress bar multi-step</li>
+                      <li>Validação por etapa</li>
+                      <li>Save draft (rascunho)</li>
+                      <li>Visualização de respostas anteriores</li>
+                      <li>Gráfico de evolução pessoal</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.6 Dashboard & Relatórios</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Recharts</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>/dashboard - Overview geral (KPIs)</li>
+                      <li>/relatorios - Relatórios para professores</li>
+                      <li>/admin - Dashboard da diretoria</li>
+                      <li>Gráficos: humor por período, notas por aula</li>
+                      <li>Filtros dinâmicos (data, turma, matéria)</li>
+                      <li>Exportação em PDF/Excel</li>
+                      <li>Comparações por professor/turma</li>
+                      <li>Métricas de engajamento</li>
+                      <li>Alertas para indicadores baixos</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.7 Páginas de Suporte</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge tech">Static Content</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>/perfil - Configurações do usuário</li>
+                      <li>/historico - Histórico de atividades</li>
+                      <li>/notificacoes - Central de notificações</li>
+                      <li>/ajuda - FAQ e suporte</li>
+                      <li>/configuracoes - Settings do sistema</li>
+                      <li>Páginas de erro (404, 500)</li>
+                      <li>Política de privacidade</li>
+                      <li>Termos de uso</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 4 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--muted), #6b7280);">
+            <div class="phase-title">Fase 4: Autenticação & Segurança</div>
+            <div class="phase-status">⏳ FUTURO</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Implementação completa de autenticação, autorização por roles, segurança e middleware de proteção de rotas.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">4.1 NextAuth Configuration</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">NextAuth</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Configuração NextAuth com Prisma adapter</li>
+                      <li>Provider de credenciais (email/senha)</li>
+                      <li>JWT strategy para sessões</li>
+                      <li>Callbacks personalizados (jwt, session)</li>
+                      <li>Pages customizadas (/login, /register)</li>
+                      <li>Environment variables de produção</li>
+                      <li>Hash de senhas com bcrypt</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">4.2 Role-based Access Control</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">Middleware</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Middleware de autenticação</li>
+                      <li>Guards por role (ALUNO, PROFESSOR, ADMIN)</li>
+                      <li>Proteção de rotas API</li>
+                      <li>Proteção de páginas frontend</li>
+                      <li>Redirecionamentos baseados em role</li>
+                      <li>Componente de autorização reutilizável</li>
+                      <li>Hook useAuth personalizado</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">4.3 Security & Validation</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Security</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Rate limiting nas APIs</li>
+                      <li>Sanitização de inputs</li>
+                      <li>Validação server-side obrigatória</li>
+                      <li>Headers de segurança (CORS, CSP)</li>
+                      <li>Logs de segurança</li>
+                      <li>Detecção de tentativas de ataque</li>
+                      <li>Backup e recovery de sessões</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 5 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--muted), #6b7280);">
+            <div class="phase-title">Fase 5: Testes, Qualidade & Performance</div>
+            <div class="phase-status">⏳ FUTURO</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Cobertura completa de testes automatizados, otimizações de performance, acessibilidade e qualidade de código.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">5.1 Testes Unitários</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Ambos</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Jest + RTL</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Setup Jest + React Testing Library</li>
+                      <li>Testes de validadores Zod</li>
+                      <li>Testes de utils e helpers</li>
+                      <li>Testes de componentes básicos</li>
+                      <li>Mocks das APIs</li>
+                      <li>Coverage mínimo de 70%</li>
+                      <li>CI integrado com testes</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">5.2 Testes E2E</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">Playwright</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Setup Playwright</li>
+                      <li>Fluxo completo: Login → Avaliação → Logout</li>
+                      <li>Teste por role (Aluno, Professor, Admin)</li>
+                      <li>Testes de formulários críticos</li>
+                      <li>Testes de responsividade</li>
+                      <li>Testes de performance básica</li>
+                      <li>Screenshots em falhas</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">5.3 Qualidade & Performance</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Lighthouse</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Acessibilidade WCAG 2.1 AA</li>
+                      <li>Performance audit com Lighthouse</li>
+                      <li>SEO básico (meta tags, sitemap)</li>
+                      <li>Otimização de imagens</li>
+                      <li>Code splitting automático</li>
+                      <li>Lazy loading de componentes</li>
+                      <li>Bundle analyzer</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 6 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--muted), #6b7280);">
+            <div class="phase-title">Fase 6: Deploy & Produção</div>
+            <div class="phase-status">⏳ FUTURO</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              Deploy em produção, configuração de infraestrutura, monitoramento e observabilidade do sistema em funcionamento.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">6.1 Deploy & Infrastructure</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge tech">Vercel</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Deploy na Vercel com domínio customizado</li>
+                      <li>Configuração de environment variables</li>
+                      <li>Database em produção (PlanetScale/Neon)</li>
+                      <li>CDN para assets estáticos</li>
+                      <li>SSL certificates</li>
+                      <li>Preview deployments para PRs</li>
+                      <li>Rollback strategy</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">6.2 Monitoring & Observability</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge tech">Analytics</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Error tracking (Sentry)</li>
+                      <li>Analytics básico (Vercel Analytics)</li>
+                      <li>Logs estruturados</li>
+                      <li>Health checks</li>
+                      <li>Alertas para indisponibilidade</li>
+                      <li>Métricas de uso</li>
+                      <li>Backup automático de dados</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">6.3 Documentation & Handover</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Ambos</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge tech">Docs</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>README completo para desenvolvedores</li>
+                      <li>Documentação de APIs (Swagger)</li>
+                      <li>Manual do usuário</li>
+                      <li>Guia de troubleshooting</li>
+                      <li>Procedimentos de manutenção</li>
+                      <li>Release notes</li>
+                      <li>Treinamento para equipe</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TAB: ARCHITECTURE -->
+    <div class="tab-content" id="architecture">
+      <div class="card">
+        <h3>🏗️ Arquitetura do Sistema</h3>
+        <div class="arch-diagram">
+          <div class="arch-layer">
+            <h4>Frontend</h4>
+            <div class="arch-tech">
+              <span class="badge tech">Next.js 15</span>
+              <span class="badge tech">React 19</span>
+              <span class="badge tech">TypeScript</span>
+              <span class="badge tech">Tailwind CSS</span>
+              <span class="badge tech">shadcn/ui</span>
+            </div>
+          </div>
+          <div class="arch-layer">
+            <h4>Backend</h4>
+            <div class="arch-tech">
+              <span class="badge tech">API Routes</span>
+              <span class="badge tech">Prisma ORM</span>
+              <span class="badge tech">Zod Validation</span>
+              <span class="badge tech">NextAuth</span>
+              <span class="badge tech">Middleware</span>
+            </div>
+          </div>
+          <div class="arch-layer">
+            <h4>Database</h4>
+            <div class="arch-tech">
+              <span class="badge tech">MySQL 8.0</span>
+              <span class="badge tech">Docker</span>
+              <span class="badge tech">Prisma Studio</span>
+              <span class="badge tech">phpMyAdmin</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>📊 Modelos de Dados</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">👤 Usuario</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • id, email, nome, avatar<br>
+              • role: ALUNO/PROFESSOR/ADMIN<br>
+              • Relacionado: avaliacoes, humor
+            </div>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">👨‍🏫 Professor</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • id, nome, email, materia<br>
+              • avatar, ativo<br>
+              • Relacionado: aulas
+            </div>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">📚 Aula</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • título, descrição, materia<br>
+              • dataHora, duração, sala<br>
+              • status, professorId
+            </div>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">⭐ Avaliacao</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • usuarioId, aulaId<br>
+              • humor, nota (1-5), feedback<br>
+              • Unique: usuario + aula
+            </div>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">😊 HumorRegistro</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • usuarioId, humor, data<br>
+              • observação<br>
+              • Unique: usuario + data
+            </div>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+            <h4 style="color: var(--brand); margin-bottom: 10px;">📅 Evento</h4>
+            <div style="font-size: 0.9em; color: var(--muted);">
+              • título, descrição<br>
+              • dataInicio, dataFim, cor<br>
+              • tipo: AULA/PROVA/EVENTO
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🐳 Configuração Docker</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; text-align: center;">
+            <h4 style="color: var(--brand);">App Container</h4>
+            <div style="color: var(--muted); font-size: 0.9em; margin: 10px 0;">
+              Node.js 20 Alpine<br>
+              Next.js dev server<br>
+              Hot reload enabled
+            </div>
+            <span class="badge status">localhost:3000</span>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; text-align: center;">
+            <h4 style="color: var(--brand);">Database</h4>
+            <div style="color: var(--muted); font-size: 0.9em; margin: 10px 0;">
+              MySQL 8.0<br>
+              Persistent volumes<br>
+              Health checks
+            </div>
+            <span class="badge status">localhost:3307</span>
+          </div>
+          <div style="background: var(--soft); padding: 15px; border-radius: 8px; text-align: center;">
+            <h4 style="color: var(--brand);">phpMyAdmin</h4>
+            <div style="color: var(--muted); font-size: 0.9em; margin: 10px 0;">
+              Web interface<br>
+              Database management<br>
+              Easy administration
+            </div>
+            <span class="badge status">localhost:8080</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TAB: TEAM -->
+    <div class="tab-content" id="team">
+      <div class="team-grid">
+        <div class="member-card">
+          <div class="member-avatar">F</div>
+          <div class="member-name">Felipe Allan Nascimento Cruz</div>
+          <div class="member-role">Full Stack Developer • Tech Lead</div>
+          <div class="member-skills">
+            <span class="badge tech">Next.js</span>
+            <span class="badge tech">TypeScript</span>
+            <span class="badge tech">Docker</span>
+            <span class="badge tech">Prisma</span>
+            <span class="badge tech">API Design</span>
+          </div>
+          <div style="margin-top: 15px; padding: 15px; background: var(--soft); border-radius: 8px; text-align: left;">
+            <strong style="color: var(--brand);">Responsabilidades:</strong>
+            <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted);">
+              <li>Arquitetura do sistema</li>
+              <li>Configuração Docker + Prisma</li>
+              <li>APIs backend</li>
+              <li>Páginas de avaliação</li>
+              <li>Integração banco de dados</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="member-card">
+          <div class="member-avatar">N</div>
+          <div class="member-name">Nickollas Teixeira Medeiros</div>
+          <div class="member-role">Frontend Developer • UI/UX</div>
+          <div class="member-skills">
+            <span class="badge tech">React</span>
+            <span class="badge tech">Tailwind</span>
+            <span class="badge tech">shadcn/ui</span>
+            <span class="badge tech">Figma</span>
+            <span class="badge tech">Git Flow</span>
+          </div>
+          <div style="margin-top: 15px; padding: 15px; background: var(--soft); border-radius: 8px; text-align: left;">
+            <strong style="color: var(--brand);">Responsabilidades:</strong>
+            <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted);">
+              <li>Design system e componentes</li>
+              <li>Interfaces de usuário</li>
+              <li>Dashboards e relatórios</li>
+              <li>Fluxo Git e documentação</li>
+              <li>Testes E2E</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🤝 Metodologia de Trabalho</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          <div>
+            <h4 style="color: var(--brand); margin-bottom: 10px;">📋 Gestão de Tarefas</h4>
+            <ul style="color: var(--muted); line-height: 1.6;">
+              <li>GitHub Issues para tracking</li>
+              <li>Priorização por impacto</li>
+              <li>Estimativas em horas</li>
+              <li>Review de código obrigatório</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: var(--brand); margin-bottom: 10px;">🌿 Git Flow</h4>
+            <ul style="color: var(--muted); line-height: 1.6;">
+              <li>Branch main para produção</li>
+              <li>Feature branches por funcionalidade</li>
+              <li>Pull requests com template</li>
+              <li>CI/CD com GitHub Actions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TAB: TIMELINE -->
+    <div class="tab-content" id="timeline">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">15/08/2025</div>
+          <div class="timeline-title">🚀 Infraestrutura Completa</div>
+          <div class="timeline-desc">
+            Docker environment configurado, Prisma schema implementado, 
+            banco de dados migrado com seed de dados de exemplo.
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-date">16-20/08/2025</div>
+          <div class="timeline-title">🔗 Fase 2: APIs REST</div>
+          <div class="timeline-desc">
+            Implementação das APIs para aulas, avaliações e humor. 
+            Validação com Zod e testes básicos.
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-date">21-30/08/2025</div>
+          <div class="timeline-title">🎨 Fase 3: Frontend</div>
+          <div class="timeline-desc">
+            Desenvolvimento das páginas principais com shadcn/ui. 
+            Integração com APIs e responsividade.
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-date">01-10/09/2025</div>
+          <div class="timeline-title">🔐 Fase 4: Autenticação</div>
+          <div class="timeline-desc">
+            NextAuth setup, controle de permissões por role, 
+            middleware de proteção de rotas.
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-date">11-20/09/2025</div>
+          <div class="timeline-title">✅ Fase 5: Testes & QA</div>
+          <div class="timeline-desc">
+            Testes unitários, E2E com Playwright, 
+            acessibilidade e otimizações de performance.
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-date">21-30/09/2025</div>
+          <div class="timeline-title">🌐 Fase 6: Deploy</div>
+          <div class="timeline-desc">
+            Deploy na Vercel, configuração de banco gerenciado, 
+            monitoramento e release 1.0.
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>🎯 Próximos Passos Imediatos - Semana Atual</h3>
+        <div class="task-list">
+          <div class="task-item">
+            <div class="task-checkbox progress">⚡</div>
+            <div class="task-content">
+              <div class="task-title">2.2 API Professores - CRUD Completo</div>
+              <div class="task-meta">
+                <div class="task-owner">Nickollas</div>
+                <span class="badge priority-high">Alta Prioridade</span>
+                <span class="badge tech">Estimativa: 8h</span>
+              </div>
+              <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                <strong style="color: var(--danger);">📋 Checklist Detalhado:</strong>
+                <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                  <li>[ ] Criar arquivo /src/app/api/professores/route.ts</li>
+                  <li>[ ] Implementar GET - listar professores ativos</li>
+                  <li>[ ] Implementar POST - criar professor com validação Zod</li>
+                  <li>[ ] Criar /src/app/api/professores/[id]/route.ts</li>
+                  <li>[ ] Implementar GET [id] - buscar professor específico</li>
+                  <li>[ ] Implementar PUT [id] - atualizar dados</li>
+                  <li>[ ] Implementar DELETE [id] - desativar professor</li>
+                  <li>[ ] Criar schema Zod para validação de professor</li>
+                  <li>[ ] Endpoint GET /api/professores/[id]/aulas</li>
+                  <li>[ ] Testes básicos com Postman/curl</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="task-item">
+            <div class="task-checkbox progress">⚡</div>
+            <div class="task-content">
+              <div class="task-title">2.3 API Aulas - Sistema Core</div>
+              <div class="task-meta">
+                <div class="task-owner">Felipe</div>
+                <span class="badge priority-high">Alta Prioridade</span>
+                <span class="badge tech">Estimativa: 12h</span>
+              </div>
+              <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                <strong style="color: var(--danger);">📋 Checklist Detalhado:</strong>
+                <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                  <li>[ ] Criar /src/app/api/aulas/route.ts</li>
+                  <li>[ ] GET com query params (data, professor, materia, status)</li>
+                  <li>[ ] POST com validação de conflitos de horário</li>
+                  <li>[ ] Schema Zod para criação/atualização de aula</li>
+                  <li>[ ] Criar /src/app/api/aulas/[id]/route.ts</li>
+                  <li>[ ] GET [id] com detalhes + avaliações relacionadas</li>
+                  <li>[ ] PUT [id] - atualizar aula</li>
+                  <li>[ ] DELETE [id] - cancelar aula (status CANCELADA)</li>
+                  <li>[ ] Endpoint POST /api/aulas/[id]/favoritar</li>
+                  <li>[ ] Lógica de status (AGENDADA → EM_ANDAMENTO → CONCLUIDA)</li>
+                  <li>[ ] Validação de datas (não permitir aulas no passado)</li>
+                  <li>[ ] Include de professor nas responses</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="task-item">
+            <div class="task-checkbox todo">📋</div>
+            <div class="task-content">
+              <div class="task-title">1.5 Completar API Usuários</div>
+              <div class="task-meta">
+                <div class="task-owner">Felipe</div>
+                <span class="badge priority-medium">Média Prioridade</span>
+                <span class="badge tech">Estimativa: 4h</span>
+              </div>
+              <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                <strong style="color: var(--danger);">📋 Checklist Detalhado:</strong>
+                <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                  <li>[ ] Criar /src/app/api/usuarios/[id]/route.ts</li>
+                  <li>[ ] Implementar GET [id] - buscar usuário por ID</li>
+                  <li>[ ] Implementar PUT [id] - atualizar dados do usuário</li>
+                  <li>[ ] Implementar DELETE [id] - desativar usuário</li>
+                  <li>[ ] Validação: não permitir editar email existente</li>
+                  <li>[ ] Endpoint GET /api/usuarios/[id]/avaliacoes</li>
+                  <li>[ ] Endpoint GET /api/usuarios/[id]/humor</li>
+                  <li>[ ] Error handling aprimorado</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="task-item">
+            <div class="task-checkbox todo">📋</div>
+            <div class="task-content">
+              <div class="task-title">3.1 Setup Base do Frontend</div>
+              <div class="task-meta">
+                <div class="task-owner">Ambos</div>
+                <span class="badge priority-medium">Média Prioridade</span>
+                <span class="badge tech">Estimativa: 6h</span>
+              </div>
+              <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                <strong style="color: var(--danger);">📋 Checklist Detalhado:</strong>
+                <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                  <li>[ ] Limpar componentes exemplo (page.tsx, layout.tsx)</li>
+                  <li>[ ] Configurar theme provider (dark/light mode)</li>
+                  <li>[ ] Criar component Layout base</li>
+                  <li>[ ] Header com logo e navegação</li>
+                  <li>[ ] Sidebar com menu baseado em role</li>
+                  <li>[ ] Footer simples</li>
+                  <li>[ ] Loading states globais</li>
+                  <li>[ ] Error boundaries</li>
+                  <li>[ ] Toast provider (sonner ou similar)</li>
+                  <li>[ ] Configurar axios/fetch para APIs</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>📅 Roadmap Próximas 2 Semanas</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">16-18/08/2025</div>
+            <div class="timeline-title">🔗 APIs Críticas</div>
+            <div class="timeline-desc">
+              Finalizar APIs de Professores e Aulas. Completar CRUD de Usuários. 
+              Testar integrações básicas.
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">19-22/08/2025</div>
+            <div class="timeline-title">⭐ API Avaliações</div>
+            <div class="timeline-desc">
+              Implementar sistema de avaliações com humor, notas e feedback. 
+              Agregações para relatórios.
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">23-25/08/2025</div>
+            <div class="timeline-title">😊 API Humor + Eventos</div>
+            <div class="timeline-desc">
+              Sistema de registro de humor diário. 
+              API de eventos e calendário.
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">26-30/08/2025</div>
+            <div class="timeline-title">🎨 Frontend Sprint 1</div>
+            <div class="timeline-desc">
+              Componentes base, layout, páginas de autenticação e 
+              primeira integração com APIs.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // READONLY MODE - Disable all interactive elements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab navigation
+      const tabs = document.querySelectorAll('.nav-tab');
+      const contents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const targetTab = tab.dataset.tab;
+          
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          document.getElementById(targetTab).classList.add('active');
+        });
+      });
+      
+      // Update last update date
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('pt-BR');
+      
+      // Add fade-in animation to cards
+      const cards = document.querySelectorAll('.card, .phase-card, .stat-card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('fade-in');
+        }, index * 100);
+      });
+      
+      // Disable all form elements
+      const formElements = document.querySelectorAll('input, textarea, select, button[data-action]');
+      formElements.forEach(el => {
+        el.disabled = true;
+        el.style.pointerEvents = 'none';
+        el.style.userSelect = 'none';
+      });
+      
+      console.log('%c🔒 ClassCheck Relatório - Modo Somente Leitura Ativo', 'color: #ef4444; font-weight: bold; font-size: 16px;');
+      console.log('Este relatório é somente para visualização. Para editar, acesse o código fonte.');
+    });
+  </script>
+</body>
+</html>
