@@ -448,177 +448,8 @@
         
         <!-- FASE 2 -->
         <div class="phase-card">
-          <div class="phase-header" style="background: linear-gradient(135deg, var(--success), #10b981);">
-            <div class="phase-title">Fase 2: APIs REST & Backend</div>
-            <div class="phase-status">� EM ANDAMENTO (75%)</div>
-          </div>
-          <div class="phase-body">
-            <div class="phase-description">
-              Implementação completa das APIs REST para todas as entidades do sistema com validação, autenticação e testes.
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
-            <div class="task-list">
-              <div class="task-item">
-                <div class="task-checkbox done">✓</div>
-                <div class="task-content">
-                  <div class="task-title">2.1 API Base & Usuários</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Felipe</div>
-                    <span class="badge priority-high">Alta Prioridade</span>
-                    <span class="badge status">Completo</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
-                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>GET /api/usuarios - Listar usuários</li>
-                      <li>POST /api/usuarios - Criar usuário</li>
-                      <li>Validação Zod para campos obrigatórios</li>
-                      <li>Error handling padronizado</li>
-                      <li>Cliente Prisma integrado</li>
-                    </ul>
-                  </div>
-                  <div style="margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">⏳ Pendentes:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>PUT /api/usuarios/[id] - Atualizar usuário</li>
-                      <li>DELETE /api/usuarios/[id] - Remover usuário</li>
-                      <li>GET /api/usuarios/[id] - Buscar por ID</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox done">✅</div>
-                <div class="task-content">
-                  <div class="task-title">2.2 API Professores</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Nickollas</div>
-                    <span class="badge priority-high">Alta Prioridade</span>
-                    <span class="badge status-done">Concluído</span>
-                  </div>
-                  <div style="margin-top: 8px; padding: 10px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
-                    <strong style="color: var(--success);">✅ Funcionalidades Implementadas:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>✅ GET /api/professores - Listar com paginação e filtros</li>
-                      <li>✅ POST /api/professores - Criar com validação de email</li>
-                      <li>✅ PUT /api/professores/[id] - Atualizar dados completos</li>
-                      <li>✅ DELETE /api/professores/[id] - Remover com validação</li>
-                      <li>✅ GET /api/professores/[id] - Buscar com aulas relacionadas</li>
-                      <li>✅ Validação completa de matéria e email único</li>
-                      <li>⏳ Upload de avatar (planejado para Fase 3)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox done">✅</div>
-                <div class="task-content">
-                  <div class="task-title">2.3 API Aulas</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Felipe</div>
-                    <span class="badge priority-high">Alta Prioridade</span>
-                    <span class="badge status-done">Concluído</span>
-                  </div>
-                  <div style="margin-top: 8px; padding: 10px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
-                    <strong style="color: var(--success);">✅ Funcionalidades Implementadas:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>✅ GET /api/aulas - Listar com filtros avançados (data, matéria, professor)</li>
-                      <li>✅ POST /api/aulas - Criar com validação de conflitos</li>
-                      <li>✅ PUT /api/aulas/[id] - Atualizar com verificações</li>
-                      <li>✅ DELETE /api/aulas/[id] - Remover aula</li>
-                      <li>✅ GET /api/aulas/[id] - Detalhes completos + avaliações</li>
-                      <li>✅ Validação completa de conflitos de horário</li>
-                      <li>✅ Relacionamentos com professor e avaliações</li>
-                      <li>⏳ POST /api/aulas/[id]/favoritar (planejado)</li>
-                      <li>⏳ Status management automático (planejado)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
-                <div class="task-content">
-                  <div class="task-title">2.4 API Avaliações</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Felipe</div>
-                    <span class="badge priority-high">Alta Prioridade</span>
-                    <span class="badge status">Próximo</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>POST /api/avaliacoes - Criar avaliação (humor + nota + feedback)</li>
-                      <li>GET /api/avaliacoes - Listar com filtros</li>
-                      <li>PUT /api/avaliacoes/[id] - Editar avaliação</li>
-                      <li>GET /api/avaliacoes/usuario/[id] - Histórico do usuário</li>
-                      <li>GET /api/avaliacoes/aula/[id] - Avaliações da aula</li>
-                      <li>GET /api/avaliacoes/stats - Agregações para relatórios</li>
-                      <li>Validação: uma avaliação por usuário/aula</li>
-                      <li>Campos: humor (enum), nota (1-5), feedback (text)</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
-                <div class="task-content">
-                  <div class="task-title">2.5 API Humor & Bem-estar</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Nickollas</div>
-                    <span class="badge priority-medium">Média Prioridade</span>
-                    <span class="badge status">Planejado</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>POST /api/humor - Registrar humor diário</li>
-                      <li>GET /api/humor/usuario/[id] - Histórico do usuário</li>
-                      <li>GET /api/humor/dashboard - Dados para gráficos</li>
-                      <li>GET /api/humor/trends - Tendências por período</li>
-                      <li>PUT /api/humor/[id] - Editar registro</li>
-                      <li>Validação: um registro por usuário/dia</li>
-                      <li>Agregações por turma, período</li>
-                      <li>Alertas para humor muito baixo</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
-                <div class="task-content">
-                  <div class="task-title">2.6 API Eventos & Calendário</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Nickollas</div>
-                    <span class="badge priority-low">Baixa Prioridade</span>
-                    <span class="badge status">Planejado</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>GET /api/eventos - Listar eventos por período</li>
-                      <li>POST /api/eventos - Criar evento</li>
-                      <li>PUT /api/eventos/[id] - Atualizar evento</li>
-                      <li>DELETE /api/eventos/[id] - Remover evento</li>
-                      <li>GET /api/calendario - View completa do mês</li>
-                      <li>Tipos: AULA, PROVA, EVENTO, FERIADO, REUNIAO</li>
-                      <li>Integração com aulas automáticas</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- FASE 3 -->
-        <div class="phase-card">
           <div class="phase-header" style="background: linear-gradient(135deg, var(--muted), #6b7280);">
-            <div class="phase-title">Fase 3: Frontend & Interface</div>
+            <div class="phase-title">Fase 2: Frontend & Interface</div>
             <div class="phase-status">⏳ AGUARDANDO</div>
           </div>
           <div class="phase-body">
@@ -630,7 +461,7 @@
               <div class="task-item">
                 <div class="task-checkbox progress">⚡</div>
                 <div class="task-content">
-                  <div class="task-title">3.1 Design System & Componentes Base</div>
+                  <div class="task-title">2.1 Design System & Componentes Base</div>
                   <div class="task-meta">
                     <div class="task-owner">Ambos</div>
                     <span class="badge priority-high">Alta Prioridade</span>
@@ -661,9 +492,205 @@
               </div>
               
               <div class="task-item">
+                <div class="task-checkbox progress">⚡</div>
+                <div class="task-content">
+                  <div class="task-title">2.2 Páginas de Autenticação</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>⏳ Página de Login (/login)</li>
+                      <li>⏳ Página de Cadastro (/cadastro)</li>
+                      <li>⏳ Página de Recuperação de Senha (/reset-password)</li>
+                      <li>⏳ Validação de formulários com Zod</li>
+                      <li>⏳ Estados de loading e erro</li>
+                      <li>⏳ Redirecionamento após autenticação</li>
+                      <li>⏳ Design responsivo mobile-first</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
                 <div class="task-checkbox todo">📋</div>
                 <div class="task-content">
-                  <div class="task-title">3.2 Páginas de Autenticação</div>
+                  <div class="task-title">2.3 Home & Landing Page</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status-done">Concluído</span>
+                  </div>
+                  <div style="margin-top: 8px; padding: 10px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✅ Funcionalidades Implementadas:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>✅ Landing Page principal (/)</li>
+                      <li>✅ Homepage logada (/home)</li>
+                      <li>✅ Componente Hero Section</li>
+                      <li>✅ Seção de Features e benefícios</li>
+                      <li>✅ Header responsivo com navegação</li>
+                      <li>✅ Footer com links úteis</li>
+                      <li>✅ Call-to-action buttons</li>
+                      <li>⏳ Animações e transições (Fase 3)</li>
+                      <li>⏳ Otimização de performance (Fase 3)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.4 Páginas de Avaliação (Core)</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Em aberto</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>⏳ Página de avaliação de aula (/aulas/[id]/avaliar)</li>
+                      <li>⏳ Modal de avaliação rápida</li>
+                      <li>⏳ Formulário com seletor de humor</li>
+                      <li>⏳ Sistema de notas (1-5 estrelas)</li>
+                      <li>⏳ Campo de feedback textual</li>
+                      <li>⏳ Histórico de avaliações (/avaliacoes)</li>
+                      <li>⏳ Cards de avaliação com filtros</li>
+                      <li>⏳ Componente de estatísticas</li>
+                      <li>⏳ Validação de formulários</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.5 Questionários Socioemocionais</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-medium">Média Prioridade</span>
+                    <span class="badge status">Em aberto</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>⏳ Página de registro de humor (/humor)</li>
+                      <li>⏳ Componente seletor de emojis</li>
+                      <li>⏳ Questionários de bem-estar</li>
+                      <li>⏳ Dashboard de histórico pessoal</li>
+                      <li>⏳ Gráficos de tendências emocionais</li>
+                      <li>⏳ Modal de reflexão diária</li>
+                      <li>⏳ Notificações de lembrete</li>
+                      <li>⏳ Relatórios de progresso</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.6 Dashboard & Relatórios</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Nickollas</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>⏳ Dashboard principal (/dashboard)</li>
+                      <li>⏳ Gráficos interativos (Chart.js)</li>
+                      <li>⏳ Cards de estatísticas</li>
+                      <li>⏳ Calendário de eventos</li>
+                      <li>⏳ Filtros por período e turma</li>
+                      <li>⏳ Relatórios em PDF</li>
+                      <li>⏳ Exportação de dados</li>
+                      <li>⏳ Widgets personalizáveis</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">2.7 Páginas de Suporte</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Ambos</div>
+                    <span class="badge priority-low">Baixa Prioridade</span>
+                    <span class="badge status">Planejado</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>Página de Ajuda/FAQ</li>
+                      <li>Página de Contato</li>
+                      <li>Página de Sobre</li>
+                      <li>Política de Privacidade</li>
+                      <li>Termos de Uso</li>
+                      <li>Página de Erro 404</li>
+                      <li>Página de Manutenção</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FASE 3 -->
+        <div class="phase-card">
+          <div class="phase-header" style="background: linear-gradient(135deg, var(--success), #10b981);">
+            <div class="phase-title">Fase 3: APIs REST & Backend</div>
+            <div class="phase-status" style="color: var(--warning);">🟡 EM ANDAMENTO (60%)</div>
+          </div>
+          <div class="phase-body">
+            <div class="phase-description">
+              <strong>Status Atual:</strong> APIs de Usuários, Professores e Aulas concluídas (CRUD). Avaliações, Humor/Bem-estar e Eventos/Calendário pendentes.<br>
+              <strong>Subitens extras</strong> (ex: favoritar aula, upload de avatar, status automático) planejados para fases futuras.
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 60%; background: var(--warning);"></div></div>
+            <div class="task-list">
+              <div class="task-item">
+                <div class="task-checkbox done">✓</div>
+                <div class="task-content">
+                  <div class="task-title">3.1 API Base & Usuários</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status-done">Parcial</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✓ Subitens Completos:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>✅ GET /api/usuarios - Listar usuários</li>
+                      <li>✅ POST /api/usuarios - Criar usuário</li>
+                      <li>✅ Validação Zod para campos obrigatórios</li>
+                      <li>✅ Error handling padronizado</li>
+                      <li>✅ Cliente Prisma integrado</li>
+                    </ul>
+                  </div>
+                  <div style="margin-top: 8px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">⏳ Pendentes:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--danger); font-size: 0.9em;">
+                      <li>⏳ PUT /api/usuarios/[id] - Atualizar usuário</li>
+                      <li>⏳ DELETE /api/usuarios/[id] - Remover usuário</li>
+                      <li>⏳ GET /api/usuarios/[id] - Buscar por ID</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox done">✅</div>
+                <div class="task-content">
+                  <div class="task-title">3.2 API Professores</div>
                   <div class="task-meta">
                     <div class="task-owner">Felipe</div>
                     <span class="badge priority-high">Alta Prioridade</span>
@@ -672,65 +699,39 @@
                   <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
                     <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
                     <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>/login - Formulário com email/senha</li>
-                      <li>/cadastro - Registro com validação</li>
-                      <li>Validação em tempo real com Zod</li>
-                      <li>Error states e feedback visual</li>
-                      <li>Loading states durante submit</li>
-                      <li>Redirecionamento pós-login</li>
-                      <li>Recuperação de senha (link)</li>
-                      <li>Responsividade mobile-first</li>
+                      <li>⏳ GET /api/professores - Listar professores</li>
+                      <li>⏳ POST /api/professores - Criar professor</li>
+                      <li>⏳ PUT /api/professores/[id] - Atualizar dados</li>
+                      <li>⏳ DELETE /api/professores/[id] - Remover professor</li>
+                      <li>⏳ GET /api/professores/[id] - Buscar por ID</li>
+                      <li>⏳ Validação de dados com Zod</li>
+                      <li>⏳ Relacionamentos com aulas</li>
+                      <li>⏳ Filtros por matéria e status</li>
                     </ul>
                   </div>
                 </div>
               </div>
               
               <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
+                <div class="task-checkbox done">✅</div>
                 <div class="task-content">
-                  <div class="task-title">3.3 Home & Landing Page</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Nickollas</div>
-                    <span class="badge priority-medium">Média Prioridade</span>
-                    <span class="badge tech">Hero Section</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>Hero section com CTAs</li>
-                      <li>Seção de features principais</li>
-                      <li>Depoimentos/testimonials</li>
-                      <li>FAQ expandível</li>
-                      <li>Links para login/cadastro</li>
-                      <li>Seção "Como funciona"</li>
-                      <li>Footer com contatos</li>
-                      <li>Otimização SEO básica</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
-                <div class="task-content">
-                  <div class="task-title">3.4 Páginas de Avaliação (Core)</div>
+                  <div class="task-title">3.3 API Aulas</div>
                   <div class="task-meta">
                     <div class="task-owner">Felipe</div>
                     <span class="badge priority-high">Alta Prioridade</span>
-                    <span class="badge tech">Forms + Charts</span>
+                    <span class="badge status-done">Concluído</span>
                   </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid var(--success);">
+                    <strong style="color: var(--success);">✅ Funcionalidades Implementadas:</strong>
                     <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>/avaliacoes - Lista de aulas para avaliar</li>
-                      <li>/avaliacoes/[id] - Formulário de avaliação</li>
-                      <li>Escala Likert (1-5 estrelas) para nota</li>
-                      <li>Seletor de humor com emojis</li>
-                      <li>Campo de feedback/comentários</li>
-                      <li>Preview antes de submeter</li>
-                      <li>Confirmação de envio</li>
-                      <li>Histórico de avaliações feitas</li>
-                      <li>Filtros por data/matéria</li>
+                      <li>✅ GET /api/aulas - Listar com filtros avançados (data, matéria, professor)</li>
+                      <li>✅ POST /api/aulas - Criar com validação de conflitos</li>
+                      <li>✅ PUT /api/aulas/[id] - Atualizar com verificações</li>
+                      <li>✅ DELETE /api/aulas/[id] - Remover aula</li>
+                      <li>✅ GET /api/aulas/[id] - Detalhes completos + avaliações</li>
+                      <li>✅ Validação completa de conflitos de horário</li>
+                      <li>✅ Relacionamentos com professor e avaliações</li>
+                      <li>⏳ POST /api/aulas/[id]/favoritar (Fase 4)</li>
                     </ul>
                   </div>
                 </div>
@@ -739,7 +740,32 @@
               <div class="task-item">
                 <div class="task-checkbox todo">📋</div>
                 <div class="task-content">
-                  <div class="task-title">3.5 Questionários Socioemocionais</div>
+                  <div class="task-title">3.4 API Avaliações</div>
+                  <div class="task-meta">
+                    <div class="task-owner">Felipe</div>
+                    <span class="badge priority-high">Alta Prioridade</span>
+                    <span class="badge status">Em aberto</span>
+                  </div>
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
+                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
+                      <li>⏳ POST /api/avaliacoes - Criar avaliação (humor + nota + feedback)</li>
+                      <li>⏳ GET /api/avaliacoes - Listar com filtros</li>
+                      <li>⏳ PUT /api/avaliacoes/[id] - Editar avaliação</li>
+                      <li>⏳ GET /api/avaliacoes/usuario/[id] - Histórico do usuário</li>
+                      <li>⏳ GET /api/avaliacoes/aula/[id] - Avaliações da aula</li>
+                      <li>⏳ GET /api/avaliacoes/stats - Agregações para relatórios</li>
+                      <li>⏳ Validação: uma avaliação por usuário/aula</li>
+                      <li>⏳ Campos: humor (enum), nota (1-5), feedback (text)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="task-item">
+                <div class="task-checkbox todo">📋</div>
+                <div class="task-content">
+                  <div class="task-title">3.5 API Humor & Bem-estar</div>
                   <div class="task-meta">
                     <div class="task-owner">Felipe</div>
                     <span class="badge priority-medium">Média Prioridade</span>
@@ -748,14 +774,14 @@
                   <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
                     <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
                     <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>/questionarios - Dashboard dos questionários</li>
-                      <li>Questionário de humor diário</li>
-                      <li>Questionário de bem-estar semanal</li>
-                      <li>Progress bar multi-step</li>
-                      <li>Validação por etapa</li>
-                      <li>Save draft (rascunho)</li>
-                      <li>Visualização de respostas anteriores</li>
-                      <li>Gráfico de evolução pessoal</li>
+                      <li>⏳ POST /api/humor - Registrar humor diário</li>
+                      <li>⏳ GET /api/humor/usuario/[id] - Histórico do usuário</li>
+                      <li>⏳ GET /api/humor/dashboard - Dados para gráficos</li>
+                      <li>⏳ GET /api/humor/trends - Tendências por período</li>
+                      <li>⏳ PUT /api/humor/[id] - Editar registro</li>
+                      <li>⏳ Validação: um registro por usuário/dia</li>
+                      <li>⏳ Agregações por turma, período</li>
+                      <li>⏳ Alertas para humor muito baixo</li>
                     </ul>
                   </div>
                 </div>
@@ -764,7 +790,7 @@
               <div class="task-item">
                 <div class="task-checkbox todo">📋</div>
                 <div class="task-content">
-                  <div class="task-title">3.6 Dashboard & Relatórios</div>
+                  <div class="task-title">3.6 API Eventos & Calendário</div>
                   <div class="task-meta">
                     <div class="task-owner">Nickollas</div>
                     <span class="badge priority-medium">Média Prioridade</span>
@@ -773,44 +799,19 @@
                   <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
                     <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
                     <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>/dashboard - Overview geral (KPIs)</li>
-                      <li>/relatorios - Relatórios para professores</li>
-                      <li>/admin - Dashboard da diretoria</li>
-                      <li>Gráficos: humor por período, notas por aula</li>
-                      <li>Filtros dinâmicos (data, turma, matéria)</li>
-                      <li>Exportação em PDF/Excel</li>
-                      <li>Comparações por professor/turma</li>
-                      <li>Métricas de engajamento</li>
-                      <li>Alertas para indicadores baixos</li>
+                      <li>⏳ GET /api/eventos - Listar eventos por período</li>
+                      <li>⏳ POST /api/eventos - Criar evento</li>
+                      <li>⏳ PUT /api/eventos/[id] - Atualizar evento</li>
+                      <li>⏳ DELETE /api/eventos/[id] - Remover evento</li>
+                      <li>⏳ GET /api/calendario - View completa do mês</li>
+                      <li>⏳ Tipos: AULA, PROVA, EVENTO, FERIADO, REUNIAO</li>
+                      <li>⏳ Integração com aulas automáticas</li>
+                      <li>⏳ Filtros por tipo e data</li>
                     </ul>
                   </div>
                 </div>
               </div>
               
-              <div class="task-item">
-                <div class="task-checkbox todo">📋</div>
-                <div class="task-content">
-                  <div class="task-title">3.7 Páginas de Suporte</div>
-                  <div class="task-meta">
-                    <div class="task-owner">Nickollas</div>
-                    <span class="badge priority-low">Baixa Prioridade</span>
-                    <span class="badge tech">Static Content</span>
-                  </div>
-                  <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 4px solid var(--danger);">
-                    <strong style="color: var(--danger);">📋 Subitens Planejados:</strong>
-                    <ul style="margin: 8px 0; padding-left: 20px; color: var(--muted); font-size: 0.9em;">
-                      <li>/perfil - Configurações do usuário</li>
-                      <li>/historico - Histórico de atividades</li>
-                      <li>/notificacoes - Central de notificações</li>
-                      <li>/ajuda - FAQ e suporte</li>
-                      <li>/configuracoes - Settings do sistema</li>
-                      <li>Páginas de erro (404, 500)</li>
-                      <li>Política de privacidade</li>
-                      <li>Termos de uso</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
