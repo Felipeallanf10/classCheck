@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins, Quicksand } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { AppSidebar } from "@/components/app-sidebar"; // Importe o Sidebar correto
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { ConditionalLayout } from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,16 +42,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${geistPoppins.variable} ${geistQuicksand.variable} antialiased bg-gray-200 dark:bg-gray-900 text-black dark:text-white`}
       >
         <ThemeProvider>
-          <div className="flex min-h-screen">
-          <SidebarProvider>
-            <AppSidebar /> {/* Sidebar fixo à esquerda */}
-            <main className="flex-1">{children}</main>
-          </SidebarProvider>
-          </div>
-          {/* Botão flutuante theme */}
-          <div className="fixed bottom-4 right-4">
-            <ThemeToggle/>
-          </div>
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
         </ThemeProvider>
       </body>
     </html>
