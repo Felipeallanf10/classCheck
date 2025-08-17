@@ -1,54 +1,52 @@
 # 🎯 Objetivo
-Adicionar as seguintes melhorias nas páginas de autenticação (`/login`, `/cadastro`, `/reset-password`), mantendo o padrão do projeto:
+Modificar a estrutura de layout para que a **navegação (Nav)** só apareça quando o usuário estiver em páginas logadas, e **não apareça na rota raiz (`/`) ou nas páginas públicas (landing, login, cadastro, reset-password)**.
 
 ---
 
-## ✅ O que já existe:
-- ✅ Página de Login (/login)
-- ✅ Página de Cadastro (/cadastro)
-- ✅ Página de Recuperação de Senha (/reset-password)
-- ✅ Validação de formulários com Zod
-- ✅ Design System (shadcn/ui)
-- ✅ Botão Google OAuth (apenas visual)
-- ✅ Fundo personalizado com tema dark/light
-- ✅ Layout exclusivo para auth
+## ✅ Regras de exibição do Nav:
+- **Exibir Nav** apenas nas rotas:
+  - `/home`
+  - `/favoritos`
+  - `/aulas`
+  - `/eventos`
+- **Não exibir Nav** nas rotas:
+  - `/` (Landing Page)
+  - `/login`
+  - `/cadastro`
+  - `/reset-password`
 
 ---
 
-## ✅ O que implementar agora:
-1. **Estados de Loading**:
-   - Adicione um estado de carregamento (`isLoading`) para todos os botões de envio.
-   - Quando `onSubmit` for executado:
-     - Desabilite o botão.
-     - Substitua o texto por `"Carregando..."` ou use o componente `Loader2` do `lucide-react` com animação `animate-spin`.
-
-2. **Responsividade Mobile**:
-   - Ajuste o layout `(auth)` e os componentes:
-     - Garanta que o `Card` do formulário ocupe **90% da largura no mobile**.
-     - Use classes Tailwind (`max-w-sm w-full`) para centralização no mobile e largura adequada no desktop.
-     - Botão Google deve ser full width em mobile.
-
-3. **Redirecionamento básico após submit**:
-   - No `onSubmit` dos formulários:
-     - Após `setTimeout` simulado (2 segundos), use `router.push('/dashboard')`.
-     - Utilize `useRouter` do `next/navigation`.
-     - Apenas para simulação por enquanto (sem autenticação real).
-   - Exemplo:
+## ✅ Implementação sugerida:
+1. No arquivo do layout principal (`src/app/layout.tsx` ou equivalente):
+   - Detectar a rota atual usando `usePathname()` do `next/navigation`.
+   - Criar uma lista de rotas em que o Nav deve aparecer:
      ```tsx
-     const router = useRouter();
-     setTimeout(() => {
-       router.push('/dashboard');
-     }, 2000);
+     const showNavRoutes = ['/home', '/favoritos', '/aulas', '/eventos'];
+     ```
+   - Condicionar a renderização:
+     ```tsx
+     const pathname = usePathname();
+     const showNav = showNavRoutes.includes(pathname);
+
+     return (
+       <div className="flex min-h-screen">
+         {showNav && <Nav />}
+         <main className="flex-1">{children}</main>
+       </div>
+     );
      ```
 
----
-
-## ✅ Critérios:
-- Não remova nada do que já existe.
-- Manter padrão visual **login-03 do shadcn/ui**.
-- Código limpo, comentado e fácil de adaptar para integração futura com backend/NextAuth.
+2. Certifique-se de que:
+   - O layout `(auth)` continua separado e sem Nav.
+   - O layout público (Landing) também não exibe o Nav.
 
 ---
 
-💡 **Sugestão**:
-- Implemente primeiro o estado de loading no botão, depois a responsividade e por fim o redirecionamento.
+## ✅ Observações:
+- Essa abordagem não exige autenticação real, apenas lógica baseada em rota.
+- Quando integrar com autenticação, condicione também à sessão (usuário logado).
+
+---
+
+💡 **Não altere o design do Nav**, apenas a lógica de exibição.
