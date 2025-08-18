@@ -6,13 +6,10 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
-import { Loader2 } from 'lucide-react'
+import { Input, EmailInput, PasswordInput, LoadingButton } from '@/components/ui'
+import { useToast } from '@/hooks/use-toast'
 
 // Schema de validação com Zod
 const cadastroSchema = z.object({
@@ -63,6 +60,7 @@ export default function CadastroPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const { toast } = useToast()
   
   const {
     register,
@@ -77,163 +75,140 @@ export default function CadastroPage() {
     setIsLoading(true)
     console.log('Dados do cadastro:', data)
     
-    // Simula chamada de API
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      // Simula chamada de API
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      toast.success("Conta criada com sucesso!")
+      
       // Redirecionamento após sucesso
-      router.push('/dashboard')
-    }, 2000)
+      setTimeout(() => router.push('/dashboard'), 1000)
+    } catch (error) {
+      toast.error("Erro ao criar conta. Tente novamente.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true)
-    console.log("Login com Google")
+    console.log("Cadastro com Google")
     
-    // Simula chamada de API do Google
-    setTimeout(() => {
-      setIsGoogleLoading(false)
+    try {
+      // Simula chamada de API do Google
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      toast.success("Cadastro com Google realizado!")
+      
       // Redirecionamento após sucesso
-      router.push('/dashboard')
-    }, 2000)
+      setTimeout(() => router.push('/dashboard'), 1000)
+    } catch (error) {
+      toast.error("Erro no cadastro com Google. Tente novamente.")
+    } finally {
+      setIsGoogleLoading(false)
+    }
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Criar sua conta</CardTitle>
-        <CardDescription>
+    <Card className="w-full max-w-md mx-auto shadow-lg border-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm">
+      <CardHeader className="text-center space-y-3">
+        <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Criar sua conta
+        </CardTitle>
+        <CardDescription className="text-gray-600 dark:text-gray-400">
           Preencha os dados abaixo para acessar o ClassCheck
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-6">
-            <div className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="nome">Nome completo</Label>
-                <Input
-                  id="nome"
-                  type="text"
-                  placeholder="Seu nome completo"
-                  {...register('nome')}
-                  className={errors.nome ? 'border-red-500' : ''}
-                />
-                {errors.nome && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {errors.nome.message}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  {...register('email')}
-                  className={errors.email ? 'border-red-500' : ''}
-                />
-                {errors.email && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {errors.email.message}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Crie uma senha"
-                  {...register('password')}
-                  className={errors.password ? 'border-red-500' : ''}
-                />
-                {errors.password && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {errors.password.message}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="confirmPassword">Confirmar senha</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirme sua senha"
-                  {...register('confirmPassword')}
-                  className={errors.confirmPassword ? 'border-red-500' : ''}
-                />
-                {errors.confirmPassword && (
-                  <Alert variant="destructive">
-                    <AlertDescription>
-                      {errors.confirmPassword.message}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div>
-              <Button 
-                type="submit" 
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                label="Nome completo"
+                placeholder="Seu nome completo"
+                errorMessage={errors.nome?.message}
+                required
+                {...register('nome')}
                 className="w-full"
-                disabled={!isValid || isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Carregando...
-                  </>
-                ) : (
-                  'Criar conta'
-                )}
-              </Button>
+              />
             </div>
             
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  ou continue com
-                </span>
-              </div>
+            <div className="space-y-2">
+              <EmailInput
+                label="Email"
+                placeholder="seu@email.com"
+                errorMessage={errors.email?.message}
+                required
+                {...register('email')}
+                className="w-full"
+              />
             </div>
             
-            <Button 
-              variant="outline" 
+            <div className="space-y-2">
+              <PasswordInput
+                label="Senha"
+                placeholder="Crie uma senha"
+                errorMessage={errors.password?.message}
+                required
+                {...register('password')}
+                className="w-full"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <PasswordInput
+                label="Confirmar senha"
+                placeholder="Confirme sua senha"
+                errorMessage={errors.confirmPassword?.message}
+                required
+                {...register('confirmPassword')}
+                className="w-full"
+              />
+            </div>
+            
+            <LoadingButton 
+              type="submit" 
               className="w-full"
-              onClick={handleGoogleLogin}
-              disabled={isGoogleLoading}
+              disabled={!isValid}
+              loading={isLoading}
+              loadingText="Criando conta..."
             >
-              {isGoogleLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Carregando...
-                </>
-              ) : (
-                <>
-                  <GoogleIcon />
-                  Entrar com Google
-                </>
-              )}
-            </Button>
-            
-            <div className="text-center text-sm">
-              Já tem uma conta?{' '}
-              <Link 
-                href="/login" 
-                className="underline underline-offset-4"
-              >
-                Fazer login
-              </Link>
-            </div>
+              Criar conta
+            </LoadingButton>
           </div>
         </form>
+        
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <Separator className="w-full" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400">
+              ou continue com
+            </span>
+          </div>
+        </div>
+        
+        <LoadingButton 
+          variant="outline" 
+          className="w-full"
+          onClick={handleGoogleLogin}
+          loading={isGoogleLoading}
+          loadingText="Conectando..."
+        >
+          <GoogleIcon />
+          <span className="ml-2">Cadastrar com Google</span>
+        </LoadingButton>
+        
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          Já tem uma conta?{' '}
+          <Link 
+            href="/login" 
+            className="font-medium text-primary-600 hover:text-primary-700 underline-offset-4 hover:underline"
+          >
+            Fazer login
+          </Link>
+        </div>
       </CardContent>
     </Card>
   )

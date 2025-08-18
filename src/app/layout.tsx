@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Poppins, Quicksand } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
+import { ToastProvider } from "@/hooks/use-toast";
+import { ToastDisplay } from "@/components/ui/toast-display";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,9 +44,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${geistPoppins.variable} ${geistQuicksand.variable} antialiased bg-gray-200 dark:bg-gray-900 text-black dark:text-white`}
       >
         <ThemeProvider>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
+          <ToastProvider>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
+            <ToastDisplay />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
