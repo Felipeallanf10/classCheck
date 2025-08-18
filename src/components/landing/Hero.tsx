@@ -64,7 +64,7 @@ export function Hero() {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="text-lg px-8 py-4 w-full sm:w-auto border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-950"
+                  className="text-lg px-8 py-4 w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-950"
                 >
                   Já tenho conta
                 </Button>
@@ -74,25 +74,25 @@ export function Hero() {
 
           {/* Ilustração/Imagem */}
           <div className="relative">
-            <div className="bg-gradient-to-br from-white/80 to-blue-50/80 dark:from-gray-800/80 dark:to-blue-900/30 rounded-2xl p-8 lg:p-12 backdrop-blur-sm border border-blue-200/30 dark:border-blue-700/30">
+            <div className="bg-gradient-to-br from-white/95 to-blue-50/95 dark:from-gray-800/80 dark:to-blue-900/30 rounded-2xl p-8 lg:p-12 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/30 shadow-xl">
               <div className="grid grid-cols-2 gap-4">
                 {/* Mock de interface */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm">😊</span>
                     </div>
-                    <div className="text-sm font-medium">Humor do Dia</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Humor do Dia</div>
                   </div>
-                  <div className="text-xs text-gray-500">Muito satisfeito</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Muito satisfeito</div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">⭐</span>
                     </div>
-                    <div className="text-sm font-medium">Avaliação</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">Avaliação</div>
                   </div>
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
@@ -101,9 +101,9 @@ export function Hero() {
                   </div>
                 </div>
                 
-                <div className="col-span-2 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
-                  <div className="text-sm font-medium mb-2">Feedback Recente</div>
-                  <div className="text-xs text-gray-500">
+                <div className="col-span-2 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-100 dark:border-gray-700">
+                  <div className="text-sm font-medium mb-2 text-gray-900 dark:text-white">Feedback Recente</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     "A aula de matemática foi muito clara e dinâmica!"
                   </div>
                 </div>
