@@ -145,7 +145,7 @@ const StudyTimer = React.forwardRef<HTMLDivElement, StudyTimerProps>(
   ) => {
     const [timeLeft, setTimeLeft] = React.useState(initialTime)
     const [isRunning, setIsRunning] = React.useState(isActive)
-    const intervalRef = React.useRef<NodeJS.Timeout>()
+    const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
 
     // Determinar variante baseada no modo
     const getVariant = () => {
