@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
 import { ToastProvider } from "@/hooks/use-toast";
 import { ToastDisplay } from "@/components/ui/toast-display";
+import { ConfirmProvider } from "@/hooks/use-confirm";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,9 +46,11 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <ToastProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
+            <ConfirmProvider>
+              <ConditionalLayout>
+                {children}
+              </ConditionalLayout>
+            </ConfirmProvider>
             <ToastDisplay />
           </ToastProvider>
         </ThemeProvider>
