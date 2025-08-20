@@ -1,81 +1,138 @@
-# 🚀 Tarefa: Integrar Design System (Fase 2.1) com Autenticação (Fase 2.2) e Layouts/Home (Fase 2.3)
+# 🚀 Implementar Fase 2.4 - Páginas de Avaliação (Frontend)
 
-## ✅ Contexto Atual
-- Fase 2.1 (Design System) → COMPLETA ✅
-- Fase 2.2 (Páginas de Autenticação) → já implementada ✅
-- Fase 2.3 (Landing Page / Dashboard / Home) → já implementada ✅
-
-Agora precisamos **integrar tudo**, garantindo:
-- Consistência visual usando **Design Tokens** e **componentes novos** da Fase 2.1
-- Reaproveitamento de **componentes avançados** nos fluxos existentes
-- Eliminação de duplicações (componentes antigos vs. novos)
-- Responsividade e UX alinhada ao design system
+## ✅ CONTEXTO ATUAL
+- Design System v2 completo (tokens, UI components, loading, toast)
+- Páginas de autenticação e dashboard prontos
+- Layout exclusivo para auth já implementado
+- Não implementar backend agora → usar mocks e states locais
+- Objetivo: Criar páginas e componentes interativos com UX completa
 
 ---
 
-## ✅ Passos para Integração
-### 🔹 Passo 1: Revisar Páginas Existentes (Login, Cadastro, Reset Password)
-- Substituir inputs antigos por **enhanced-input** (com validação e ícones)
-- Garantir uso de **botões com loading** nos formulários (loading-button)
-- Aplicar **tokens de cor, tipografia e espaçamento**
-- Adicionar **toasts para feedback** (ex.: erro, sucesso no login)
-- Ajustar layouts para usar breakpoints definidos nos tokens
+## ✅ OBJETIVO DA FASE
+Criar a experiência completa de avaliações para o usuário logado:
+- Avaliar aulas (com humor, estrelas, feedback)
+- Modal de avaliação rápida
+- Histórico visual de avaliações
+- Responsividade + dark/light mode
 
 ---
 
-### 🔹 Passo 2: Revisar Layouts Globais
-- Atualizar `layout.tsx` e `auth-layout.tsx` para:
-  - Usar **Page Loading** para transições
-  - Garantir que **NavBar** só aparece em rotas logadas (/home, /favoritos, /aulas, /eventos)
-  - Aplicar **theme tokens** (dark/light)
-  - Centralizar tokens no **Tailwind config**
-- Adicionar **feedback-states** em páginas vazias (ex.: dashboard sem dados)
+## ✅ O QUE IMPLEMENTAR (SEM BACKEND)
+### 🔹 **Passo 1: Criar Branch**
+`feature/avaliacoes-frontend`
 
 ---
 
-### 🔹 Passo 3: Atualizar Landing Page (/ ou /landing)
-- Aplicar tokens de cores, tipografia e espaçamento
-- Melhorar CTA com **loading-button**
-- Aplicar animações suaves (usando framer-motion ou tailwind transitions)
-- Incluir **Empty States** para seções ainda não preenchidas
+### 🔹 **Passo 2: Componentes Base**
+Local: `src/components/avaliacao/`
+
+1. **RatingStars.tsx**
+   - 5 estrelas interativas
+   - Estados: vazio, hover, selecionado
+   - Animações suaves
+   - Integrar com tokens (cor amarelo para selecionado)
+
+2. **HumorSelector.tsx**
+   - 5 ícones de humor (muito triste → muito feliz)
+   - Hover effects e cores associadas
+   - Interativo (seleciona humor)
+
+3. **AvaliacaoForm.tsx**
+   - Campos:
+     - HumorSelector
+     - RatingStars
+     - Textarea opcional (500 caracteres máx + contador)
+   - Validação com Zod
+   - Botão de envio com estado loading (simulação)
 
 ---
 
-### 🔹 Passo 4: Melhorar Dashboard (/home)
-- Substituir cards simples por:
-  - **AulaCard v2** (estados completos)
-  - **ProfessorCard** com rating e interações
-  - **AvaliacaoCard** para histórico
-- Integrar **metrics-progress** para exibir progresso
-- Garantir responsividade e grid consistente
+### 🔹 **Passo 3: Componentes Avançados**
+1. **AvaliacaoModal.tsx**
+   - Modal para avaliação rápida
+   - Integrar AvaliacaoForm
+   - Fechar automaticamente após envio simulado
+
+2. **AvaliacaoCard.tsx**
+   - Mostrar:
+     - Aula (mocked)
+     - Data (mocked)
+     - Nota (estrelas preenchidas)
+     - Humor (ícone)
+     - Feedback textual
+   - Botões: editar/excluir (apenas simulação visual)
+
+3. **StatsCard.tsx**
+   - Componente com estatísticas básicas mockadas:
+     - Avaliações feitas
+     - Média de humor
+     - Média de estrelas
+   - Pode usar gráfico simples com barras ou ícones
 
 ---
 
-### 🔹 Passo 5: Ajustar Fluxos de Feedback e Notificação
-- Integrar **toast system** para eventos importantes (ex.: login, logout, erro)
-- Usar **confirmation-dialog** para exclusões
-- Adicionar **alert-banner** para avisos globais
+### 🔹 **Passo 4: Páginas**
+Local: `src/app/`
+
+1. **`/aulas/[id]/avaliar/page.tsx`**
+   - Mostrar:
+     - Detalhes mockados da aula
+     - AvaliacaoForm
+   - Estado de loading ao enviar
+
+2. **`/avaliacoes/page.tsx`**
+   - Histórico mockado:
+     - Lista de AvaliacaoCard
+     - StatsCard no topo
+     - Filtros básicos (por humor ou nota) → só UI (sem lógica real)
+   - EmptyState se não houver avaliações (mock controlado)
 
 ---
 
-### 🔹 Passo 6: Documentar no README
-- Adicionar seção **"Integração do Design System"** explicando:
-  - Como usar tokens
-  - Como usar componentes reutilizáveis
-  - Exemplo prático de uso nos formulários e dashboards
-- Atualizar **checklist** das fases concluídas
-- Incluir instruções para rodar Storybook (se aplicável)
+### 🔹 **Passo 5: Integração Simulada**
+- Ao enviar uma avaliação:
+  - Simular delay com `setTimeout`
+  - Exibir toast de sucesso
+  - Atualizar lista mock localmente (useState)
+
+- Modal:
+  - Abrir/fechar corretamente
+  - Resetar formulário após envio
 
 ---
 
-## ✅ Observações importantes
-- Não remova código que já está funcionando. Apenas **substitua e padronize aos poucos**.
-- Use **commits granulares**, exemplo:
-  - `chore: replace auth inputs with enhanced-input`
-  - `feat: apply design tokens to landing page`
-  - `feat: integrate AulaCard v2 in dashboard`
-- Sempre testar após cada substituição (páginas de login, home e landing).
+### 🔹 **Passo 6: Validação e UX**
+- Validar formulário com Zod:
+  - Humor obrigatório
+  - Nota obrigatória
+  - Feedback opcional (máx. 500 chars)
+- Exibir erros abaixo dos campos
+- Mostrar contador de caracteres no feedback
 
 ---
 
-💡 **Agora, comece pelo Passo 1 (páginas de autenticação) e siga até o Passo 6.**
+### ✅ CHECKLIST FINAL
+- [ ] RatingStars funcional
+- [ ] HumorSelector funcional
+- [ ] AvaliacaoForm com validação
+- [ ] AvaliacaoModal integrado
+- [ ] AvaliacaoCard estilizado
+- [ ] StatsCard com métricas mockadas
+- [ ] Página `/aulas/[id]/avaliar` completa
+- [ ] Página `/avaliacoes` completa
+- [ ] Loading states + toasts funcionando
+- [ ] Responsividade mobile + dark/light mode
+- [ ] Código limpo, tipado e seguindo design system
+
+---
+
+💡 **Commits sugeridos:**
+- `feat: add rating stars component`
+- `feat: implement humor selector`
+- `feat: create avaliacao form`
+- `feat: add avaliacao modal`
+- `feat: add avaliacao card and stats card`
+- `feat: create avaliacao pages with mock data`
+
+Implemente TUDO em sequência usando **React + Next.js + TypeScript + shadcn/ui + Tailwind + Zod**, mantendo consistência com o Design System. 🚀
