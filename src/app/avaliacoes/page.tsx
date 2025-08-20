@@ -210,8 +210,11 @@ export default function AvaliacoesPage() {
                     key={avaliacao.id}
                     className="transform hover:scale-105 transition-all duration-300"
                     style={{
-                      animationDelay: `${index * 100}ms`,
-                      animation: 'fadeInUp 0.6s ease-out forwards'
+                      animationName: 'fadeInUp',
+                      animationDuration: '0.6s',
+                      animationTimingFunction: 'ease-out',
+                      animationFillMode: 'forwards',
+                      animationDelay: `${index * 100}ms`
                     }}
                   >
                     <AvaliacaoCard
