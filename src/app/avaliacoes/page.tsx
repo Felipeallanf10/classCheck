@@ -1,15 +1,20 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AvaliacaoCard, StatsCard } from "@/components/avaliacao"
+import { AvaliacaoSkeleton, StatsCardSkeleton, AvaliacoesPageSkeleton } from "@/components/avaliacao/AvaliacaoSkeleton"
+import { FilterBar } from "@/components/FilterBar"
+import { FloatingButton } from "@/components/FloatingButton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Filter, Calendar } from "lucide-react"
+import { Search, Filter, Calendar, SlidersHorizontal } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { useToast } from "@/hooks/use-toast"
 
 // Mock data para demonstração
 const mockAvaliacoes = [
@@ -80,15 +85,68 @@ const mockStats = {
 type FilterType = "all" | "excelente" | "bom" | "regular" | "ruim"
 
 export default function AvaliacoesPage() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filter, setFilter] = useState<FilterType>("all")
+  const [useAdvancedFilters, setUseAdvancedFilters] = useState(false)
+  
+  // Estados para FilterBar
+  const [filtros, setFiltros] = useState({
+    busca: "",
+    disciplina: " ",
+    professor: " ",
+    periodo: " "
+  })
+
+  // Simular carregamento inicial
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1500) // 1.5 segundos de loading
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Funções para ações dos cards
+  const handleEditAvaliacao = (avaliacaoId: string) => {
+    // Simular navegação para página de edição
+    toast.info({
+      title: "Redirecionando...",
+      description: "Abrindo formulário de edição."
+    })
+    
+    // Em um app real, isso seria:
+    // router.push(`/avaliacoes/${avaliacaoId}/editar`)
+    // Por ora, vou redirecionar para a página de avaliar novamente
+    const avaliacao = mockAvaliacoes.find(a => a.id === avaliacaoId)
+    if (avaliacao) {
+      router.push(`/aulas/${avaliacao.aulaId}/avaliar`)
+    }
+  }
+
+  const handleDeleteAvaliacao = (avaliacaoId: string) => {
+    toast.warning({
+      title: "Funcionalidade em desenvolvimento",
+      description: "A exclusão de avaliações será implementada em breve."
+    })
+    
+    // Em um app real, isso seria uma confirmação + delete:
+    // if (confirm("Tem certeza que deseja excluir esta avaliação?")) {
+    //   // chamada para API de delete
+    //   toast.success("Avaliação excluída com sucesso!")
+    // }
+  }
 
   // Filtrar avaliações
   const avaliacoesFiltradas = mockAvaliacoes.filter((avaliacao) => {
+    // Filtros básicos (busca + rating)
+    const searchText = useAdvancedFilters ? filtros.busca : searchTerm
     const matchesSearch = 
-      avaliacao.aulaTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      avaliacao.professor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      avaliacao.disciplina.toLowerCase().includes(searchTerm.toLowerCase())
+      avaliacao.aulaTitle.toLowerCase().includes(searchText.toLowerCase()) ||
+      avaliacao.professor.toLowerCase().includes(searchText.toLowerCase()) ||
+      avaliacao.disciplina.toLowerCase().includes(searchText.toLowerCase())
 
     const matchesFilter = (() => {
       switch (filter) {
@@ -104,6 +162,14 @@ export default function AvaliacoesPage() {
           return true
       }
     })()
+
+    // Filtros avançados (se ativados)
+    if (useAdvancedFilters) {
+      const matchesDisciplina = filtros.disciplina === " " || avaliacao.disciplina === filtros.disciplina
+      const matchesProfessor = filtros.professor === " " || avaliacao.professor.includes(filtros.professor)
+      
+      return matchesSearch && matchesFilter && matchesDisciplina && matchesProfessor
+    }
 
     return matchesSearch && matchesFilter
   })
@@ -125,52 +191,115 @@ export default function AvaliacoesPage() {
             </div>
 
             {/* Stats Cards */}
-            <StatsCard 
-              totalAvaliacoes={mockStats.totalAvaliacoes}
-              mediaHumor={mockStats.mediaHumor}
-              mediaNota={mockStats.mediaNota}
-              ultimaAvaliacao={mockStats.ultimaAvaliacao}
-            />
+            {isLoading ? (
+              <StatsCardSkeleton />
+            ) : (
+              <StatsCard 
+                totalAvaliacoes={mockStats.totalAvaliacoes}
+                mediaHumor={mockStats.mediaHumor}
+                mediaNota={mockStats.mediaNota}
+                ultimaAvaliacao={mockStats.ultimaAvaliacao}
+              />
+            )}
 
             {/* Filtros e Busca */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              {/* Busca */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Buscar por aula, professor ou disciplina..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+            <div className="space-y-4">
+              {/* Toggle entre filtros simples e avançados */}
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Filtros</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setUseAdvancedFilters(!useAdvancedFilters)
+                    // Limpar filtros ao trocar
+                    setSearchTerm("")
+                    setFiltros({ busca: "", disciplina: " ", professor: " ", periodo: " " })
+                  }}
+                  className="gap-2"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {useAdvancedFilters ? "Filtros Simples" : "Filtros Avançados"}
+                </Button>
               </div>
 
-              {/* Filtros */}
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <div className="flex gap-2">
-                  {[
-                    { key: "all", label: "Todas" },
-                    { key: "excelente", label: "Excelente (5⭐)" },
-                    { key: "bom", label: "Bom (4⭐)" },
-                    { key: "regular", label: "Regular (3⭐)" },
-                    { key: "ruim", label: "Ruim (1-2⭐)" }
-                  ].map((filterOption) => (
-                    <Badge
-                      key={filterOption.key}
-                      variant={filter === filterOption.key ? "default" : "secondary"}
-                      className="cursor-pointer hover:bg-primary/20 transition-colors"
-                      onClick={() => setFilter(filterOption.key as FilterType)}
-                    >
-                      {filterOption.label}
-                    </Badge>
-                  ))}
+              {!useAdvancedFilters ? (
+                // Filtros simples (originais)
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  {/* Busca */}
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Buscar por aula, professor ou disciplina..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+
+                  {/* Filtros por nota */}
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex gap-2">
+                      {[
+                        { key: "all", label: "Todas" },
+                        { key: "excelente", label: "Excelente (5⭐)" },
+                        { key: "bom", label: "Bom (4⭐)" },
+                        { key: "regular", label: "Regular (3⭐)" },
+                        { key: "ruim", label: "Ruim (1-2⭐)" }
+                      ].map((filterOption) => (
+                        <Badge
+                          key={filterOption.key}
+                          variant={filter === filterOption.key ? "default" : "secondary"}
+                          className="cursor-pointer hover:bg-primary/20 transition-colors"
+                          onClick={() => setFilter(filterOption.key as FilterType)}
+                        >
+                          {filterOption.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                // Filtros avançados (usando FilterBar)
+                <div className="space-y-4">
+                  <FilterBar filtros={filtros} setFiltros={setFiltros} />
+                  
+                  {/* Filtros por nota ainda disponíveis */}
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Por nota:</span>
+                    <div className="flex gap-2">
+                      {[
+                        { key: "all", label: "Todas" },
+                        { key: "excelente", label: "5⭐" },
+                        { key: "bom", label: "4⭐" },
+                        { key: "regular", label: "3⭐" },
+                        { key: "ruim", label: "1-2⭐" }
+                      ].map((filterOption) => (
+                        <Badge
+                          key={filterOption.key}
+                          variant={filter === filterOption.key ? "default" : "secondary"}
+                          className="cursor-pointer hover:bg-primary/20 transition-colors"
+                          onClick={() => setFilter(filterOption.key as FilterType)}
+                        >
+                          {filterOption.label}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Lista de Avaliações */}
-            {avaliacoesFiltradas.length === 0 ? (
+            {isLoading ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(6)].map((_, index) => (
+                  <AvaliacaoSkeleton key={index} />
+                ))}
+              </div>
+            ) : avaliacoesFiltradas.length === 0 ? (
               <div className="text-center py-12">
                 <div className="mx-auto w-24 h-24 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-4">
                   <Calendar className="h-12 w-12 text-primary-600 dark:text-primary-400" />
@@ -225,8 +354,8 @@ export default function AvaliacoesPage() {
                       humor={avaliacao.humor}
                       nota={avaliacao.nota}
                       feedback={avaliacao.feedback}
-                      onEdit={() => console.log("Editar avaliação", avaliacao.id)}
-                      onDelete={() => console.log("Excluir avaliação", avaliacao.id)}
+                      onEdit={() => handleEditAvaliacao(avaliacao.id)}
+                      onDelete={() => handleDeleteAvaliacao(avaliacao.id)}
                     />
                   </div>
                 ))}
@@ -234,7 +363,7 @@ export default function AvaliacoesPage() {
             )}
 
             {/* Informações adicionais */}
-            {avaliacoesFiltradas.length > 0 && (
+            {!isLoading && avaliacoesFiltradas.length > 0 && (
               <div className="text-center text-sm text-muted-foreground mt-8">
                 Mostrando {avaliacoesFiltradas.length} de {mockAvaliacoes.length} avaliações
               </div>
@@ -254,6 +383,18 @@ export default function AvaliacoesPage() {
             }
           }
         `}</style>
+
+        {/* Floating Button for Quick Evaluation */}
+        <FloatingButton
+          position="bottom-right"
+          onClick={() => {
+            toast.success({
+              title: "Avaliação Rápida",
+              description: "Redirecionando para avaliar aula...",
+            })
+            router.push("/aulas")
+          }}
+        />
       </SidebarInset>
     </SidebarProvider>
   )
