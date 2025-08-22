@@ -1,5 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/avaliar-animations.css";
+
+/* Toast customizations */
+.toast-container {
+  z-index: 100 !important;
+  pointer-events: none;
+}
+
+.toast-container > * {
+  pointer-events: auto;
+}
+
+/* Garantir que toasts ficam acima de tudo */
+[data-radix-toast-viewport] {
+  z-index: 100 !important;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,4 +135,15 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Toast z-index fix - garantir que fique acima de tudo */
+.toast-container {
+  z-index: 999999 !important;
+  position: fixed !important;
+}
+
+/* Sidebar z-index - garantir que não interfira nos toasts */
+[data-sidebar] {
+  z-index: 10 !important;
 }
