@@ -5,15 +5,15 @@ import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from "lucide-react"
 
 // ✨ TOAST VARIANTS
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md border border-neutral-200 bg-white p-4 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full dark:border-neutral-800 dark:bg-neutral-950",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-lg border shadow-xl transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full backdrop-blur-sm",
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
-        success: "border-success-200 bg-success-50 text-success-900 dark:border-success-800 dark:bg-success-950 dark:text-success-100",
-        error: "border-danger-200 bg-danger-50 text-danger-900 dark:border-danger-800 dark:bg-danger-950 dark:text-danger-100", 
-        warning: "border-warning-200 bg-warning-50 text-warning-900 dark:border-warning-800 dark:bg-warning-950 dark:text-warning-100",
-        info: "border-primary-200 bg-primary-50 text-primary-900 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-100"
+        default: "border-slate-200 bg-white/95 text-slate-900 dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-100",
+        success: "border-green-200 bg-green-50/95 text-green-900 dark:border-green-800 dark:bg-green-950/95 dark:text-green-100",
+        error: "border-red-200 bg-red-50/95 text-red-900 dark:border-red-800 dark:bg-red-950/95 dark:text-red-100", 
+        warning: "border-yellow-200 bg-yellow-50/95 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950/95 dark:text-yellow-100",
+        info: "border-blue-200 bg-blue-50/95 text-blue-900 dark:border-blue-800 dark:bg-blue-950/95 dark:text-blue-100"
       },
     },
     defaultVariants: {
@@ -90,12 +90,12 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
     return (
       <div
         ref={ref}
-        className={cn(toastVariants({ variant }), className)}
+        className={cn(toastVariants({ variant }), "p-4 pr-8 min-w-[350px]", className)}
         role="alert"
         aria-live="polite"
         {...props}
       >
-        <div className="flex items-start space-x-3">
+        <div className="flex items-start space-x-3 w-full">
           {/* Ícone */}
           {showIcon && (
             <div className="flex-shrink-0 mt-0.5">
@@ -104,16 +104,16 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
           )}
 
           {/* Conteúdo */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-1">
             {title && (
-              <div className="text-sm font-semibold">
+              <div className="text-sm font-semibold leading-tight">
                 {title}
               </div>
             )}
             {description && (
               <div className={cn(
-                "text-sm opacity-90",
-                title && "mt-1"
+                "text-sm leading-relaxed",
+                variant === "default" ? "opacity-80" : "opacity-90"
               )}>
                 {description}
               </div>
@@ -123,7 +123,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
 
           {/* Ação */}
           {action && (
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 ml-3">
               {action}
             </div>
           )}
@@ -133,8 +133,8 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
         {closable && (
           <button
             onClick={onClose}
-            className="absolute right-2 top-2 rounded-md p-1 text-current/50 opacity-0 transition-opacity hover:text-current hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-1 focus:ring-current group-hover:opacity-100"
-            aria-label="Fechar"
+            className="absolute right-2 top-2 rounded-md p-1.5 text-current/60 opacity-70 transition-all hover:text-current hover:opacity-100 hover:bg-current/10 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-current/20 group-hover:opacity-100"
+            aria-label="Fechar notificação"
           >
             <X className="h-4 w-4" />
           </button>
@@ -202,25 +202,32 @@ const ToastContainer = React.forwardRef<HTMLDivElement, ToastContainerProps>(
     ref
   ) => {
     const positionClasses = {
-      "top-left": `top-${offset}px left-${offset}px`,
-      "top-center": `top-${offset}px left-1/2 transform -translate-x-1/2`,
-      "top-right": `top-${offset}px right-${offset}px`,
-      "bottom-left": `bottom-${offset}px left-${offset}px`,
-      "bottom-center": `bottom-${offset}px left-1/2 transform -translate-x-1/2`,
-      "bottom-right": `bottom-${offset}px right-${offset}px`
+      "top-left": "top-4 left-4",
+      "top-center": "top-4 left-1/2 transform -translate-x-1/2",
+      "top-right": "top-4 right-4",
+      "bottom-left": "bottom-4 left-4",
+      "bottom-center": "bottom-4 left-1/2 transform -translate-x-1/2",
+      "bottom-right": "bottom-4 right-4"
     }
 
     return (
       <div
         ref={ref}
         className={cn(
-          "fixed z-toast flex flex-col space-y-2 w-full max-w-sm",
+          "fixed flex flex-col space-y-3 w-full max-w-sm pointer-events-none",
+          "z-[100] toast-container",
           positionClasses[position],
           className
         )}
+        style={{ 
+          zIndex: 100,
+          pointerEvents: 'none'
+        }}
         {...props}
       >
-        {children}
+        <div className="space-y-3 pointer-events-auto">
+          {children}
+        </div>
       </div>
     )
   }

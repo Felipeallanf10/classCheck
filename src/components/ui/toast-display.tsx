@@ -39,7 +39,7 @@ export function ToastDisplay({
   }, [])
 
   const content = (
-    <ToastContainer position={position}>
+    <ToastContainer position={position} className="z-[100]">
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
