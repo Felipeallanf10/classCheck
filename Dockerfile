@@ -35,8 +35,11 @@ EXPOSE 3000
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Definir permissões corretas
+# Criar diretórios necessários com permissões corretas
+RUN mkdir -p /app/.next /app/node_modules
 RUN chown -R nextjs:nodejs /app
+RUN chmod -R 755 /app/.next
+
 USER nextjs
 
 # Comando padrão: iniciar servidor de desenvolvimento com hot reload

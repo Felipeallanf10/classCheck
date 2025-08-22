@@ -63,10 +63,10 @@ export function CtaFinal() {
             </Button>
             
             <Button 
+              asChild 
               variant="outline" 
               size="lg" 
-              asChild 
-              className="border-white text-white hover:bg-white/10 text-lg px-8 py-4"
+              className="border-2 border-white text-white hover:bg-white hover:text-blue-600 hover:dark:text-white text-lg px-8 py-4 font-semibold bg-transparent transition-all"
             >
               <Link href="/login">
                 Fazer Login

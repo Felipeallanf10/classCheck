@@ -159,13 +159,14 @@ const data = {
 }
 
 
-import { Home, Star, Calendar} from "lucide-react"
+import { Home, Star, Calendar, Heart} from "lucide-react"
 import Link from "next/link"
 
 const navItems = [
   { label: "Início", icon: Home, href: "/" },
   { label: "Favoritas", icon: Star, href: "/favoritas" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
+  { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
   { label: "Eventos", icon: Calendar, href: "/eventos" },
 ]
 

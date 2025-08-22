@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 const backgroundColors = [
     "bg-red-400",
@@ -26,6 +27,8 @@ export function DrawerAvaliacao() {
   const [value, setValue] = useState(3) // valores de 1 a 5
   const [step, setStep] = useState<"emoji" | "pergunta">("emoji")
   const [comentario, setComentario] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
+  const { toast } = useToast()
 
   const handleIncrement = () => {
     setValue((prev) => Math.min(prev + 1, 5))
@@ -37,14 +40,28 @@ export function DrawerAvaliacao() {
 
   const handleSubmit = () => {
     console.log({ humor: value, comentario })
+    
+    // Exibir toast de sucesso
+    toast.success({
+      title: "Avaliação enviada com sucesso! 🎉",
+      description: `Obrigado por compartilhar como se sentiu. Sua opinião é muito importante para nós.`
+    })
+
+    // Reset e fechamento
     setStep("emoji")
     setComentario("")
+    setIsOpen(false)
   }
 
   return (
-    <Drawer>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
-        <Button variant="default">Avaliar Aula</Button>
+        <Button 
+          variant="default" 
+          className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        >
+          💬 Avaliar Aula
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent

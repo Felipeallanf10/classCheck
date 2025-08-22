@@ -151,14 +151,16 @@ export default function HomePage() {
             </Card>
 
             <div className="lg:col-span-2 space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <GraficoHumor />
                 <CalendarioEventos />
-              </div>
             </div>
+              <div className="lg:col-span-3 space-y-6">
+                <GraficoHumor />
+              </div>
           </section>
         </div>
       </main>
     </SidebarInset>
   )
 }
+
+

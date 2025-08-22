@@ -30,8 +30,8 @@ services:
       - .:/app
       # Volume anônimo para node_modules (evita conflitos Windows/Linux)
       - /app/node_modules
-      # Montar Next.js cache
-      - ./.next:/app/.next
+      # Volume anônimo para .next (evita conflitos de permissão)
+      - /app/.next
     
     # Dependências de outros serviços
     depends_on:
