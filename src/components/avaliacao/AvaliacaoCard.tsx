@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -35,6 +36,12 @@ export function AvaliacaoCard({
   onDelete,
   className
 }: AvaliacaoCardProps) {
+  const [isClient, setIsClient] = useState(false)
+  
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const getBadgeColor = (nota: number) => {
     if (nota >= 5) return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
     if (nota >= 4) return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
@@ -47,6 +54,11 @@ export function AvaliacaoCard({
     if (nota >= 4) return "Bom"
     if (nota >= 3) return "Regular"
     return "Precisa melhorar"
+  }
+
+  const getFormattedDate = () => {
+    if (!isClient) return "—"
+    return format(data, "dd/MM/yyyy", { locale: ptBR })
   }
 
   return (
@@ -68,7 +80,7 @@ export function AvaliacaoCard({
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3 flex-shrink-0" />
-                <span className="text-xs">{format(data, "dd/MM/yyyy", { locale: ptBR })}</span>
+                <span className="text-xs">{getFormattedDate()}</span>
               </div>
             </div>
           </div>
