@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useState, useEffect } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Star, BookOpen, Users } from "lucide-react"
@@ -39,9 +40,32 @@ function formatarData(d: Date) {
 }
 
 export function CalendarioEventos() {
+  const [isClient, setIsClient] = useState(false)
   const hoje = new Date()
   const [ano, setAno] = React.useState(hoje.getFullYear())
   const [mes, setMes] = React.useState(hoje.getMonth()) // 0 = janeiro
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return (
+      <Card className="w-full mx-auto shadow-lg">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b bg-background/80">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <CalendarIcon className="w-5 h-5 text-sky-700 dark:text-sky-400" />
+            Calendário Escolar
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="min-h-[320px] flex items-center justify-center">
+            <span className="text-muted-foreground">Carregando calendário...</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const dias = getDiasDoMes(ano, mes)
   const primeiroDiaSemana = dias[0].getDay() // 0 = domingo
