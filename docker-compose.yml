@@ -20,7 +20,7 @@ services:
     # Variáveis de ambiente
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=mysql://classcheck_user:classcheck_password@db:3306/classcheck_db
+      - DATABASE_URL=postgresql://classcheck_user:classcheck_password@db:5432/classcheck_db?schema=public
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=your-secret-key-change-in-production
     
@@ -30,8 +30,8 @@ services:
       - .:/app
       # Volume anônimo para node_modules (evita conflitos Windows/Linux)
       - /app/node_modules
-      # Volume anônimo para .next (evita conflitos de permissão)
-      - /app/.next
+      # Montar Next.js cache
+      - ./.next:/app/.next
     
     # Dependências de outros serviços
     depends_on:
@@ -55,29 +55,28 @@ services:
       "
 
   # ===================
-  # BANCO MYSQL
+  # BANCO POSTGRESQL
   # ===================
   db:
-    image: mysql:8.0
+    image: postgres:16-alpine
     container_name: classcheck-db
     
-    # Mapeamento de portas: HOST:CONTAINER (usando porta 3307 para evitar conflito)
+    # Mapeamento de portas: HOST:CONTAINER
     ports:
-      - "3307:3306"
+      - "5433:5432"
     
-    # Variáveis de ambiente do MySQL
+    # Variáveis de ambiente do PostgreSQL
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: classcheck_db
-      MYSQL_USER: classcheck_user
-      MYSQL_PASSWORD: classcheck_password
-      MYSQL_ROOT_HOST: '%'
+      POSTGRES_DB: classcheck_db
+      POSTGRES_USER: classcheck_user
+      POSTGRES_PASSWORD: classcheck_password
+      POSTGRES_ROOT_PASSWORD: root_password
     
     # Volume para persistir dados do banco
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
       # Scripts de inicialização (opcional)
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
     
     # Rede customizada
     networks:
@@ -85,7 +84,7 @@ services:
     
     # Health check para garantir que o banco está pronto
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      test: ["CMD-SHELL", "pg_isready -U classcheck_user -d classcheck_db"]
       timeout: 10s
       retries: 10
       interval: 10s
@@ -95,43 +94,36 @@ services:
     restart: unless-stopped
 
   # ===================
-  # PHPMYADMIN (OPCIONAL)
-  # Interface web para gerenciar MySQL
+  # PGADMIN (OPCIONAL)
+  # Interface web para gerenciar PostgreSQL - Alternativa ao DBeaver
   # ===================
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: classcheck-phpmyadmin
-    
-    # Mapeamento de portas: HOST:CONTAINER
-    ports:
-      - "8080:80"
-    
-    # Configurações do phpMyAdmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root_password
-      MYSQL_ROOT_PASSWORD: root_password
-    
-    # Dependências
-    depends_on:
-      db:
-        condition: service_healthy
-    
-    # Rede customizada
-    networks:
-      - classcheck-network
-    
-    # Política de restart
-    restart: unless-stopped
+  # Descomente as linhas abaixo se preferir usar uma interface web
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: classcheck-pgadmin
+  #   
+  #   ports:
+  #     - "8080:80"
+  #   
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@classcheck.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin123
+  #   
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   
+  #   networks:
+  #     - classcheck-network
+  #   
+  #   restart: unless-stopped
 
 # ===================
 # VOLUMES
 # ===================
 volumes:
-  # Volume nomeado para persistir dados do MySQL
-  mysql_data:
+  # Volume nomeado para persistir dados do PostgreSQL
+  postgres_data:
     driver: local
 
 # ===================
