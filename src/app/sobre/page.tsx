@@ -7,7 +7,6 @@ import { Separator } from '@/components/ui/separator'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
-import { InstitutionalNav } from '@/components/shared/InstitutionalNav'
 
 export default function SobrePage() {
   return (
@@ -384,8 +383,6 @@ export default function SobrePage() {
           </div>
         </CardContent>
       </Card>
-
-      <InstitutionalNav />
     </PageContainer>
   )
 }

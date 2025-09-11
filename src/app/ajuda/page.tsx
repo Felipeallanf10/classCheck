@@ -9,7 +9,6 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { FAQItem } from '@/components/faq/FAQItem'
-import { InstitutionalNav } from '@/components/shared/InstitutionalNav'
 
 // Dados das perguntas frequentes
 const faqData = [
@@ -252,8 +251,6 @@ export default function AjudaPage() {
           </div>
         </CardContent>
       </Card>
-
-      <InstitutionalNav />
     </PageContainer>
   )
 }

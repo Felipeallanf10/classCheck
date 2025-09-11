@@ -5,7 +5,6 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { ContatoForm } from '@/components/contato/ContatoForm'
-import { InstitutionalNav } from '@/components/shared/InstitutionalNav'
 
 export default function ContatoPage() {
   return (
@@ -168,8 +167,6 @@ export default function ContatoPage() {
           </Card>
         </div>
       </div>
-
-      <InstitutionalNav />
     </PageContainer>
   )
 }
