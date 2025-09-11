@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
+import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { FAQItem } from '@/components/faq/FAQItem'
 
 // Dados das perguntas frequentes
@@ -117,6 +118,8 @@ export default function AjudaPage() {
 
   return (
     <PageContainer>
+      <Breadcrumb items={[{ label: 'Central de Ajuda' }]} className="mb-6" />
+      
       <PageHeader
         title="Central de Ajuda"
         description="Encontre respostas para as perguntas mais frequentes sobre o ClassCheck"

@@ -159,7 +159,7 @@ const data = {
 }
 
 
-import { Home, Star, Calendar, Heart} from "lucide-react"
+import { Home, Star, Calendar, Heart, HelpCircle, Mail, Info, Shield, FileText, Settings } from "lucide-react"
 import Link from "next/link"
 
 const navItems = [
@@ -168,6 +168,19 @@ const navItems = [
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
   { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
   { label: "Eventos", icon: Calendar, href: "/eventos" },
+]
+
+// Seção de páginas institucionais
+const institutionalItems = [
+  { label: "Ajuda", icon: HelpCircle, href: "/ajuda" },
+  { label: "Contato", icon: Mail, href: "/contato" },
+  { label: "Sobre", icon: Info, href: "/sobre" },
+]
+
+// Seção de políticas (no footer)
+const policyItems = [
+  { label: "Privacidade", icon: Shield, href: "/politica-de-privacidade" },
+  { label: "Termos", icon: FileText, href: "/termos-de-uso" },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -191,23 +204,60 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        {/* Navegação Principal */}
         <SidebarGroup>
-        <SidebarMenu>
-          {navItems.map(({ label, icon: Icon, href }) => (
-            <SidebarMenuItem key={label}>
-              <SidebarMenuButton asChild>
-                <Link href={href}>
-                  <Icon className="size-8" />
-                  <span className="ml-2">{label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+          <SidebarMenu>
+            {navItems.map(({ label, icon: Icon, href }) => (
+              <SidebarMenuItem key={label}>
+                <SidebarMenuButton asChild>
+                  <Link href={href}>
+                    <Icon className="size-4" />
+                    <span className="ml-2">{label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
         </SidebarGroup>
 
+        {/* Seção Institucional */}
+        <SidebarGroup>
+          <div className="px-2 py-1">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Suporte
+            </h4>
+          </div>
+          <SidebarMenu>
+            {institutionalItems.map(({ label, icon: Icon, href }) => (
+              <SidebarMenuItem key={label}>
+                <SidebarMenuButton asChild size="sm">
+                  <Link href={href}>
+                    <Icon className="size-4" />
+                    <span className="ml-2">{label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        {/* Links de Política no Footer */}
+        <SidebarGroup>
+          <SidebarMenu>
+            {policyItems.map(({ label, icon: Icon, href }) => (
+              <SidebarMenuItem key={label}>
+                <SidebarMenuButton asChild size="sm" variant="outline">
+                  <Link href={href} className="text-xs">
+                    <Icon className="size-3" />
+                    <span className="ml-1">{label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+        
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />

@@ -3,11 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
+import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { ContatoForm } from '@/components/contato/ContatoForm'
 
 export default function ContatoPage() {
   return (
     <PageContainer>
+      <Breadcrumb items={[{ label: 'Contato' }]} className="mb-6" />
+      
       <PageHeader
         title="Entre em Contato"
         description="Estamos aqui para ajudar! Entre em contato conosco através do formulário abaixo ou pelos nossos canais de atendimento."
