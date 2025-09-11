@@ -9,7 +9,10 @@ import { ContatoForm } from '@/components/contato/ContatoForm'
 export default function ContatoPage() {
   return (
     <PageContainer>
-      <Breadcrumb items={[{ label: 'Contato' }]} className="mb-6" />
+      <Breadcrumb items={[
+        { label: 'Suporte', href: '/suporte' },
+        { label: 'Contato' }
+      ]} className="mb-6" />
       
       <PageHeader
         title="Entre em Contato"

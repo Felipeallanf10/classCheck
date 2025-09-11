@@ -172,7 +172,8 @@ const navItems = [
 
 // Seção de páginas institucionais
 const institutionalItems = [
-  { label: "Ajuda", icon: HelpCircle, href: "/ajuda" },
+  { label: "Suporte", icon: HelpCircle, href: "/suporte" },
+  { label: "Ajuda", icon: BookOpen, href: "/ajuda" },
   { label: "Contato", icon: Mail, href: "/contato" },
   { label: "Sobre", icon: Info, href: "/sobre" },
 ]

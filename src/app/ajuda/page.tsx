@@ -119,7 +119,7 @@ export default function AjudaPage() {
   return (
     <PageContainer>
       <Breadcrumb items={[
-        { label: 'Suporte', href: '/contato' },
+        { label: 'Suporte', href: '/suporte' },
         { label: 'Central de Ajuda' }
       ]} className="mb-6" />
       
