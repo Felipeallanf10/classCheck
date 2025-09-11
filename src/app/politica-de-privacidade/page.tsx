@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
+import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { cn } from '@/lib/utils'
 
 // Seções da política de privacidade
@@ -57,6 +58,11 @@ export default function PoliticaPrivacidadePage() {
   return (
     <PageContainer maxWidth="full">
       <div className="max-w-4xl mx-auto">
+        <Breadcrumb items={[
+          { label: 'Institucional', href: '/sobre' },
+          { label: 'Política de Privacidade' }
+        ]} className="mb-6" />
+        
         <PageHeader
           title="Política de Privacidade"
           description="Saiba como coletamos, usamos e protegemos seus dados pessoais no ClassCheck. Última atualização: 11 de setembro de 2025."

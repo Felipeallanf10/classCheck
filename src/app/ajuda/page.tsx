@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
 import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { FAQItem } from '@/components/faq/FAQItem'
+import { InstitutionalNav } from '@/components/shared/InstitutionalNav'
 
 // Dados das perguntas frequentes
 const faqData = [
@@ -118,7 +119,10 @@ export default function AjudaPage() {
 
   return (
     <PageContainer>
-      <Breadcrumb items={[{ label: 'Central de Ajuda' }]} className="mb-6" />
+      <Breadcrumb items={[
+        { label: 'Suporte', href: '/contato' },
+        { label: 'Central de Ajuda' }
+      ]} className="mb-6" />
       
       <PageHeader
         title="Central de Ajuda"
@@ -248,6 +252,8 @@ export default function AjudaPage() {
           </div>
         </CardContent>
       </Card>
+
+      <InstitutionalNav />
     </PageContainer>
   )
 }

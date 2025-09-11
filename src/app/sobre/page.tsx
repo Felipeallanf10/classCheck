@@ -1,13 +1,19 @@
+'use client'
+
 import { Target, Eye, Heart, Github, Linkedin, Mail } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
+import { Breadcrumb } from '@/components/shared/Breadcrumb'
+import { InstitutionalNav } from '@/components/shared/InstitutionalNav'
 
 export default function SobrePage() {
   return (
     <PageContainer>
+      <Breadcrumb items={[{ label: 'Sobre' }]} className="mb-6" />
+      
       <PageHeader
         title="Sobre o ClassCheck"
         description="Conheça nossa missão, visão e a equipe por trás da plataforma que está transformando a educação através de feedback inteligente."
@@ -378,6 +384,8 @@ export default function SobrePage() {
           </div>
         </CardContent>
       </Card>
+
+      <InstitutionalNav />
     </PageContainer>
   )
 }

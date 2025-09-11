@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { PageContainer } from '@/components/shared/PageContainer'
+import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { cn } from '@/lib/utils'
 
 // Seções dos termos de uso
@@ -61,6 +62,11 @@ export default function TermosUsoPage() {
   return (
     <PageContainer maxWidth="full">
       <div className="max-w-4xl mx-auto">
+        <Breadcrumb items={[
+          { label: 'Institucional', href: '/sobre' },
+          { label: 'Termos de Uso' }
+        ]} className="mb-6" />
+        
         <PageHeader
           title="Termos de Uso"
           description="Leia com atenção os termos e condições para uso da plataforma ClassCheck. Última atualização: 11 de setembro de 2025."
