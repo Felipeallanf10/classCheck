@@ -13,6 +13,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  Trophy,
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -54,86 +55,214 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: SquareTerminal,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Visão Geral",
+          url: "/dashboard",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Métricas da Turma",
+          url: "/dashboard?tab=metricas",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Tabela de Alunos",
+          url: "/dashboard?tab=alunos",
+        },
+        {
+          title: "Alertas Urgentes",
+          url: "/dashboard?tab=alertas",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
+      title: "Questionário Socioemocional",
+      url: "/questionario",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Questionário Adaptivo",
+          url: "/questionario",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Avaliação Socioemocional",
+          url: "/avaliacao-socioemocional",
         },
         {
-          title: "Tutorials",
-          url: "#",
+          title: "Histórico de Respostas",
+          url: "/questionario/historico",
         },
         {
-          title: "Changelog",
-          url: "#",
+          title: "Análise Científica",
+          url: "/questionario/analise",
+        },
+        {
+          title: "Resultados Detalhados",
+          url: "/questionario/resultados",
         },
       ],
     },
     {
-      title: "Settings",
+      title: "Relatórios Científicos",
+      url: "/relatorios",
+      icon: PieChart,
+      items: [
+        {
+          title: "Análise Longitudinal",
+          url: "/relatorios?type=longitudinal",
+        },
+        {
+          title: "Tendências da Turma",
+          url: "/relatorios?type=tendencias",
+        },
+        {
+          title: "Circumplex de Russell",
+          url: "/relatorios?type=circumplex",
+        },
+        {
+          title: "Evolução Emocional",
+          url: "/relatorios?type=evolucao",
+        },
+        {
+          title: "Mapa de Calor Emocional",
+          url: "/relatorios?type=mapa",
+        },
+        {
+          title: "Validação Psicométrica",
+          url: "/relatorios?type=validacao",
+        },
+      ],
+    },
+    {
+      title: "Insights Científicos",
+      url: "/insights",
+      icon: Bot,
+      items: [
+        {
+          title: "Previsões TRI",
+          url: "/insights?tab=previsoes",
+        },
+        {
+          title: "Análise de Cenários",
+          url: "/insights?tab=cenarios",
+        },
+        {
+          title: "Recomendações Adaptivas",
+          url: "/insights?tab=recomendacoes",
+        },
+        {
+          title: "Métricas do Modelo",
+          url: "/insights?tab=metricas",
+        },
+        {
+          title: "Validação Científica",
+          url: "/insights?tab=validacao",
+        },
+        {
+          title: "Motor Adaptativo",
+          url: "/insights?tab=motor",
+        },
+      ],
+    },
+    {
+      title: "Exportação",
+      url: "/exportacao",
+      icon: BookOpen,
+      items: [
+        {
+          title: "Gerar Relatórios",
+          url: "/exportacao",
+        },
+        {
+          title: "Templates",
+          url: "/exportacao?tab=templates",
+        },
+        {
+          title: "Histórico",
+          url: "/exportacao?tab=historico",
+        },
+        {
+          title: "Compartilhamento",
+          url: "/exportacao?tab=compartilhar",
+        },
+      ],
+    },
+    {
+      title: "Sistema Científico",
+      url: "/sprint3",
+      icon: Trophy,
+      items: [
+        {
+          title: "Motor Adaptativo",
+          url: "/sprint3?component=adaptive-engine",
+        },
+        {
+          title: "Seleção de Questões",
+          url: "/sprint3?component=question-selection",
+        },
+        {
+          title: "Analytics Científicas",
+          url: "/sprint3?component=scientific-analytics",
+        },
+        {
+          title: "Banco de Questões",
+          url: "/sprint3?component=validated-questions",
+        },
+        {
+          title: "Testes Unitários",
+          url: "/sprint3?component=tests",
+        },
+      ],
+    },
+    {
+      title: "Gamificação",
+      url: "/gamificacao",
+      icon: Trophy,
+      items: [
+        {
+          title: "Dashboard",
+          url: "/gamificacao",
+        },
+        {
+          title: "Conquistas",
+          url: "/gamificacao/conquistas",
+        },
+        {
+          title: "Ranking",
+          url: "/gamificacao/ranking",
+        },
+        {
+          title: "Missões",
+          url: "/gamificacao/missoes",
+        },
+        {
+          title: "Perfil",
+          url: "/gamificacao/perfil",
+        },
+      ],
+    },
+    {
+      title: "Configurações",
       url: "#",
       icon: Settings2,
       items: [
         {
-          title: "General",
+          title: "Perfil",
           url: "#",
         },
         {
-          title: "Team",
+          title: "Notificações",
           url: "#",
         },
         {
-          title: "Billing",
+          title: "Privacidade",
           url: "#",
         },
         {
-          title: "Limits",
+          title: "Integrações",
           url: "#",
         },
       ],
@@ -159,14 +288,21 @@ const data = {
 }
 
 
-import { Home, Star, Calendar} from "lucide-react"
+import { Home, Star, Calendar, Brain, BarChart3, FileText, Zap, Target, Users } from "lucide-react"
 import Link from "next/link"
 
 const navItems = [
-  { label: "Início", icon: Home, href: "/" },
-  { label: "Favoritas", icon: Star, href: "/favoritas" },
+  { label: "Início", icon: Home, href: "/home" },
+  { label: "Dashboard", icon: BarChart3, href: "/dashboard" },
+  { label: "Questionário", icon: Brain, href: "/questionario" },
+  { label: "Avaliação Socioemocional", icon: Target, href: "/avaliacao-socioemocional" },
+  { label: "Sistema Científico", icon: Users, href: "/sprint3" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
-  { label: "Eventos", icon: Calendar, href: "/eventos" },
+  { label: "Favoritas", icon: Star, href: "/favoritos" },
+  { label: "Relatórios", icon: FileText, href: "/relatorios" },
+  { label: "Insights Preditivos", icon: Zap, href: "/insights" },
+  { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
+  { label: "Exportação", icon: Calendar, href: "/exportacao" },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

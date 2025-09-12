@@ -31,6 +31,7 @@ model Usuario {
   avaliacoes     Avaliacao[]
   humorRegistros HumorRegistro[]
   aulasFavoritas AulaFavorita[]
+  avaliacoesSocioemocionais AvaliacaoSocioemocional[]
 
   @@map("usuarios")
 }
@@ -145,6 +146,26 @@ model Evento {
   aula Aula? @relation(fields: [aulaId], references: [id])
 
   @@map("eventos")
+}
+
+// Modelo AvaliacaoSocioemocional (Sistema Psicométrico)
+model AvaliacaoSocioemocional {
+  id               String   @id @default(cuid())
+  usuarioId        Int
+  estadoEmocional  String   @db.VarChar(50)  // Ex: "feliz", "ansioso", "focado"
+  valencia         Float    // -2.0 a +2.0 (modelo circumplex)
+  ativacao         Float    // -2.0 a +2.0 (modelo circumplex)
+  confianca        Float    // 0.0 a 1.0 (confiabilidade da predição)
+  observacoes      String?  @db.Text
+  respostas        String?  @db.Text // JSON das respostas do questionário
+  dataAvaliacao    DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("avaliacoes_socioemocionais")
 }
 
 // ==============================================
