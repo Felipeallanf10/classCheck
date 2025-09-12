@@ -61,7 +61,7 @@ export default function TermosUsoPage() {
 
   return (
     <PageContainer maxWidth="full">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <Breadcrumb items={[{ label: 'Termos de Uso' }]} className="mb-6" />
         
         <PageHeader
@@ -79,16 +79,16 @@ export default function TermosUsoPage() {
           </AlertDescription>
         </Alert>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Índice lateral */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-6">
-              <CardHeader>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Índice lateral compacto */}
+          <div className="lg:w-72 lg:flex-shrink-0">
+            <Card className="lg:sticky lg:top-6">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-base">Índice</CardTitle>
-                <CardDescription>Navegue pelas seções</CardDescription>
+                <CardDescription className="text-xs">Navegue pelas seções</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[500px]">
+                <ScrollArea className="h-[400px]">
                   <nav className="space-y-1 p-3">
                     {sections.map((section) => {
                       const Icon = section.icon
@@ -97,16 +97,18 @@ export default function TermosUsoPage() {
                           key={section.id}
                           variant="ghost"
                           className={cn(
-                            "w-full justify-start text-left h-auto py-2 px-3",
+                            "w-full justify-start text-left h-auto py-1.5 px-2 text-xs",
                             activeSection === section.id 
                               ? "bg-primary/10 text-primary border-r-2 border-primary" 
                               : "text-muted-foreground hover:text-foreground"
                           )}
                           onClick={() => scrollToSection(section.id)}
                         >
-                          <Icon className="mr-2 h-4 w-4 flex-shrink-0" />
-                          <span className="text-sm">{section.title}</span>
-                          <ChevronRight className="ml-auto h-3 w-3 opacity-50" />
+                          <div className="flex items-center gap-2 w-full min-w-0">
+                            <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span className="flex-1 break-words leading-tight">{section.title}</span>
+                            <ChevronRight className="h-2.5 w-2.5 opacity-50 flex-shrink-0" />
+                          </div>
                         </Button>
                       )
                     })}
@@ -116,8 +118,8 @@ export default function TermosUsoPage() {
             </Card>
           </div>
 
-          {/* Conteúdo principal */}
-          <div className="lg:col-span-3 space-y-8">
+        {/* Conteúdo principal */}
+        <div className="flex-1 space-y-8">
             
             {/* Aceitação dos Termos */}
             <section id="aceitacao" className="scroll-mt-6">
