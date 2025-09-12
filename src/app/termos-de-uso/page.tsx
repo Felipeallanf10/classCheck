@@ -62,10 +62,7 @@ export default function TermosUsoPage() {
   return (
     <PageContainer maxWidth="full">
       <div className="max-w-4xl mx-auto">
-        <Breadcrumb items={[
-          { label: 'Institucional', href: '/sobre' },
-          { label: 'Termos de Uso' }
-        ]} className="mb-6" />
+        <Breadcrumb items={[{ label: 'Termos de Uso' }]} className="mb-6" />
         
         <PageHeader
           title="Termos de Uso"

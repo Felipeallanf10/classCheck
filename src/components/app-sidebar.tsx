@@ -159,7 +159,7 @@ const data = {
 }
 
 
-import { Home, Star, Calendar, Heart, HelpCircle, Mail, Info, Shield, FileText, Settings } from "lucide-react"
+import { Home, Star, Calendar, Heart, HelpCircle, Mail, Info, Shield, FileText, Settings, LifeBuoy } from "lucide-react"
 import Link from "next/link"
 
 const navItems = [
@@ -172,8 +172,8 @@ const navItems = [
 
 // Seção de páginas institucionais
 const institutionalItems = [
-  { label: "Suporte", icon: HelpCircle, href: "/suporte" },
-  { label: "Ajuda", icon: BookOpen, href: "/ajuda" },
+  { label: "Central de Suporte", icon: LifeBuoy, href: "/suporte" },
+  { label: "Ajuda", icon: HelpCircle, href: "/ajuda" },
   { label: "Contato", icon: Mail, href: "/contato" },
   { label: "Sobre", icon: Info, href: "/sobre" },
 ]

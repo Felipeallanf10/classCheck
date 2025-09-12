@@ -10,7 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { PageContainer } from '@/components/shared/PageContainer'
-import { Breadcrumb } from '@/components/shared/Breadcrumb'
 import { useToast } from '@/hooks/use-toast'
 
 // Status da manutenção (isso viria de uma API em produção)
@@ -130,8 +129,6 @@ export default function MaintenancePage() {
 
   return (
     <PageContainer maxWidth="3xl">
-      <Breadcrumb items={[{ label: 'Manutenção' }]} className="mb-6" />
-      
       <div className="min-h-screen py-8 space-y-8">
         
         {/* Cabeçalho principal */}

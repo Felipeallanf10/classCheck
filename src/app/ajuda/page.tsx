@@ -118,10 +118,7 @@ export default function AjudaPage() {
 
   return (
     <PageContainer>
-      <Breadcrumb items={[
-        { label: 'Suporte', href: '/suporte' },
-        { label: 'Central de Ajuda' }
-      ]} className="mb-6" />
+      <Breadcrumb items={[{ label: 'Central de Ajuda' }]} className="mb-6" />
       
       <PageHeader
         title="Central de Ajuda"

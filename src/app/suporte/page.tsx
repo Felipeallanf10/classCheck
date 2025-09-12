@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { HelpCircle, MessageCircle, FileText, AlertCircle, Search, Lightbulb, Bug, Settings } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -94,6 +95,7 @@ const searchSuggestions = [
 export default function SuportePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredTypes, setFilteredTypes] = useState(supportTypes)
+  const router = useRouter()
 
   // Filtrar tipos de suporte baseado na busca
   const handleSearch = (term: string) => {
@@ -164,7 +166,7 @@ export default function SuportePage() {
             <Card 
               key={type.id} 
               className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${type.color}`}
-              onClick={() => window.location.href = type.href}
+              onClick={() => router.push(type.href)}
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
@@ -244,15 +246,15 @@ export default function SuportePage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-green-600 mb-1">< 2h</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">&lt; 2h</div>
               <div className="text-sm text-muted-foreground">Problemas Críticos</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 mb-1">< 12h</div>
+              <div className="text-2xl font-bold text-blue-600 mb-1">&lt; 12h</div>
               <div className="text-sm text-muted-foreground">Problemas Técnicos</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 mb-1">< 24h</div>
+              <div className="text-2xl font-bold text-purple-600 mb-1">&lt; 24h</div>
               <div className="text-sm text-muted-foreground">Dúvidas Gerais</div>
             </div>
           </div>

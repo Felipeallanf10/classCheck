@@ -58,10 +58,7 @@ export default function PoliticaPrivacidadePage() {
   return (
     <PageContainer maxWidth="full">
       <div className="max-w-4xl mx-auto">
-        <Breadcrumb items={[
-          { label: 'Institucional', href: '/sobre' },
-          { label: 'Política de Privacidade' }
-        ]} className="mb-6" />
+        <Breadcrumb items={[{ label: 'Política de Privacidade' }]} className="mb-6" />
         
         <PageHeader
           title="Política de Privacidade"
