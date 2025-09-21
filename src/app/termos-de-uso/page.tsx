@@ -61,8 +61,8 @@ export default function TermosUsoPage() {
 
   return (
     <PageContainer maxWidth="full">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        <Breadcrumb items={[{ label: 'Termos de Uso' }]} className="mb-6" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb items={[{ label: 'Termos de Uso' }]} className="mb-4 md:mb-6" />
         
         <PageHeader
           title="Termos de Uso"
@@ -70,46 +70,47 @@ export default function TermosUsoPage() {
         />
 
         {/* Alerta importante */}
-        <Alert className="mb-8">
+        <Alert className="mb-4 md:mb-6 lg:mb-8">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Importante</AlertTitle>
-          <AlertDescription>
+          <AlertDescription className="text-sm">
             Ao utilizar o ClassCheck, você concorda integralmente com estes termos. 
             Se não concordar com algum item, não utilize nossos serviços.
           </AlertDescription>
         </Alert>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8">
           {/* Índice lateral compacto */}
-          <div className="lg:w-72 lg:flex-shrink-0">
+          <div className="order-1 lg:w-72 lg:flex-shrink-0">
             <Card className="lg:sticky lg:top-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Índice</CardTitle>
-                <CardDescription className="text-xs">Navegue pelas seções</CardDescription>
+              <CardHeader className="pb-2 md:pb-3">
+                <CardTitle className="text-sm md:text-base">Índice</CardTitle>
+                <CardDescription className="text-xs hidden sm:block">Navegue pelas seções</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[400px]">
-                  <nav className="space-y-1 p-3">
+                <ScrollArea className="h-[250px] sm:h-[300px] lg:h-[400px]">
+                  <nav className="space-y-0.5 sm:space-y-1 p-2 sm:p-3 nav-item-container">
                     {sections.map((section) => {
                       const Icon = section.icon
                       return (
-                        <Button
-                          key={section.id}
-                          variant="ghost"
-                          className={cn(
-                            "w-full justify-start text-left h-auto py-1.5 px-2 text-xs",
-                            activeSection === section.id 
-                              ? "bg-primary/10 text-primary border-r-2 border-primary" 
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                          onClick={() => scrollToSection(section.id)}
-                        >
-                          <div className="flex items-center gap-2 w-full min-w-0">
-                            <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-                            <span className="flex-1 break-words leading-tight">{section.title}</span>
-                            <ChevronRight className="h-2.5 w-2.5 opacity-50 flex-shrink-0" />
-                          </div>
-                        </Button>
+                        <div key={section.id} className="nav-item-container">
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-start text-left h-auto py-1 sm:py-1.5 px-1.5 sm:px-2 text-xs sm:text-sm lg:text-xs",
+                              activeSection === section.id 
+                                ? "bg-primary/10 text-primary border-r-2 border-primary" 
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                            onClick={() => scrollToSection(section.id)}
+                          >
+                            <div className="flex items-center gap-1.5 sm:gap-2 w-full min-w-0 overflow-visible">
+                              <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                              <span className="flex-1 break-words leading-tight text-wrap-force">{section.title}</span>
+                              <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 opacity-50 flex-shrink-0" />
+                            </div>
+                          </Button>
+                        </div>
                       )
                     })}
                   </nav>
@@ -119,7 +120,7 @@ export default function TermosUsoPage() {
           </div>
 
         {/* Conteúdo principal */}
-        <div className="flex-1 space-y-8">
+        <div className="order-2 flex-1 space-y-4 md:space-y-6 lg:space-y-8">
             
             {/* Aceitação dos Termos */}
             <section id="aceitacao" className="scroll-mt-6">
@@ -809,24 +810,24 @@ export default function TermosUsoPage() {
                       <div>
                         <h4 className="font-semibold mb-3">Canais de Atendimento</h4>
                         <div className="space-y-3">
-                          <Button asChild className="w-full justify-start">
-                            <a href="/contato">
-                              <FileText className="mr-2 h-4 w-4" />
-                              Formulário de Contato
+                          <Button asChild className="w-full justify-start h-auto py-2 px-3">
+                            <a href="/contato" className="text-wrap-force">
+                              <FileText className="mr-2 h-4 w-4 flex-shrink-0" />
+                              <span className="text-wrap-force break-words">Formulário de Contato</span>
                             </a>
                           </Button>
                           
-                          <Button variant="outline" asChild className="w-full justify-start">
-                            <a href="/ajuda">
-                              <Users className="mr-2 h-4 w-4" />
-                              Central de Ajuda
+                          <Button variant="outline" asChild className="w-full justify-start h-auto py-2 px-3">
+                            <a href="/ajuda" className="text-wrap-force">
+                              <Users className="mr-2 h-4 w-4 flex-shrink-0" />
+                              <span className="text-wrap-force break-words">Central de Ajuda</span>
                             </a>
                           </Button>
 
-                          <Button variant="outline" asChild className="w-full justify-start">
-                            <a href="/politica-de-privacidade">
-                              <Shield className="mr-2 h-4 w-4" />
-                              Política de Privacidade
+                          <Button variant="outline" asChild className="w-full justify-start h-auto py-2 px-3">
+                            <a href="/politica-de-privacidade" className="text-wrap-force">
+                              <Shield className="mr-2 h-4 w-4 flex-shrink-0" />
+                              <span className="text-wrap-force break-words">Política de Privacidade</span>
                             </a>
                           </Button>
                         </div>

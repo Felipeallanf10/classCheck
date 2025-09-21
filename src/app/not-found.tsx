@@ -63,8 +63,8 @@ export default function NotFoundPage() {
   }
 
   return (
-    <PageContainer maxWidth="3xl">
-      <div className="min-h-[80vh] flex flex-col items-center justify-center text-center space-y-8">
+    <PageContainer maxWidth="3xl" className="px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto min-h-[80vh] flex flex-col items-center justify-center text-center space-y-8">
         
         {/* Ilustração e erro principal */}
         <div className="space-y-6">

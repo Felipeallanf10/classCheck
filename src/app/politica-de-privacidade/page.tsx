@@ -56,26 +56,26 @@ export default function PoliticaPrivacidadePage() {
   }
 
   return (
-    <PageContainer maxWidth="full">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        <Breadcrumb items={[{ label: 'Política de Privacidade' }]} className="mb-6" />
+    <PageContainer maxWidth="full" className="px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <Breadcrumb items={[{ label: 'Política de Privacidade' }]} className="mb-4 md:mb-6" />
         
         <PageHeader
           title="Política de Privacidade"
           description="Saiba como coletamos, usamos e protegemos seus dados pessoais no ClassCheck. Última atualização: 11 de setembro de 2025."
         />
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Índice lateral compacto */}
-          <div className="lg:w-72 lg:flex-shrink-0">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8">
+          {/* Índice lateral compacto - Hidden on mobile, show as dropdown on small screens */}
+          <div className="order-2 lg:order-1 lg:w-72 lg:flex-shrink-0">
             <Card className="lg:sticky lg:top-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Índice</CardTitle>
-                <CardDescription className="text-xs">Navegue pelas seções</CardDescription>
+              <CardHeader className="pb-2 md:pb-3">
+                <CardTitle className="text-sm md:text-base">Índice</CardTitle>
+                <CardDescription className="text-xs hidden sm:block">Navegue pelas seções</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[350px]">
-                  <nav className="space-y-1 p-3">
+                <ScrollArea className="h-[250px] sm:h-[300px] lg:h-[350px]">
+                  <nav className="space-y-0.5 sm:space-y-1 p-2 sm:p-3">
                     {sections.map((section) => {
                       const Icon = section.icon
                       return (
@@ -83,17 +83,17 @@ export default function PoliticaPrivacidadePage() {
                           key={section.id}
                           variant="ghost"
                           className={cn(
-                            "w-full justify-start text-left h-auto py-1.5 px-2 text-xs",
+                            "w-full justify-start text-left h-auto py-1 sm:py-1.5 px-1.5 sm:px-2 text-xs sm:text-sm lg:text-xs",
                             activeSection === section.id 
                               ? "bg-primary/10 text-primary border-r-2 border-primary" 
                               : "text-muted-foreground hover:text-foreground"
                           )}
                           onClick={() => scrollToSection(section.id)}
                         >
-                          <div className="flex items-center gap-2 w-full min-w-0">
-                            <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                          <div className="flex items-center gap-1.5 sm:gap-2 w-full min-w-0">
+                            <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
                             <span className="flex-1 break-words leading-tight">{section.title}</span>
-                            <ChevronRight className="h-2.5 w-2.5 opacity-50 flex-shrink-0" />
+                            <ChevronRight className="h-2 w-2 sm:h-2.5 sm:w-2.5 opacity-50 flex-shrink-0" />
                           </div>
                         </Button>
                       )
@@ -105,7 +105,7 @@ export default function PoliticaPrivacidadePage() {
           </div>
 
         {/* Conteúdo principal */}
-        <div className="flex-1 space-y-8">
+        <div className="order-1 lg:order-2 flex-1 space-y-4 md:space-y-6 lg:space-y-8">
             
             {/* Introdução */}
             <section id="introducao" className="scroll-mt-6">
@@ -200,7 +200,7 @@ export default function PoliticaPrivacidadePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-3">
                       <h4 className="font-semibold">Funcionalidades do Sistema</h4>
                       <ul className="space-y-1 text-sm text-muted-foreground">
