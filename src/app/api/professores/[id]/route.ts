@@ -11,10 +11,11 @@ const updateProfessorSchema = z.object({
 })
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
     const id = parseInt(params.id)
     
@@ -72,7 +73,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
     const id = parseInt(params.id)
     
@@ -143,7 +145,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
     const id = parseInt(params.id)
     

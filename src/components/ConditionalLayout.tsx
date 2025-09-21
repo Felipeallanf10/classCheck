@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Footer } from '@/components/Footer'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppLoading } from '@/components/ui'
 import { useEffect, useState } from 'react'
@@ -18,6 +19,9 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   // Rotas que devem exibir a navegação (páginas logadas)
   const showNavRoutes = ['/home', '/favoritos', '/aulas', '/eventos', '/dashboard']
   
+  // Rotas que são páginas institucionais (devem ter footer)
+  const institutionalRoutes = ['/ajuda', '/contato', '/sobre', '/suporte', '/politica-de-privacidade', '/termos-de-uso', '/manutencao']
+  
   // Rotas de autenticação que usam layout próprio
   const isAuthRoute = pathname.startsWith('/login') || 
                      pathname.startsWith('/cadastro') || 
@@ -25,6 +29,9 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   
   // Verifica se deve mostrar a navegação
   const showNav = showNavRoutes.some(route => pathname.startsWith(route))
+  
+  // Verifica se é página institucional (precisa de footer)
+  const isInstitutionalPage = institutionalRoutes.some(route => pathname.startsWith(route)) || pathname === '/'
 
   // Simula loading entre rotas (apenas para rotas navegadas)
   useEffect(() => {
@@ -44,7 +51,15 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   if (!showNav) {
     return (
       <>
-        {children}
+        <div className="min-h-screen flex flex-col">
+          <main className="flex-1">
+            {children}
+          </main>
+          
+          {/* Footer para páginas institucionais */}
+          {isInstitutionalPage && <Footer />}
+        </div>
+        
         {/* Botão flutuante theme com design tokens */}
         <div className="fixed bottom-6 right-6 z-50">
           <div className="p-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full shadow-lg border border-neutral-200 dark:border-neutral-700">
