@@ -1,6 +1,6 @@
 // ==============================================
 // PRISMA SCHEMA - ClassCheck
-// Database: MySQL 8.0
+// Database: PostgreSQL 16
 // ==============================================
 
 generator client {
@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -81,7 +81,7 @@ model Avaliacao {
   usuarioId Int
   aulaId    Int
   humor     TipoHumor
-  nota      Int?     @db.TinyInt // 1-5 estrelas
+  nota      Int?     @db.SmallInt // 1-5 estrelas
   feedback  String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -100,7 +100,7 @@ model HumorRegistro {
   id        Int      @id @default(autoincrement())
   usuarioId Int
   humor     TipoHumor
-  data      DateTime @db.Date
+  data      DateTime @default(now()) @db.Date
   observacao String? @db.Text
   createdAt DateTime @default(now())
 

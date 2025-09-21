@@ -3,8 +3,8 @@
 # Ambiente: Desenvolvimento com Hot Reload
 # ==============================================
 
-# Usar imagem oficial do Node.js 20 (LTS)
-FROM node:20-alpine
+# Usar imagem oficial do Node.js 22 (LTS)
+FROM node:22-alpine
 
 # Definir diretório de trabalho dentro do contêiner
 WORKDIR /app

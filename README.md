@@ -1,14 +1,39 @@
 # 🎓 ClassCheck
 
-Sistema para avaliação socioemocional de aulas, desenvolvido com **Next.js 15**, **TypeScript**, **MySQL** e **Prisma**.
+Sistema para avaliação socioemocional de aulas, desenvolvido com **Next.js 15**, **TypeScript**, **MySQL** e **Prisma**, integrando um **Design System v2** completo.
 
 ## 📋 Stack Tecnológica
 
 - **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
-- **UI Components**: shadcn/ui + Radix UI
+- **UI Components**: shadcn/ui + Radix UI + Design System v2 Customizado
+- **Design System**: 15 componentes integrados com tokens de design
+- **Notifications**: Sistema de Toast + Confirmações globais
 - **Banco de Dados**: MySQL 8.0 + Prisma ORM
 - **Containerização**: Docker + Docker Compose
 - **Autenticação**: NextAuth.js (configuração futura)
+
+## 🎨 Design System v2 Integrado
+
+### Componentes Disponíveis
+- **Enhanced Input**: `EmailInput`, `PasswordInput` com estados avançados
+- **Loading States**: `LoadingButton`, `AppLoading`, `PageLoading`
+- **Feedback**: Sistema de Toast com múltiplas variantes
+- **Metrics**: `MetricsProgress`, `ClassCheckMetrics` para dashboards
+- **Confirmations**: Hook `useConfirm` para diálogos globais
+
+### Tokens de Design
+- **Colors**: `primary-*`, `success-*`, `warning-*`, `error-*`, `info-*`
+- **Typography**: Gradientes, tamanhos responsivos
+- **Animations**: Transições suaves, hover effects, loading states
+- **Layout**: Grids responsivos, cards com elevação
+
+### Integração Completa
+✅ **Páginas de Autenticação**: Login, Cadastro, Reset Password  
+✅ **Layouts**: ConditionalLayout com AppLoading  
+✅ **Landing Page**: Hero, Features com design tokens  
+✅ **Dashboard**: Métricas com ClassCheckMetrics  
+✅ **Sistema de Toasts**: Feedback global integrado  
+✅ **Confirmações**: Diálogos de confirmação reutilizáveis  
 
 ## 🚀 Getting Started
 
@@ -139,14 +164,86 @@ classcheck/
 │       └── init/              # Scripts de inicialização MySQL
 ├── 📱 src/
 │   ├── app/                   # App Router (Next.js 15)
+│   │   ├── (auth)/           # Páginas de autenticação integradas
+│   │   ├── home/             # Dashboard com métricas v2
+│   │   └── aulas/            # Listagem de aulas melhorada
 │   ├── components/            # Componentes React
-│   │   └── ui/               # Design System (shadcn/ui)
+│   │   ├── ui/               # Design System v2 (15 componentes)
+│   │   ├── landing/          # Landing page com design tokens
+│   │   └── *.tsx             # Componentes ClassCheck
 │   ├── hooks/                # Custom Hooks
+│   │   ├── use-toast.ts      # Sistema de notificações
+│   │   └── use-confirm.tsx   # Confirmações globais
 │   └── lib/                  # Utilitários
 ├── 🔧 prisma/                 # Schema e migrações (a criar)
 ├── 📄 Dockerfile             # Imagem Docker da aplicação
 ├── 📄 docker-compose.yml     # Orquestração dos serviços
 └── 📄 .env.example          # Exemplo de variáveis de ambiente
+```
+
+## 🚀 Funcionalidades do Design System
+
+### 📝 Componentes de Formulário
+```tsx
+import { EmailInput, PasswordInput } from '@/components/ui/enhanced-input'
+import { LoadingButton } from '@/components/ui/loading-button'
+
+// Uso nos formulários de auth
+<EmailInput 
+  label="E-mail" 
+  error={errors.email?.message}
+  loading={isLoading}
+/>
+<LoadingButton loading={isSubmitting}>
+  Entrar
+</LoadingButton>
+```
+
+### 📊 Métricas do Dashboard
+```tsx
+import { ClassCheckMetrics } from '@/components/ui/metrics-progress'
+
+// Dashboard integrado
+<ClassCheckMetrics 
+  userType="aluno"
+  data={{
+    totalAulas: 25,
+    aulasCompletadas: 12,
+    avaliacaoMedia: 4.2
+  }}
+/>
+```
+
+### 🔔 Sistema de Notificações
+```tsx
+import { useToast } from '@/hooks/use-toast'
+import { useConfirm } from '@/hooks/use-confirm'
+
+const { toast } = useToast()
+const { confirm } = useConfirm()
+
+// Notificações
+toast.success("Ação realizada com sucesso!")
+toast.error("Erro ao processar solicitação")
+
+// Confirmações
+const confirmed = await confirm({
+  title: 'Confirmar exclusão',
+  description: 'Esta ação não pode ser desfeita',
+  variant: 'destructive'
+})
+```
+
+### 🎨 Tokens de Design
+```tsx
+// Cores primárias
+className="bg-primary-600 text-primary-50"
+className="border-primary-200 hover:border-primary-300"
+
+// Estados de feedback
+className="bg-success-50 text-success-900"
+className="bg-warning-100 border-warning-500"
+className="bg-error-50 text-error-700"
 ```
 
 ## 🌐 URLs do Ambiente
@@ -184,25 +281,29 @@ classcheck/
 ## 🎯 Funcionalidades
 
 ### ✅ Implementado
-- Dashboard responsivo com modo claro/escuro
-- Componentes UI reutilizáveis (shadcn/ui)
-- Gráficos interativos (Recharts)
-- Sistema de humor e avaliações
-- Calendário de eventos
-- Sidebar navegacional
+- **Design System v2**: 15 componentes integrados com tokens de design
+- **Autenticação Melhorada**: Login, cadastro e reset com enhanced inputs
+- **Dashboard Avançado**: Métricas responsivas com ClassCheckMetrics
+- **Sistema de Feedback**: Toasts e confirmações globais
+- **Landing Page v2**: Hero e features com design tokens aplicados
+- **Animações**: Transições suaves e loading states
+- **Modo Escuro**: Tema completo com design tokens
+- **Componentes UI**: shadcn/ui customizados e otimizados
 
 ### 🔄 Em Desenvolvimento
 - Sistema de autenticação (NextAuth)
 - Integração com banco MySQL + Prisma
 - APIs REST para CRUD
 - Testes automatizados
+- Cards de Aula v2 (AulaCard, ProfessorCard)
 
 ### 📋 Roadmap
 - PWA (Progressive Web App)
 - Notificações push
-- Relatórios em PDF
+- Relatórios em PDF com design system
 - Dashboard administrativo
 - API móvel
+- Storybook para documentação de componentes
 
 ## 🤝 Contribuição
 
