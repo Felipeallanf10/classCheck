@@ -8,28 +8,29 @@ import { Breadcrumb } from '@/components/shared/Breadcrumb'
 
 export default function SobrePage() {
   return (
-    <PageContainer>
-      <Breadcrumb items={[{ label: 'Sobre' }]} className="mb-6" />
-      
-      <PageHeader
-        title="Sobre o ClassCheck"
-        description="Conheça nossa missão, visão e a equipe por trás da plataforma que está transformando a educação através de feedback inteligente."
-      />
+    <PageContainer maxWidth="3xl" className="px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <Breadcrumb items={[{ label: 'Sobre' }]} className="mb-4 md:mb-6" />
+        
+        <PageHeader
+          title="Sobre o ClassCheck"
+          description="Conheça nossa missão, visão e a equipe por trás da plataforma que está transformando a educação através de feedback inteligente."
+        />
 
       {/* Seção principal sobre o projeto */}
-      <div className="mb-12">
+      <div className="mb-8 md:mb-12">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">O que é o ClassCheck?</CardTitle>
+            <CardTitle className="text-xl md:text-2xl">O que é o ClassCheck?</CardTitle>
           </CardHeader>
           <CardContent className="prose prose-gray dark:prose-invert max-w-none">
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-4 md:mb-6">
               O ClassCheck é uma plataforma inovadora de feedback educacional que permite aos estudantes 
               avaliarem suas aulas e registrarem seu humor diário, criando um ambiente de aprendizado 
               mais conectado e responsivo.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 my-6 md:my-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary mb-2">500+</div>
                 <div className="text-sm text-muted-foreground">Avaliações Realizadas</div>
@@ -55,7 +56,7 @@ export default function SobrePage() {
       </div>
 
       {/* Missão, Visão e Valores */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -381,6 +382,7 @@ export default function SobrePage() {
           </div>
         </CardContent>
       </Card>
+      </div> {/* Fechamento da div max-w-4xl */}
     </PageContainer>
   )
 }

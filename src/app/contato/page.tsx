@@ -8,22 +8,23 @@ import { ContatoForm } from '@/components/contato/ContatoForm'
 
 export default function ContatoPage() {
   return (
-    <PageContainer>
-      <Breadcrumb items={[{ label: 'Contato' }]} className="mb-6" />
+    <PageContainer maxWidth="3xl" className="px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <Breadcrumb items={[{ label: 'Contato' }]} className="mb-4 md:mb-6" />
       
       <PageHeader
         title="Entre em Contato"
         description="Estamos aqui para ajudar! Entre em contato conosco através do formulário abaixo ou pelos nossos canais de atendimento."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Formulário de contato */}
-        <div className="lg:col-span-2">
+        <div className="order-2 lg:order-1 lg:col-span-2">
           <ContatoForm />
         </div>
 
         {/* Informações de contato */}
-        <div className="space-y-6">
+        <div className="order-1 lg:order-2 space-y-4 md:space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -167,6 +168,7 @@ export default function ContatoPage() {
           </Card>
         </div>
       </div>
+      </div> {/* Fechamento da div max-w-5xl */}
     </PageContainer>
   )
 }

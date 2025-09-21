@@ -117,8 +117,9 @@ export default function AjudaPage() {
   const allCategories = faqData.map(cat => cat.categoria)
 
   return (
-    <PageContainer>
-      <Breadcrumb items={[{ label: 'Central de Ajuda' }]} className="mb-6" />
+    <PageContainer maxWidth="3xl" className="px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <Breadcrumb items={[{ label: 'Central de Ajuda' }]} className="mb-4 md:mb-6" />
       
       <PageHeader
         title="Central de Ajuda"
@@ -126,24 +127,24 @@ export default function AjudaPage() {
       />
 
       {/* Barra de pesquisa */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             placeholder="Pesquisar nas perguntas frequentes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm md:text-base"
           />
         </div>
       </div>
 
       {/* Filtros por categoria */}
-      <div className="mb-8">
-        <div className="flex flex-wrap gap-2">
+      <div className="mb-6 md:mb-8">
+        <div className="flex flex-wrap gap-1.5 md:gap-2">
           <Badge
             variant={selectedCategory === null ? "default" : "outline"}
-            className="cursor-pointer"
+            className="cursor-pointer text-xs md:text-sm px-2 py-1"
             onClick={() => setSelectedCategory(null)}
           >
             <HelpCircle className="w-3 h-3 mr-1" />
@@ -157,7 +158,7 @@ export default function AjudaPage() {
               <Badge
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
-                className="cursor-pointer"
+                className="cursor-pointer text-xs md:text-sm px-2 py-1"
                 onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
               >
                 <Icon className="w-3 h-3 mr-1" />
@@ -171,10 +172,10 @@ export default function AjudaPage() {
       {/* Resultados */}
       {filteredFAQ.length === 0 ? (
         <Card>
-          <CardContent className="py-8 text-center">
-            <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhuma pergunta encontrada</h3>
-            <p className="text-muted-foreground">
+          <CardContent className="py-6 md:py-8 text-center px-4">
+            <HelpCircle className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground mx-auto mb-3 md:mb-4" />
+            <h3 className="text-base md:text-lg font-semibold mb-2 faq-text">Nenhuma pergunta encontrada</h3>
+            <p className="text-sm md:text-base text-muted-foreground faq-text">
               Tente pesquisar com outros termos ou{' '}
               <button 
                 className="text-primary underline hover:no-underline"
@@ -189,25 +190,25 @@ export default function AjudaPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {filteredFAQ.map((categoria) => {
             const Icon = categoria.icon
             
             return (
               <div key={categoria.categoria}>
-                <Card className="mb-4">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2">
-                      <Icon className="h-5 w-5 text-primary" />
-                      {categoria.categoria}
+                <Card className="mb-3 md:mb-4">
+                  <CardHeader className="pb-3 md:pb-4">
+                    <CardTitle className="flex items-start gap-2 text-base md:text-lg">
+                      <Icon className="h-4 w-4 md:h-5 md:w-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="faq-text min-w-0">{categoria.categoria}</span>
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm md:text-base">
                       {categoria.perguntas.length} pergunta{categoria.perguntas.length !== 1 ? 's' : ''}
                     </CardDescription>
                   </CardHeader>
                 </Card>
 
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {categoria.perguntas.map((item, index) => (
                     <FAQItem
                       key={`${categoria.categoria}-${index}`}
@@ -224,30 +225,31 @@ export default function AjudaPage() {
       )}
 
       {/* Seção de contato */}
-      <Card className="mt-12">
+      <Card className="mt-8 md:mt-12">
         <CardHeader>
-          <CardTitle>Não encontrou sua resposta?</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg md:text-xl faq-text">Não encontrou sua resposta?</CardTitle>
+          <CardDescription className="text-sm md:text-base faq-text">
             Entre em contato conosco e teremos prazer em ajudar!
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <a 
               href="/contato"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 md:h-10 px-3 md:px-4 py-2"
             >
               Entre em Contato
             </a>
             <a 
               href="mailto:suporte@classcheck.com"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 md:h-10 px-3 md:px-4 py-2"
             >
               suporte@classcheck.com
             </a>
           </div>
         </CardContent>
       </Card>
+      </div> {/* Fechamento da div max-w-4xl */}
     </PageContainer>
   )
 }
