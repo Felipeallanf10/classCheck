@@ -1,18 +1,27 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
   Command,
   Frame,
   GalleryVerticalEnd,
-  Icon,
   Map,
   PieChart,
   Settings2,
   SquareTerminal,
+  Home, 
+  Star, 
+  Calendar, 
+  Heart, 
+  BarChart3, 
+  FileText, 
+  Trophy, 
+  Target, 
+  BookOpen, 
+  Settings,
+  Bot
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -31,8 +40,8 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Felipe",
+    email: "felipe@classcheck.com",
     avatar: "/avatars/shadcn.jpg",
   },
   teams: [
@@ -159,14 +168,20 @@ const data = {
 }
 
 
-import { Home, Star, Calendar, Heart} from "lucide-react"
-import Link from "next/link"
+
 
 const navItems = [
+  { label: "Dashboard", icon: BarChart3, href: "/dashboard" },
   { label: "Início", icon: Home, href: "/" },
-  { label: "Favoritas", icon: Star, href: "/favoritas" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
   { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
+  { label: "Questionário", icon: Target, href: "/questionario" },
+  { label: "Avaliação Socioemocional", icon: Heart, href: "/avaliacao-socioemocional" },
+  { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
+  { label: "Insights", icon: BarChart3, href: "/insights" },
+  { label: "Relatórios", icon: FileText, href: "/relatorios" },
+  { label: "Exportação", icon: FileText, href: "/exportacao" },
+  { label: "Favoritas", icon: Star, href: "/favoritos" },
   { label: "Eventos", icon: Calendar, href: "/eventos" },
 ]
 
