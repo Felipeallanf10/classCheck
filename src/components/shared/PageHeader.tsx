@@ -14,13 +14,13 @@ export function PageHeader({
   showSeparator = true 
 }: PageHeaderProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground faq-text">
           {title}
         </h1>
         {description && (
-          <p className="text-lg text-muted-foreground max-w-2xl">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl faq-text">
             {description}
           </p>
         )}

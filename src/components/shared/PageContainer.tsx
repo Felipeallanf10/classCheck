@@ -26,7 +26,9 @@ export function PageContainer({
 }: PageContainerProps) {
   return (
     <div className={cn(
-      'container mx-auto px-4 py-8',
+      'container mx-auto py-6 md:py-8 lg:py-12 container-no-overflow mobile-constrain',
+      // Padding responsivo baseado na largura máxima
+      maxWidth === 'full' ? 'px-4 sm:px-6 lg:px-8' : 'px-4 md:px-6 lg:px-8',
       maxWidthClasses[maxWidth],
       className
     )}>
