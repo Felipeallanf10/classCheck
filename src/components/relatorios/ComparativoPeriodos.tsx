@@ -446,10 +446,7 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="periodo" />
                     <YAxis />
-<<<<<<< HEAD
                     <YAxis yAxisId="right" orientation="right" />
-=======
->>>>>>> main
                     <Tooltip 
                       formatter={(value, name) => [
                         metricaFoco === 'participacao' ? `${value}%` : formatarPorcentagem(value as number),
