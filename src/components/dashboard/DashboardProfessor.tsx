@@ -20,7 +20,6 @@ import {
 import MetricasTurma from './MetricasTurma';
 import TabelaAlunos from './TabelaAlunos';
 import AlertasUrgentes from './AlertasUrgentes';
-import { motion } from 'framer-motion';
 
 interface DashboardProfessorProps {
   turmaId?: string;
@@ -176,11 +175,7 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Cabeçalho */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-        >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               Dashboard da Turma
@@ -205,15 +200,10 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
               Exportar
             </Button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Métricas Principais */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -294,14 +284,10 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* Conteúdo Principal */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <div>
           <Tabs defaultValue="visao-geral" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
@@ -369,7 +355,7 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
               </Card>
             </TabsContent>
           </Tabs>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
