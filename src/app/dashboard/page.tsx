@@ -1,9 +1,18 @@
-import DashboardProfessor from '@/components/dashboard/DashboardProfessor';
+'use client'
+
+import { Suspense } from 'react'
+import { PageContainer } from '@/components/shared/PageContainer'
+import { DashboardUnificado } from '@/components/dashboard/DashboardUnificado'
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardProfessor />
-    </div>
-  );
+    <PageContainer>
+      <div className="min-h-screen bg-background">
+        <Suspense fallback={<DashboardSkeleton />}>
+          <DashboardUnificado />
+        </Suspense>
+      </div>
+    </PageContainer>
+  )
 }

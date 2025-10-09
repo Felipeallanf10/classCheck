@@ -1,6 +1,6 @@
 // ==============================================
 // PRISMA SCHEMA - ClassCheck
-// Database: PostgreSQL 16
+// Database: SQLite (desenvolvimento sem Docker)
 // ==============================================
 
 generator client {
@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -19,9 +19,9 @@ datasource db {
 // Modelo Usuario
 model Usuario {
   id        Int      @id @default(autoincrement())
-  email     String   @unique @db.VarChar(255)
-  nome      String   @db.VarChar(255)
-  avatar    String?  @db.Text
+  email     String   @unique
+  nome      String
+  avatar    String?
   role      Role     @default(ALUNO)
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -38,10 +38,10 @@ model Usuario {
 // Modelo Professor  
 model Professor {
   id        Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(255)
-  email     String   @unique @db.VarChar(255)
-  materia   String   @db.VarChar(255)
-  avatar    String?  @db.Text
+  nome      String
+  email     String   @unique
+  materia   String
+  avatar    String?
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,13 +55,13 @@ model Professor {
 // Modelo Aula
 model Aula {
   id          Int      @id @default(autoincrement())
-  titulo      String   @db.VarChar(255)
-  descricao   String?  @db.Text
-  materia     String   @db.VarChar(255)
+  titulo      String
+  descricao   String?
+  materia     String
   dataHora    DateTime
   duracao     Int      // em minutos
   professorId Int
-  sala        String?  @db.VarChar(100)
+  sala        String?
   status      StatusAula @default(AGENDADA)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -81,8 +81,8 @@ model Avaliacao {
   usuarioId Int
   aulaId    Int
   humor     TipoHumor
-  nota      Int?     @db.SmallInt // 1-5 estrelas
-  feedback  String?  @db.Text
+  nota      Int? // 1-5 estrelas
+  feedback  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -100,8 +100,8 @@ model HumorRegistro {
   id        Int      @id @default(autoincrement())
   usuarioId Int
   humor     TipoHumor
-  data      DateTime @default(now()) @db.Date
-  observacao String? @db.Text
+  data      DateTime @default(now())
+  observacao String?
   createdAt DateTime @default(now())
 
   // Relacionamentos
@@ -131,11 +131,11 @@ model AulaFavorita {
 // Modelo Evento (Calendário)
 model Evento {
   id        Int         @id @default(autoincrement())
-  titulo    String      @db.VarChar(255)
-  descricao String?     @db.Text
+  titulo    String
+  descricao String?
   dataInicio DateTime
   dataFim   DateTime?
-  cor       String?     @db.VarChar(7) // Hex color
+  cor       String? // Hex color
   tipo      TipoEvento  @default(EVENTO)
   aulaId    Int?        // Opcional, pode ser evento não relacionado a aula
   createdAt DateTime    @default(now())
