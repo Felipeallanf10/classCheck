@@ -155,16 +155,16 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <div className="hidden sm:block min-h-screen bg-gray-50 p-3 sm:p-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="h-6 sm:h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+                <div key={i} className="h-24 sm:h-32 bg-gray-200 rounded-lg"></div>
               ))}
             </div>
-            <div className="h-96 bg-gray-200 rounded-lg"></div>
+            <div className="h-64 sm:h-96 bg-gray-200 rounded-lg"></div>
           </div>
         </div>
       </div>
@@ -172,50 +172,56 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="hidden sm:block min-h-screen bg-gray-50 p-3 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Cabeçalho */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
               Dashboard da Turma
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
               Visão geral do bem-estar socioemocional - Turma 8A
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-3">
-            <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 mr-2" />
-              {periodoAnalise === 'hoje' ? 'Hoje' : 
-               periodoAnalise === 'semana' ? 'Esta Semana' : 'Este Mês'}
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full lg:w-auto">
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">
+                {periodoAnalise === 'hoje' ? 'Hoje' : 
+                 periodoAnalise === 'semana' ? 'Esta Semana' : 'Este Mês'}
+              </span>
+              <span className="sm:hidden">
+                {periodoAnalise === 'hoje' ? 'Hoje' : 
+                 periodoAnalise === 'semana' ? 'Semana' : 'Mês'}
+              </span>
             </Button>
-            <Button variant="outline" size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+            <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Atualizar</span>
             </Button>
-            <Button size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Exportar
+            <Button size="sm" className="flex-1 sm:flex-none">
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Exportar</span>
             </Button>
           </div>
         </div>
 
         {/* Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total de Alunos</p>
-                  <p className="text-2xl font-bold text-gray-900">{metricas?.totalAlunos}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total de Alunos</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">{metricas?.totalAlunos}</p>
                 </div>
-                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600" />
+                <div className="h-8 w-8 sm:h-12 sm:w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                  <Users className="h-4 w-4 sm:h-6 sm:w-6 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm">
+              <div className="mt-2 flex items-center text-xs sm:text-sm">
                 <Badge variant="secondary" className="text-xs">
                   {metricas?.avaliacoesHoje} avaliações hoje
                 </Badge>
@@ -224,41 +230,41 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Bem-estar Geral</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Bem-estar Geral</p>
+                  <p className="text-lg sm:text-2xl font-bold text-gray-900">
                     {((metricas?.mediaGeralValencia || 0) * 50 + 50).toFixed(0)}%
                   </p>
                 </div>
-                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-green-600" />
+                <div className="h-8 w-8 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                  <BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm">
+              <div className="mt-2 flex items-center text-xs sm:text-sm">
                 <Badge 
                   className={`text-xs ${getCoresTendencia(metricas?.tendenciaGeral || 'estavel')}`}
                 >
                   {getIconeTendencia(metricas?.tendenciaGeral || 'estavel')}
-                  <span className="ml-1 capitalize">{metricas?.tendenciaGeral}</span>
+                  <span className="ml-1 capitalize hidden sm:inline">{metricas?.tendenciaGeral}</span>
                 </Badge>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Alunos em Risco</p>
-                  <p className="text-2xl font-bold text-red-600">{metricas?.alunosRisco}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Alunos em Risco</p>
+                  <p className="text-lg sm:text-2xl font-bold text-red-600">{metricas?.alunosRisco}</p>
                 </div>
-                <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                <div className="h-8 w-8 sm:h-12 sm:w-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                  <AlertTriangle className="h-4 w-4 sm:h-6 sm:w-6 text-red-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm">
+              <div className="mt-2 flex items-center text-xs sm:text-sm">
                 <Badge variant="destructive" className="text-xs">
                   Requer atenção
                 </Badge>
@@ -267,17 +273,17 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
           </Card>
 
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Alertas Ativos</p>
-                  <p className="text-2xl font-bold text-orange-600">{metricas?.alertasAtivos}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Alertas Ativos</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-600">{metricas?.alertasAtivos}</p>
                 </div>
-                <div className="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-orange-600" />
+                <div className="h-8 w-8 sm:h-12 sm:w-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                  <Clock className="h-4 w-4 sm:h-6 sm:w-6 text-orange-600" />
                 </div>
               </div>
-              <div className="mt-2 flex items-center text-sm">
+              <div className="mt-2 flex items-center text-xs sm:text-sm">
                 <Badge variant="outline" className="text-xs text-orange-600">
                   Para revisar
                 </Badge>
@@ -287,67 +293,82 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
         </div>
 
         {/* Conteúdo Principal */}
-        <div>
-          <Tabs defaultValue="visao-geral" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
-              <TabsTrigger value="alunos">Alunos</TabsTrigger>
-              <TabsTrigger value="alertas">Alertas</TabsTrigger>
-              <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
+        <div className="overflow-x-auto">
+          <Tabs defaultValue="visao-geral" className="space-y-4 sm:space-y-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-10">
+              <TabsTrigger value="visao-geral" className="text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <span className="hidden sm:inline">Visão Geral</span>
+                <span className="sm:hidden">Geral</span>
+              </TabsTrigger>
+              <TabsTrigger value="alunos" className="text-xs sm:text-sm px-2 sm:px-4 py-2">Alunos</TabsTrigger>
+              <TabsTrigger value="alertas" className="text-xs sm:text-sm px-2 sm:px-4 py-2">Alertas</TabsTrigger>
+              <TabsTrigger value="relatorios" className="text-xs sm:text-sm px-2 sm:px-4 py-2">
+                <span className="hidden sm:inline">Relatórios</span>
+                <span className="sm:hidden">Rel.</span>
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="visao-geral" className="space-y-6">
-              <MetricasTurma 
-                turmaId={turmaId}
-                periodo={periodoAnalise}
-                metricas={metricas}
-              />
+            <TabsContent value="visao-geral" className="space-y-4 sm:space-y-6">
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px] sm:min-w-0">
+                  <MetricasTurma 
+                    turmaId={turmaId}
+                    periodo={periodoAnalise}
+                    metricas={metricas}
+                  />
+                </div>
+              </div>
             </TabsContent>
 
-            <TabsContent value="alunos" className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Lista de Alunos</h3>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Search className="h-4 w-4 mr-2" />
-                    Buscar
+            <TabsContent value="alunos" className="space-y-4 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <h3 className="text-base sm:text-lg font-semibold">Lista de Alunos</h3>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
+                    <Search className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Buscar</span>
                   </Button>
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filtrar: {filtroRisco}
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-xs sm:text-sm">
+                    <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Filtrar: {filtroRisco}</span>
+                    <span className="sm:hidden">{filtroRisco}</span>
                   </Button>
                 </div>
               </div>
-              <TabelaAlunos 
-                alunos={alunosFiltrados}
-                onFiltrarRisco={setFiltroRisco}
-              />
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px] sm:min-w-0">
+                  <TabelaAlunos 
+                    alunos={alunosFiltrados}
+                    onFiltrarRisco={setFiltroRisco}
+                  />
+                </div>
+              </div>
             </TabsContent>
 
-            <TabsContent value="alertas" className="space-y-6">
+            <TabsContent value="alertas" className="space-y-4 sm:space-y-6">
               <AlertasUrgentes 
                 turmaId={turmaId}
                 alertas={alunos.filter(a => a.alertas > 0)}
               />
             </TabsContent>
 
-            <TabsContent value="relatorios" className="space-y-6">
+            <TabsContent value="relatorios" className="space-y-4 sm:space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Relatórios Disponíveis</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Relatórios Disponíveis</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Button variant="outline" className="h-20 flex-col">
-                      <BarChart3 className="h-6 w-6 mb-2" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                    <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm">
+                      <BarChart3 className="h-4 w-4 sm:h-6 sm:w-6 mb-2" />
                       Relatório Semanal
                     </Button>
-                    <Button variant="outline" className="h-20 flex-col">
-                      <TrendingUp className="h-6 w-6 mb-2" />
+                    <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm">
+                      <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 mb-2" />
                       Análise Longitudinal
                     </Button>
-                    <Button variant="outline" className="h-20 flex-col">
-                      <Users className="h-6 w-6 mb-2" />
+                    <Button variant="outline" className="h-16 sm:h-20 flex-col text-xs sm:text-sm">
+                      <Users className="h-4 w-4 sm:h-6 sm:w-6 mb-2" />
                       Comparativo da Turma
                     </Button>
                   </div>
