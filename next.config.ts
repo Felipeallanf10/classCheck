@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
       'recharts',
       'date-fns'
     ],
+    // 🔧 CONFIGURAÇÕES TURBOPACK PARA HOT RELOAD
+    turbo: {
+      rules: {
+        '*.tsx': {
+          loaders: ['@turbo/loader-typescript'],
+          as: '*.tsx',
+        },
+      },
+    },
   },
   
   // ⚡ DEVELOPMENT OTIMIZADO

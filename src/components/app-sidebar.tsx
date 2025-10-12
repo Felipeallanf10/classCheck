@@ -174,8 +174,7 @@ const data = {
 
 
 const navItems = [
-  { label: "Dashboard", icon: BarChart3, href: "/dashboard" },
-  { label: "Início", icon: Home, href: "/" },
+  { label: "Dashboard", icon: Home, href: "/dashboard" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
   { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
   { label: "Questionário", icon: Target, href: "/questionario" },

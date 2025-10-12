@@ -165,6 +165,7 @@ export const designTokens = {
 
   // 📱 BREAKPOINTS
   breakpoints: {
+    xs: '475px',   // Mobile extra small
     sm: '640px',   // Mobile landscape
     md: '768px',   // Tablet
     lg: '1024px',  // Desktop
@@ -238,6 +239,7 @@ export const getShadow = (type: ShadowKey) => {
 
 // 📐 RESPONSIVE HELPERS
 export const media = {
+  xs: `@media (min-width: ${designTokens.breakpoints.xs})`,
   sm: `@media (min-width: ${designTokens.breakpoints.sm})`,
   md: `@media (min-width: ${designTokens.breakpoints.md})`,
   lg: `@media (min-width: ${designTokens.breakpoints.lg})`,
