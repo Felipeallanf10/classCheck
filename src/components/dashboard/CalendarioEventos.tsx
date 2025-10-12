@@ -71,11 +71,26 @@ interface CalendarioEventosProps {
 export function CalendarioEventos({ className }: CalendarioEventosProps) {
   const [dataAtual, setDataAtual] = useState(new Date())
   const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null)
-  const [modoVisualizacao, setModoVisualizacao] = useState<'mes' | 'semana' | 'agenda'>('mes')
+  const [modoVisualizacao, setModoVisualizacao] = useState<'mes' | 'semana' | 'agenda'>('agenda')
   const [filtroTipo, setFiltroTipo] = useState('todos')
   const [filtroStatus, setFiltroStatus] = useState('todos')
   const [eventos, setEventos] = useState<Evento[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Detectar tamanho da tela para modo padrão
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth < 1024) { // lg breakpoint
+        setModoVisualizacao('agenda')
+      } else {
+        setModoVisualizacao('mes')
+      }
+    }
+    
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   // Dados mockados para demonstração
   const eventosMock: Evento[] = [
@@ -311,8 +326,8 @@ export function CalendarioEventos({ className }: CalendarioEventosProps) {
       .sort((a, b) => a.data.getTime() - b.data.getTime())
     
     return (
-      <ScrollArea className="h-[600px]">
-        <div className="space-y-4">
+      <ScrollArea className="h-[400px] sm:h-[500px]">
+        <div className="space-y-2 sm:space-y-3">
           {eventosOrdenados.map(evento => {
             const IconeStatus = iconesPorStatus[evento.status]
             
@@ -323,46 +338,48 @@ export function CalendarioEventos({ className }: CalendarioEventosProps) {
                   "cursor-pointer transition-all hover:shadow-md",
                   evento.status === 'cancelado' && "opacity-60"
                 )}
-                style={{ borderLeft: `4px solid ${evento.cor}` }}
+                style={{ borderLeft: `3px solid ${evento.cor}` }}
                 onClick={() => setEventoSelecionado(evento)}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-medium">{evento.titulo}</h4>
-                        <Badge variant="secondary" className="text-xs">
-                          {evento.tipo}
-                        </Badge>
-                        <Badge 
-                          variant={evento.status === 'realizado' ? 'default' : 'outline'}
-                          className="text-xs"
-                        >
-                          <IconeStatus className="h-3 w-3 mr-1" />
-                          {evento.status}
-                        </Badge>
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                        <h4 className="font-medium text-sm sm:text-base truncate">{evento.titulo}</h4>
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">
+                            {evento.tipo}
+                          </Badge>
+                          <Badge 
+                            variant={evento.status === 'realizado' ? 'default' : 'outline'}
+                            className="text-xs"
+                          >
+                            <IconeStatus className="h-2.5 w-2.5 mr-1" />
+                            {evento.status}
+                          </Badge>
+                        </div>
                       </div>
                       
-                      <div className="text-sm text-muted-foreground mb-2">
-                        {format(evento.data, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                      <div className="text-xs sm:text-sm text-muted-foreground mb-2">
+                        {format(evento.data, "EEE, dd/MM", { locale: ptBR })}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {evento.horaInicio} - {evento.horaFim}
+                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          <span>{evento.horaInicio} - {evento.horaFim}</span>
                         </div>
                         
                         {evento.local && (
                           <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {evento.local}
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{evento.local}</span>
                           </div>
                         )}
                         
                         {evento.participantes && (
                           <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
+                            <Users className="h-3 w-3 flex-shrink-0" />
                             {evento.participantes}
                           </div>
                         )}
@@ -383,16 +400,16 @@ export function CalendarioEventos({ className }: CalendarioEventosProps) {
   return (
     <Card className={className}>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5" />
-            Calendário de Eventos
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span className="truncate">Calendário de Eventos</span>
           </CardTitle>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {/* Filtros */}
             <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-full sm:w-32 h-8 sm:h-10 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -410,15 +427,19 @@ export function CalendarioEventos({ className }: CalendarioEventosProps) {
                 variant={modoVisualizacao === 'mes' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setModoVisualizacao('mes')}
+                className="px-2 sm:px-3 h-8 sm:h-10 hidden lg:flex"
               >
-                <Grid3X3 className="h-4 w-4" />
+                <Grid3X3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="ml-1 sm:ml-2 hidden xl:inline text-xs sm:text-sm">Mês</span>
               </Button>
               <Button
                 variant={modoVisualizacao === 'agenda' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setModoVisualizacao('agenda')}
+                className="px-2 sm:px-3 h-8 sm:h-10"
               >
-                <List className="h-4 w-4" />
+                <List className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="ml-1 sm:ml-2 hidden sm:inline text-xs sm:text-sm">Lista</span>
               </Button>
             </div>
           </div>
@@ -426,49 +447,57 @@ export function CalendarioEventos({ className }: CalendarioEventosProps) {
         
         {/* Navegação do mês */}
         {modoVisualizacao === 'mes' && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navegarMes('anterior')}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <h3 className="text-lg font-semibold min-w-[200px] text-center">
-                {format(dataAtual, "MMMM 'de' yyyy", { locale: ptBR })}
-              </h3>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navegarMes('proximo')}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex items-center justify-between gap-2 mt-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navegarMes('anterior')}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Mês anterior</span>
+            </Button>
             
-            <Button variant="outline" size="sm" onClick={voltarParaHoje}>
-              Hoje
+            <h3 className="text-sm sm:text-base font-semibold text-center flex-1">
+              {format(dataAtual, "MMMM 'de' yyyy", { locale: ptBR })}
+            </h3>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navegarMes('proximo')}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+              <span className="sr-only">Próximo mês</span>
             </Button>
           </div>
         )}
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="p-3 sm:p-6">
         {loading ? (
-          <div className="flex items-center justify-center h-[400px]">
+          <div className="flex items-center justify-center h-[200px] sm:h-[300px]">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-              <p className="text-muted-foreground">Carregando eventos...</p>
+              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto mb-4" />
+              <p className="text-muted-foreground text-xs sm:text-sm">Carregando eventos...</p>
             </div>
           </div>
         ) : (
-          <>
-            {modoVisualizacao === 'mes' && renderizarCalendarioMes()}
-            {modoVisualizacao === 'agenda' && renderizarAgenda()}
-          </>
+          <div className="w-full overflow-hidden">
+            {modoVisualizacao === 'mes' && (
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px] sm:min-w-0">
+                  {renderizarCalendarioMes()}
+                </div>
+              </div>
+            )}
+            {modoVisualizacao === 'agenda' && (
+              <div className="w-full">
+                {renderizarAgenda()}
+              </div>
+            )}
+          </div>
         )}
       </CardContent>
       
