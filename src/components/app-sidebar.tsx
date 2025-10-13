@@ -182,7 +182,6 @@ const navItems = [
   { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
   { label: "Insights", icon: BarChart3, href: "/insights" },
   { label: "Relatórios", icon: FileText, href: "/relatorios" },
-  { label: "Exportação", icon: FileText, href: "/exportacao" },
   { label: "Favoritas", icon: Star, href: "/favoritos" },
   { label: "Eventos", icon: Calendar, href: "/eventos" },
 ]

@@ -17,7 +17,19 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const [isLoading, setIsLoading] = useState(false)
   
   // Rotas que devem exibir a navegação (páginas logadas)
-  const showNavRoutes = ['/favoritos', '/aulas', '/eventos', '/dashboard']
+  const showNavRoutes = [
+    '/dashboard',
+    '/aulas', 
+    '/avaliacoes',
+    '/questionario',
+    '/avaliacao-socioemocional',
+    '/gamificacao',
+    '/insights',
+    '/relatorios',
+    '/exportacao',
+    '/favoritos', 
+    '/eventos'
+  ]
   
   // Rotas que são páginas institucionais (devem ter footer)
   const institutionalRoutes = ['/ajuda', '/contato', '/sobre', '/suporte', '/politica-de-privacidade', '/termos-de-uso', '/manutencao']
