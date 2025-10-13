@@ -177,8 +177,7 @@ const navItems = [
   { label: "Dashboard", icon: Home, href: "/dashboard" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
   { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
-  { label: "Questionário", icon: Target, href: "/questionario" },
-  { label: "Avaliação Socioemocional", icon: Heart, href: "/avaliacao-socioemocional" },
+  { label: "Avaliação Socioemocional", icon: Target, href: "/avaliacao-socioemocional" },
   { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
   { label: "Insights", icon: BarChart3, href: "/insights" },
   { label: "Relatórios", icon: FileText, href: "/relatorios" },
@@ -188,8 +187,7 @@ const navItems = [
 
 // Seção de páginas institucionais
 const institutionalItems = [
-  { label: "Central de Suporte", icon: LifeBuoy, href: "/suporte" },
-  { label: "Ajuda", icon: HelpCircle, href: "/ajuda" },
+  { label: "Central de Ajuda", icon: HelpCircle, href: "/ajuda" },
   { label: "Contato", icon: Mail, href: "/contato" },
   { label: "Sobre", icon: Info, href: "/sobre" },
 ]
