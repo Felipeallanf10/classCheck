@@ -82,8 +82,8 @@ Adicionar redirect /exportacao → /relatorios.
 📦 Branch: refactor/phase1-dashboard-unification
 📄 Relatório: docs/relatorios/refactor-fase1.md
 
-🧩 FASE 2 — CONSOLIDAÇÕES DE CONTEÚDO (3–4 DIAS)
-🎯 Objetivo:
+## 🧩 FASE 2 — CONSOLIDAÇÕES DE CONTEÚDO (3–4 DIAS)
+###  Objetivo:
 Unificar páginas conceitualmente idênticas (questionários e suporte).
 
 Passos:
