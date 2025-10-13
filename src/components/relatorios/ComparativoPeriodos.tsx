@@ -211,15 +211,29 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
         insights.push('Tendência positiva consistente ao longo dos períodos analisados');
       } else if (tendenciaGeral === 'decrescente') {
         insights.push('Declínio no bem-estar detectado - requer atenção imediata');
+      } else {
+        insights.push('Bem-estar da turma mantém-se estável ao longo dos períodos analisados');
       }
 
       if (variabilidade === 'alta') {
         insights.push('Alta variabilidade entre períodos sugere instabilidade emocional');
+      } else if (variabilidade === 'media') {
+        insights.push('Variabilidade moderada indica necessidade de acompanhamento contínuo');
+      } else {
+        insights.push('Baixa variabilidade demonstra consistência emocional positiva');
       }
 
       const melhoriaParticipacao = dados[dados.length - 1].participacaoMedia > dados[0].participacaoMedia;
       if (melhoriaParticipacao) {
         insights.push('Aumento na participação dos alunos observado');
+      } else {
+        insights.push('Participação dos alunos mantém-se dentro dos padrões esperados');
+      }
+      
+      // Insight sobre consistência
+      const mediaConsistencia = dados.reduce((acc, d) => acc + d.metricas.consistencia, 0) / dados.length;
+      if (mediaConsistencia > 0.7) {
+        insights.push('Alta consistência nos padrões emocionais ao longo do tempo');
       }
 
       // Gerar recomendações
@@ -227,15 +241,24 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
       if (tendenciaGeral === 'decrescente') {
         recomendacoes.push('Implementar estratégias de engajamento mais efetivas');
         recomendacoes.push('Revisar metodologia de ensino aplicada');
+      } else if (tendenciaGeral === 'crescente') {
+        recomendacoes.push('Manter as práticas pedagógicas atuais que têm demonstrado resultados positivos');
       }
 
       if (variabilidade === 'alta') {
         recomendacoes.push('Criar protocolos de estabilização emocional');
         recomendacoes.push('Monitorar eventos externos que impactam a turma');
+      } else {
+        recomendacoes.push('Continuar monitorando os indicadores de bem-estar regularmente');
       }
 
       if (piorPeriodo.eventosNegativos > melhorPeriodo.eventosNegativos * 2) {
         recomendacoes.push('Desenvolver estratégias preventivas para eventos estressantes');
+      }
+      
+      // Adicionar recomendação sobre participação
+      if (dados[dados.length - 1].participacaoMedia < 70) {
+        recomendacoes.push('Implementar atividades mais dinâmicas para aumentar a participação dos alunos');
       }
 
       return {
@@ -314,13 +337,13 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-6"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
-          <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
     );
@@ -331,10 +354,10 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Comparativo entre Períodos
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Análise {tipoComparacao} - Turma 8A ({dadosPeriodos.length} períodos comparados)
           </p>
         </div>
@@ -365,7 +388,7 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Tendência Geral</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Tendência Geral</p>
                   <div className={`flex items-center ${getCorTendencia(analiseComparativa.tendenciaGeral)}`}>
                     {analiseComparativa.tendenciaGeral === 'crescente' ? <TrendingUp className="h-4 w-4 mr-1" /> :
                      analiseComparativa.tendenciaGeral === 'decrescente' ? <TrendingDown className="h-4 w-4 mr-1" /> :
@@ -375,8 +398,8 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
                     </span>
                   </div>
                 </div>
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </CardContent>
@@ -386,14 +409,14 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Melhor Período</p>
-                  <p className="text-lg font-bold">{analiseComparativa.melhorPeriodo.periodo}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Melhor Período</p>
+                  <p className="text-lg font-bold dark:text-gray-100">{analiseComparativa.melhorPeriodo.periodo}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {formatarPorcentagem(analiseComparativa.melhorPeriodo.valenciaMedia)} bem-estar
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Award className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                  <Award className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
@@ -403,7 +426,7 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Variabilidade</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Variabilidade</p>
                   <div className={`flex items-center ${getCorVariabilidade(analiseComparativa.variabilidade)}`}>
                     <Badge variant={
                       analiseComparativa.variabilidade === 'baixa' ? 'default' :
@@ -413,8 +436,8 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
                     </Badge>
                   </div>
                 </div>
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </CardContent>
@@ -482,7 +505,7 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
               <Card key={index}>
                 <CardHeader>
                   <CardTitle className="text-lg">{periodo.periodo}</CardTitle>
-                  <p className="text-sm text-gray-600">{periodo.periodoCompleto}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{periodo.periodoCompleto}</p>
                 </CardHeader>
                 <CardContent>
                   <div className="h-48">
@@ -613,9 +636,9 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
             <CardContent>
               <div className="space-y-3">
                 {analiseComparativa.insights.map((insight, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
-                    <Target className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-blue-800">{insight}</p>
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <Target className="h-5 w-5 text-blue-600 dark:text-blue-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-blue-800 dark:text-blue-500">{insight}</p>
                   </div>
                 ))}
               </div>
@@ -629,9 +652,9 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
             <CardContent>
               <div className="space-y-3">
                 {analiseComparativa.recomendacoes.map((recomendacao, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-orange-800">{recomendacao}</p>
+                  <div key={index} className="flex items-start space-x-3 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-orange-800 dark:text-orange-300">{recomendacao}</p>
                   </div>
                 ))}
               </div>
@@ -649,55 +672,55 @@ const ComparativoPeriodos: React.FC<ComparativoPeriodosProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2">Período</th>
-                  <th className="text-center p-2">Bem-estar</th>
-                  <th className="text-center p-2">Energia</th>
-                  <th className="text-center p-2">Participação</th>
-                  <th className="text-center p-2">Aulas</th>
-                  <th className="text-center p-2">Eventos +/-</th>
-                  <th className="text-center p-2">Consistência</th>
+                <tr className="border-b dark:border-gray-700">
+                  <th className="text-left p-2 dark:text-gray-300">Período</th>
+                  <th className="text-center p-2 dark:text-gray-300">Bem-estar</th>
+                  <th className="text-center p-2 dark:text-gray-300">Energia</th>
+                  <th className="text-center p-2 dark:text-gray-300">Participação</th>
+                  <th className="text-center p-2 dark:text-gray-300">Aulas</th>
+                  <th className="text-center p-2 dark:text-gray-300">Eventos +/-</th>
+                  <th className="text-center p-2 dark:text-gray-300">Consistência</th>
                 </tr>
               </thead>
               <tbody>
                 {dadosPeriodos.map((periodo, index) => (
-                  <tr key={index} className="border-b hover:bg-gray-50">
+                  <tr key={index} className="border-b dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150">
                     <td className="p-2">
                       <div>
-                        <p className="font-medium">{periodo.periodo}</p>
-                        <p className="text-xs text-gray-500">{periodo.numeroAlunos} alunos</p>
+                        <p className="font-medium dark:text-gray-100">{periodo.periodo}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{periodo.numeroAlunos} alunos</p>
                       </div>
                     </td>
                     <td className="text-center p-2">
                       <span className={`font-medium ${
-                        periodo.valenciaMedia > 0.2 ? 'text-green-600' :
-                        periodo.valenciaMedia < -0.2 ? 'text-red-600' : 'text-gray-600'
+                        periodo.valenciaMedia > 0.2 ? 'text-green-600 dark:text-green-400' :
+                        periodo.valenciaMedia < -0.2 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
                       }`}>
                         {formatarPorcentagem(periodo.valenciaMedia)}
                       </span>
                     </td>
-                    <td className="text-center p-2">
+                    <td className="text-center p-2 dark:text-gray-300">
                       {formatarPorcentagem(periodo.arousalMedio)}
                     </td>
-                    <td className="text-center p-2">
+                    <td className="text-center p-2 dark:text-gray-300">
                       {periodo.participacaoMedia.toFixed(0)}%
                     </td>
-                    <td className="text-center p-2">
+                    <td className="text-center p-2 dark:text-gray-300">
                       {periodo.aulasRealizadas}
                     </td>
                     <td className="text-center p-2">
-                      <span className="text-green-600">{periodo.eventosPositivos}</span> / 
-                      <span className="text-red-600 ml-1">{periodo.eventosNegativos}</span>
+                      <span className="text-green-600 dark:text-green-400">{periodo.eventosPositivos}</span> / 
+                      <span className="text-red-600 dark:text-red-400 ml-1">{periodo.eventosNegativos}</span>
                     </td>
                     <td className="text-center p-2">
                       <div className="flex items-center justify-center">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                        <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div 
-                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            className="bg-blue-500 dark:bg-blue-400 h-2 rounded-full transition-all"
                             style={{ width: `${periodo.metricas.consistencia * 100}%` }}
                           ></div>
                         </div>
-                        <span className="ml-2 text-xs">
+                        <span className="ml-2 text-xs dark:text-gray-300">
                           {(periodo.metricas.consistencia * 100).toFixed(0)}%
                         </span>
                       </div>

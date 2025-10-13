@@ -177,8 +177,8 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
   };
 
   const getIconeTendencia = (tendencia: number) => {
-    if (tendencia > 0.02) return <TrendingUp className="h-4 w-4" />;
-    if (tendencia < -0.02) return <TrendingDown className="h-4 w-4" />;
+    if (tendencia > 0.02) return <TrendingUp className="h-4 w-4 dark:text-white" />;
+    if (tendencia < -0.02) return <TrendingDown className="h-4 w-4 dark:text-white" />;
     return <Activity className="h-4 w-4" />;
   };
 
@@ -203,10 +203,10 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Relatório Longitudinal
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Análise temporal de {periodo} - {tipoAnalise === 'individual' ? 'Aluno Individual' : 'Turma 8A'}
           </p>
         </div>
@@ -234,8 +234,8 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Bem-estar Médio</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Bem-estar Médio</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {formatarPorcentagem(estatisticas.valenciaMedia)}
                   </p>
                 </div>
@@ -250,13 +250,13 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Energia Média</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Energia Média</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {formatarPorcentagem(estatisticas.arousalMedio)}
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
@@ -266,10 +266,10 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Tendência</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Tendência</p>
                   <div className={`flex items-center ${getCorTendencia(estatisticas.tendencia)}`}>
                     {getIconeTendencia(estatisticas.tendencia)}
-                    <span className="ml-1 font-bold">
+                    <span className="ml-1 font-bold dark:text-gray-100">
                       {estatisticas.tendencia > 0 ? 'Melhorando' : 
                        estatisticas.tendencia < 0 ? 'Piorando' : 'Estável'}
                     </span>
@@ -286,7 +286,7 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Estabilidade</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Estabilidade</p>
                   <p className="text-xl font-bold">
                     {(estatisticas.estabilidade * 100).toFixed(0)}%
                   </p>
@@ -426,19 +426,31 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
             <CardContent>
               <div className="space-y-4">
                 {marcos.map((marco, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-4 border rounded-lg">
+                  <div key={index} className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
                     <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                      marco.impacto === 'positivo' ? 'bg-green-100' :
-                      marco.impacto === 'negativo' ? 'bg-red-100' : 'bg-gray-100'
+                      marco.impacto === 'positivo' ? 'bg-green-100 dark:bg-green-900' :
+                      marco.impacto === 'negativo' ? 'bg-red-100 dark:bg-red-900' : 'bg-gray-100 dark:bg-gray-700'
                     }`}>
-                      {marco.tipo === 'avaliacao' ? <BarChart3 className="h-5 w-5" /> :
-                       marco.tipo === 'projeto' ? <User className="h-5 w-5" /> :
-                       marco.tipo === 'evento' ? <Users className="h-5 w-5" /> :
-                       <Calendar className="h-5 w-5" />}
+                      {marco.tipo === 'avaliacao' ? <BarChart3 className={`h-5 w-5 ${
+                        marco.impacto === 'positivo' ? 'text-green-600 dark:text-green-400' :
+                        marco.impacto === 'negativo' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                      }`} /> :
+                       marco.tipo === 'projeto' ? <User className={`h-5 w-5 ${
+                        marco.impacto === 'positivo' ? 'text-green-600 dark:text-green-400' :
+                        marco.impacto === 'negativo' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                      }`} /> :
+                       marco.tipo === 'evento' ? <Users className={`h-5 w-5 ${
+                        marco.impacto === 'positivo' ? 'text-green-600 dark:text-green-400' :
+                        marco.impacto === 'negativo' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                      }`} /> :
+                       <Calendar className={`h-5 w-5 ${
+                        marco.impacto === 'positivo' ? 'text-green-600 dark:text-green-400' :
+                        marco.impacto === 'negativo' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'
+                      }`} />}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold">{marco.descricao}</h4>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">{marco.descricao}</h4>
                         <Badge variant={
                           marco.impacto === 'positivo' ? 'default' :
                           marco.impacto === 'negativo' ? 'destructive' : 'secondary'
@@ -446,7 +458,7 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
                           {marco.impacto}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {format(marco.data, "dd 'de' MMMM", { locale: ptBR })}
                       </p>
                     </div>
@@ -465,22 +477,22 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center mb-2">
-                <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
-                <span className="font-semibold text-blue-800">Padrão Identificado</span>
+                <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-500 mr-2" />
+                <span className="font-semibold text-blue-800 dark:text-blue-500">Padrão Identificado</span>
               </div>
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-blue-700 dark:text-blue-400">
                 Melhoria consistente nos últimos 7 dias, com aumento de 15% no bem-estar geral.
               </p>
             </div>
             
-            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+            <div className="bg-orange-50 dark:bg-orange-950 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
               <div className="flex items-center mb-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
-                <span className="font-semibold text-orange-800">Atenção</span>
+                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400 mr-2" />
+                <span className="font-semibold text-orange-800 dark:text-orange-300">Atenção</span>
               </div>
-              <p className="text-sm text-orange-700">
+              <p className="text-sm text-orange-700 dark:text-orange-400">
                 Variabilidade emocional alta detectada. Considere investigar fatores externos.
               </p>
             </div>

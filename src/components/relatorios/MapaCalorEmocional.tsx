@@ -330,13 +330,13 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-6"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
-          <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
     );
@@ -347,10 +347,10 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Mapa de Calor Emocional
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Visualização temporal de {tipoVisualizacao === 'valencia' ? 'bem-estar' : 
                                     tipoVisualizacao === 'arousal' ? 'energia' : 'intensidade emocional'} - {periodo}
           </p>
@@ -387,13 +387,13 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Bem-estar Médio</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Bem-estar Médio</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {((estatisticas.valenciaMedia + 1) * 50).toFixed(0)}%
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Heart className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                  <Heart className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
@@ -403,13 +403,13 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Energia Média</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Energia Média</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {((estatisticas.arousalMedio + 1) * 50).toFixed(0)}%
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-orange-600" />
+                <div className="h-10 w-10 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
               </div>
             </CardContent>
@@ -419,16 +419,16 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Melhor Momento</p>
-                  <p className="text-lg font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Melhor Momento</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                     {estatisticas.melhorMomento.diaSemana}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {estatisticas.melhorMomento.hora}h - {((estatisticas.melhorMomento.valencia + 1) * 50).toFixed(0)}%
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </CardContent>
@@ -438,13 +438,13 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Registros</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Registros</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {estatisticas.totalRegistros.toLocaleString()}
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </CardContent>
@@ -457,40 +457,40 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium">Legenda:</span>
+              <span className="text-sm font-medium dark:text-gray-200">Legenda:</span>
               <div className="flex items-center space-x-2">
                 {tipoVisualizacao === 'valencia' ? (
                   <>
                     <div className="w-4 h-4 bg-red-500 rounded"></div>
-                    <span className="text-xs">Baixo bem-estar</span>
-                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                    <span className="text-xs">Neutro</span>
+                    <span className="text-xs dark:text-gray-300">Baixo bem-estar</span>
+                    <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <span className="text-xs dark:text-gray-300">Neutro</span>
                     <div className="w-4 h-4 bg-green-500 rounded"></div>
-                    <span className="text-xs">Alto bem-estar</span>
+                    <span className="text-xs dark:text-gray-300">Alto bem-estar</span>
                   </>
                 ) : tipoVisualizacao === 'arousal' ? (
                   <>
                     <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span className="text-xs">Baixa energia</span>
-                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                    <span className="text-xs">Neutra</span>
+                    <span className="text-xs dark:text-gray-300">Baixa energia</span>
+                    <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <span className="text-xs dark:text-gray-300">Neutra</span>
                     <div className="w-4 h-4 bg-orange-500 rounded"></div>
-                    <span className="text-xs">Alta energia</span>
+                    <span className="text-xs dark:text-gray-300">Alta energia</span>
                   </>
                 ) : (
                   <>
-                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                    <span className="text-xs">Baixa intensidade</span>
+                    <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <span className="text-xs dark:text-gray-300">Baixa intensidade</span>
                     <div className="w-4 h-4 bg-purple-400 rounded"></div>
-                    <span className="text-xs">Média</span>
+                    <span className="text-xs dark:text-gray-300">Média</span>
                     <div className="w-4 h-4 bg-purple-800 rounded"></div>
-                    <span className="text-xs">Alta intensidade</span>
+                    <span className="text-xs dark:text-gray-300">Alta intensidade</span>
                   </>
                 )}
               </div>
             </div>
             
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Clock className="h-4 w-4" />
               <span>Horários de aula: 7h-17h</span>
             </div>
@@ -511,9 +511,9 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
             <div className="min-w-full">
               {/* Cabeçalho dos horários */}
               <div className="grid grid-cols-11 gap-1 mb-2">
-                <div className="text-xs font-medium text-gray-600 p-2"></div>
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-400 p-2"></div>
                 {horariosAula.map(hora => (
-                  <div key={hora} className="text-xs font-medium text-gray-600 text-center p-2">
+                  <div key={hora} className="text-xs font-medium text-gray-600 dark:text-gray-400 text-center p-2">
                     {hora}h
                   </div>
                 ))}
@@ -522,7 +522,7 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
               {/* Linhas do mapa */}
               {Array.from(new Set(dadosFiltrados.map(d => d.dia))).sort().map(dia => (
                 <div key={dia} className="grid grid-cols-11 gap-1 mb-1">
-                  <div className="text-xs font-medium text-gray-600 p-2 flex items-center">
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 p-2 flex items-center">
                     {dadosFiltrados.find(d => d.dia === dia)?.diaSemana || `Dia ${dia + 1}`}
                   </div>
                   
@@ -531,7 +531,7 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
                     
                     if (!celula) {
                       return (
-                        <div key={hora} className="aspect-square bg-gray-100 rounded border border-gray-200"></div>
+                        <div key={hora} className="aspect-square bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700"></div>
                       );
                     }
 
@@ -547,9 +547,6 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
                         title={`${celula.diaSemana} ${hora}h: ${formatarValor(celula)}% | ${celula.numeroRegistros} registros${celula.evento ? ` | ${celula.evento.descricao}` : ''}`}
                       >
                         {formatarValor(celula)}
-                        {celula.evento && (
-                          <div className="absolute top-0 right-0 w-2 h-2 bg-yellow-400 rounded-full"></div>
-                        )}
                       </div>
                     );
                   })}
@@ -581,17 +578,17 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
                       }>
                         {padrao.tipo.replace('_', ' ')}
                       </Badge>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
                         {(padrao.confianca * 100).toFixed(0)}% confiança
                       </span>
                     </div>
-                    {padrao.tipo === 'horario' && <Clock className="h-5 w-5 text-gray-400" />}
-                    {padrao.tipo === 'dia_semana' && <CalendarDays className="h-5 w-5 text-gray-400" />}
-                    {padrao.tipo === 'periodo' && <Activity className="h-5 w-5 text-gray-400" />}
+                    {padrao.tipo === 'horario' && <Clock className="h-5 w-5 text-gray-400 dark:text-gray-500" />}
+                    {padrao.tipo === 'dia_semana' && <CalendarDays className="h-5 w-5 text-gray-400 dark:text-gray-500" />}
+                    {padrao.tipo === 'periodo' && <Activity className="h-5 w-5 text-gray-400 dark:text-gray-500" />}
                   </div>
                   
-                  <p className="text-sm font-medium mb-2">{padrao.descricao}</p>
-                  <p className="text-xs text-gray-600 italic">{padrao.recomendacao}</p>
+                  <p className="text-sm font-medium mb-2 dark:text-gray-100">{padrao.descricao}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 italic">{padrao.recomendacao}</p>
                 </CardContent>
               </Card>
             ))}
@@ -608,21 +605,21 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
                 {dadosFiltrados
                   .filter(d => d.evento)
                   .map((celula, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className="h-3 w-3 bg-yellow-400 rounded-full"></div>
                         <div>
-                          <p className="font-medium">{celula.evento?.descricao}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-medium dark:text-gray-100">{celula.evento?.descricao}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
                             {celula.diaSemana} às {celula.hora}h
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
+                        <p className="text-sm font-medium dark:text-gray-100">
                           {formatarValor(celula)}% bem-estar
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {celula.numeroRegistros} registros
                         </p>
                       </div>
@@ -641,22 +638,22 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Brain className="h-5 w-5 text-green-600 mr-2" />
-                      <span className="font-semibold text-green-800">Pico de Bem-estar</span>
+                      <Brain className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+                      <span className="font-semibold text-green-800 dark:text-green-300">Pico de Bem-estar</span>
                     </div>
-                    <p className="text-sm text-green-700">
+                    <p className="text-sm text-green-700 dark:text-green-400">
                       Melhor período detectado entre 9h-10h com consistência de 85%
                     </p>
                   </div>
                   
-                  <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Thermometer className="h-5 w-5 text-orange-600 mr-2" />
-                      <span className="font-semibold text-orange-800">Declínio Vespertino</span>
+                      <Thermometer className="h-5 w-5 text-orange-600 dark:text-orange-400 mr-2" />
+                      <span className="font-semibold text-orange-800 dark:text-orange-300">Declínio Vespertino</span>
                     </div>
-                    <p className="text-sm text-orange-700">
+                    <p className="text-sm text-orange-700 dark:text-orange-400">
                       Queda gradual de energia observada após 15h - considerar intervalos
                     </p>
                   </div>
@@ -672,21 +669,21 @@ const MapaCalorEmocional: React.FC<MapaCalorEmocionalProps> = ({
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="h-2 w-2 bg-blue-500 rounded-full mt-2"></div>
-                    <p className="text-sm">
+                    <p className="text-sm dark:text-gray-300">
                       <strong>Aulas importantes:</strong> Agendar entre 9h-11h para máximo engajamento
                     </p>
                   </div>
                   
                   <div className="flex items-start space-x-3">
                     <div className="h-2 w-2 bg-green-500 rounded-full mt-2"></div>
-                    <p className="text-sm">
+                    <p className="text-sm dark:text-gray-300">
                       <strong>Atividades dinâmicas:</strong> Implementar após 13h para reativar energia
                     </p>
                   </div>
                   
                   <div className="flex items-start space-x-3">
                     <div className="h-2 w-2 bg-purple-500 rounded-full mt-2"></div>
-                    <p className="text-sm">
+                    <p className="text-sm dark:text-gray-300">
                       <strong>Momentos de reflexão:</strong> Finais de semana mostram padrão de estabilização
                     </p>
                   </div>
