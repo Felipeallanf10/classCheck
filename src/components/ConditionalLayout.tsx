@@ -21,18 +21,17 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
     '/dashboard',
     '/aulas', 
     '/avaliacoes',
-    '/questionario',
     '/avaliacao-socioemocional',
     '/gamificacao',
     '/insights',
     '/relatorios',
-    '/exportacao',
+    '/ajuda',
     '/favoritos', 
     '/eventos'
   ]
   
   // Rotas que são páginas institucionais (devem ter footer)
-  const institutionalRoutes = ['/ajuda', '/contato', '/sobre', '/suporte', '/politica-de-privacidade', '/termos-de-uso', '/manutencao']
+  const institutionalRoutes = ['/contato', '/sobre', '/politica-de-privacidade', '/termos-de-uso', '/manutencao']
   
   // Rotas de autenticação que usam layout próprio
   const isAuthRoute = pathname.startsWith('/login') || 
