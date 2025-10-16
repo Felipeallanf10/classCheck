@@ -7,7 +7,7 @@ import { ActivityFeed } from "@/components/dashboard/ActivityFeed"
 import { AnalyticsSection } from "@/components/dashboard/AnalyticsSection"
 import { CalendarioEventos } from "@/components/dashboard/CalendarioEventos"
 import { ConfigurationSection } from "@/components/dashboard/ConfigurationSection"
-import { Smile, BarChart3, FileText, Calendar, Settings, Heart, Star, MessageSquare } from "lucide-react"
+import { Smile, BarChart3, FileText, Calendar, Settings, Heart, Star, MessageSquare, Users } from "lucide-react"
 
 interface UnifiedDashboardProps {
   userName?: string
@@ -98,6 +98,14 @@ export function UnifiedDashboard({ userName = "Professor" }: UnifiedDashboardPro
     },
     {
       id: "2",
+      title: "Avaliar Professor",
+      description: "Avalie seus professores",
+      icon: <Users className="w-5 h-5" />,
+      href: "/professores",
+      color: "hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950"
+    },
+    {
+      id: "3",
       title: "Registrar Humor",
       description: "Como você está se sentindo?",
       icon: <Heart className="w-5 h-5" />,
@@ -105,20 +113,12 @@ export function UnifiedDashboard({ userName = "Professor" }: UnifiedDashboardPro
       color: "hover:border-pink-300 hover:bg-pink-50 dark:hover:bg-pink-950"
     },
     {
-      id: "3",
+      id: "4",
       title: "Ver Próximas Aulas",
       description: "Confira sua agenda",
       icon: <Calendar className="w-5 h-5" />,
       href: "/aulas",
       color: "hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950"
-    },
-    {
-      id: "4",
-      title: "Enviar Feedback",
-      description: "Compartilhe suas ideias",
-      icon: <MessageSquare className="w-5 h-5" />,
-      href: "/contato",
-      color: "hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-950"
     }
   ]
 

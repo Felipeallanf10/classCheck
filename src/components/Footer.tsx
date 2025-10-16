@@ -10,8 +10,8 @@ export function Footer() {
     product: {
       title: 'Produto',
       links: [
-        { name: 'Dashboard', href: '/dashboard' },
-        { name: 'Avaliações', href: '/avaliacoes' },
+        { name: 'Início', href: '/dashboard' },
+        { name: 'Minhas Avaliações', href: '/minhas-avaliacoes' },
         { name: 'Relatórios', href: '/relatorios' },
         { name: 'Aulas', href: '/aulas' },
       ]

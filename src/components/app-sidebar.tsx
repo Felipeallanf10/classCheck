@@ -26,10 +26,14 @@ import {
   Mail, 
   Info, 
   Shield, 
-  LifeBuoy
+  LifeBuoy,
+  Activity,
+  Users,
+  TrendingUp
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main"
 import {
   Sidebar,
   SidebarContent,
@@ -174,15 +178,31 @@ const data = {
 
 
 const navItems = [
-  { label: "Dashboard", icon: Home, href: "/dashboard" },
+  { label: "Início", icon: Home, href: "/dashboard" },
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
-  { label: "Avaliações", icon: Heart, href: "/avaliacoes" },
-  { label: "Avaliação Socioemocional", icon: Target, href: "/avaliacao-socioemocional" },
+  { label: "Professores", icon: Star, href: "/professores" },
+  { label: "Check-in Diário", icon: Heart, href: "/check-in" },
+  { label: "Minhas Avaliações", icon: Target, href: "/minhas-avaliacoes" },
   { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
-  { label: "Insights", icon: BarChart3, href: "/insights" },
-  { label: "Relatórios", icon: FileText, href: "/relatorios" },
-  { label: "Favoritas", icon: Star, href: "/favoritos" },
-  { label: "Eventos", icon: Calendar, href: "/eventos" },
+]
+
+// Itens de relatórios com sub-menu
+const relatoriosItems = [
+  {
+    title: "Relatórios",
+    url: "/relatorios",
+    icon: BarChart3,
+    items: [
+      {
+        title: "Visão Geral",
+        url: "/relatorios",
+      },
+      {
+        title: "Minha Jornada Emocional",
+        url: "/relatorios/meu-estado-emocional",
+      },
+    ],
+  },
 ]
 
 // Seção de páginas institucionais
@@ -235,9 +255,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
 
+        {/* Relatórios com Sub-menu */}
+        <NavMain items={relatoriosItems} />
+
         {/* Seção Institucional */}
         <SidebarGroup>
-          <div className="px-2 py-1">
+          <div className="px-2 py-1 group-data-[collapsible=icon]:hidden">
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Suporte
             </h4>

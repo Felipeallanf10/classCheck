@@ -27,7 +27,9 @@ export function SidebarCalendario({
 }) {
   const [expandido, setExpandido] = useState(true)
 
-  const aulasDoDia = aulas.filter(
+  const aulasArray = Array.isArray(aulas) ? aulas : []
+  
+  const aulasDoDia = aulasArray.filter(
     (aula) =>
       format(new Date(aula.data), "yyyy-MM-dd") ===
       format(dataSelecionada, "yyyy-MM-dd")
