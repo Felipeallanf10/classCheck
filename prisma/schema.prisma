@@ -1,6 +1,5 @@
 // ==============================================
 // PRISMA SCHEMA - ClassCheck
-// Database: SQLite (desenvolvimento sem Docker)
 // ==============================================
 
 generator client {
@@ -8,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -28,9 +27,12 @@ model Usuario {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  avaliacoes     Avaliacao[]
-  humorRegistros HumorRegistro[]
-  aulasFavoritas AulaFavorita[]
+  avaliacoes                Avaliacao[]
+  avaliacoesSocioemocionais AvaliacaoSocioemocional[]
+  avaliacoesDidaticas       AvaliacaoDidatica[]
+  avaliacoesProfessores     AvaliacaoProfessor[]
+  humorRegistros            HumorRegistro[]
+  aulasFavoritas            AulaFavorita[]
 
   @@map("usuarios")
 }
@@ -47,7 +49,8 @@ model Professor {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  aulas Aula[]
+  aulas                 Aula[]
+  avaliacoesProfessores AvaliacaoProfessor[]
 
   @@map("professores")
 }
@@ -67,10 +70,12 @@ model Aula {
   updatedAt   DateTime @updatedAt
 
   // Relacionamentos
-  professor      Professor      @relation(fields: [professorId], references: [id])
-  avaliacoes     Avaliacao[]
-  aulasFavoritas AulaFavorita[]
-  eventos        Evento[]
+  professor                 Professor                 @relation(fields: [professorId], references: [id])
+  avaliacoes                Avaliacao[]
+  avaliacoesSocioemocionais AvaliacaoSocioemocional[]
+  avaliacoesDidaticas       AvaliacaoDidatica[]
+  aulasFavoritas            AulaFavorita[]
+  eventos                   Evento[]
 
   @@map("aulas")
 }
@@ -93,6 +98,98 @@ model Avaliacao {
   // Um usuário só pode avaliar uma aula uma vez
   @@unique([usuarioId, aulaId])
   @@map("avaliacoes")
+}
+
+// ==============================================
+// NOVOS MODELOS - SISTEMA DE AVALIAÇÃO REESTRUTURADO
+// ==============================================
+
+// Modelo AvaliacaoSocioemocional (Questionário Adaptativo - Circumplex)
+model AvaliacaoSocioemocional {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  aulaId    Int
+  
+  // Dados do Modelo Circumplex
+  valencia  Float    // -1.0 (negativo) a 1.0 (positivo)
+  ativacao  Float    // -1.0 (baixa energia) a 1.0 (alta energia)
+  estadoPrimario String // "Animado", "Calmo", "Entediado", "Ansioso", etc.
+  confianca Float    // 0.0 a 1.0 (confiança da medição IRT)
+  
+  // Metadados do questionário adaptativo
+  totalPerguntas Int  // 5-12 perguntas
+  tempoResposta  Int  // em segundos
+  respostas      String // JSON: [{perguntaId, valor, timestamp}]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  aula    Aula    @relation(fields: [aulaId], references: [id])
+  
+  // Um usuário só pode fazer avaliação socioemocional uma vez por aula
+  @@unique([usuarioId, aulaId])
+  @@map("avaliacoes_socioemocionais")
+}
+
+// Modelo AvaliacaoDidatica (Avaliação do Conteúdo/Pedagogia)
+model AvaliacaoDidatica {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  aulaId    Int
+  
+  // Critérios didáticos (escala 1-5)
+  compreensaoConteudo Int  // O quanto entendeu o conteúdo
+  ritmoAula          Int   // Velocidade adequada (1=muito lento, 5=muito rápido, 3=ideal)
+  recursosDidaticos  Int   // Qualidade dos slides, exemplos, materiais
+  engajamento        Int   // Nível de envolvimento com a aula
+  
+  // Feedback estruturado (opcional)
+  pontoPositivo    String?  // O que funcionou bem
+  pontoMelhoria    String?  // O que pode melhorar
+  sugestao         String?  // Sugestões específicas
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  aula    Aula    @relation(fields: [aulaId], references: [id])
+  
+  // Um usuário só pode fazer avaliação didática uma vez por aula
+  @@unique([usuarioId, aulaId])
+  @@map("avaliacoes_didaticas")
+}
+
+// Modelo AvaliacaoProfessor (Avaliação Periódica/Coletiva do Professor)
+model AvaliacaoProfessor {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  professorId Int
+  periodo     String   // "2025-10" (ano-mês) - limita 1 avaliação por mês
+  
+  // Critérios de avaliação do professor (escala 1-5)
+  dominioConteudo    Int  // Conhecimento da matéria
+  clarezaExplicacao  Int  // Didática e clareza
+  pontualidade       Int  // Pontualidade e assiduidade
+  organizacao        Int  // Organização das aulas
+  acessibilidade     Int  // Disponibilidade para dúvidas
+  empatia            Int  // Empatia com alunos
+  
+  // Comentário anônimo (opcional)
+  comentario String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamentos
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
+  professor Professor @relation(fields: [professorId], references: [id])
+  
+  // Um usuário só pode avaliar um professor uma vez por período
+  @@unique([usuarioId, professorId, periodo])
+  @@map("avaliacoes_professores")
 }
 
 // Modelo HumorRegistro (Registro diário de humor)
