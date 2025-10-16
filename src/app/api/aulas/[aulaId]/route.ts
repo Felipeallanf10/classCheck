@@ -16,13 +16,13 @@ const updateAulaSchema = z.object({
 })
 
 interface RouteParams {
-  params: Promise<{ id: string }>
+  params: Promise<{ aulaId: string }>
 }
 
 export async function GET(request: NextRequest, context: RouteParams) {
   const params = await context.params
   try {
-    const id = parseInt(params.id)
+    const id = parseInt(params.aulaId)
     
     if (isNaN(id)) {
       return NextResponse.json(
@@ -97,7 +97,14 @@ export async function GET(request: NextRequest, context: RouteParams) {
       )
     }
 
-    return NextResponse.json(aula)
+    // Formatar para evitar erro de objeto React
+    const aulaFormatada = {
+      ...aula,
+      professor: aula.professor.nome, // String ao invés de objeto
+      professorCompleto: aula.professor // Objeto completo disponível se necessário
+    }
+
+    return NextResponse.json(aulaFormatada)
   } catch (error) {
     console.error('Erro ao buscar aula:', error)
     return NextResponse.json(
@@ -110,7 +117,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
 export async function PUT(request: NextRequest, context: RouteParams) {
   const params = await context.params
   try {
-    const id = parseInt(params.id)
+    const id = parseInt(params.aulaId)
     
     if (isNaN(id)) {
       return NextResponse.json(
@@ -235,7 +242,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 export async function DELETE(request: NextRequest, context: RouteParams) {
   const params = await context.params
   try {
-    const id = parseInt(params.id)
+    const id = parseInt(params.aulaId)
     
     if (isNaN(id)) {
       return NextResponse.json(

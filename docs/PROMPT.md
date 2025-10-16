@@ -123,7 +123,7 @@ Remover /suporte e criar redirect /suporte → /ajuda.
 📦 Branch: refactor/phase2-forms-and-questionarios
 📄 Relatório: docs/relatorios/refactor-fase2.md
 
-🧱 FASE 3 — REFINAMENTOS E LIMPEZA (1–2 DIAS)
+## 🧱 FASE 3 — REFINAMENTOS E LIMPEZA (1–2 DIAS)
 🎯 Objetivo:
 Integrar funções menores, remover páginas temporárias e revisar a navegação geral.
 
@@ -132,7 +132,7 @@ Passos:
 Adicionar filtro “Favoritas” no topo da lista de aulas:
 
 tsx
-Copiar código
+Copiar código 
 <ToggleFilter name="Favoritas" icon={<Star />} />
 Remover rota /favoritos e atualizar links no menu lateral.
 

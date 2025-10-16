@@ -20,13 +20,13 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const showNavRoutes = [
     '/dashboard',
     '/aulas', 
-    '/avaliacoes',
-    '/avaliacao-socioemocional',
+    '/professores',
+    '/check-in',
+    '/minhas-avaliacoes',
     '/gamificacao',
     '/insights',
     '/relatorios',
     '/ajuda',
-    '/favoritos', 
     '/eventos'
   ]
   

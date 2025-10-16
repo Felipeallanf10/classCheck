@@ -1,309 +1,524 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
-import { AvaliacaoForm } from '@/components/avaliacao'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, BookOpen, User, Calendar, Clock } from 'lucide-react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { type AvaliacaoFormData } from '@/lib/validations/avaliacao'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Progress } from '@/components/ui/progress'
+import { ArrowLeft, ArrowRight, Loader2, Star, CheckCircle, ChevronRight } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import QuestionarioSocioemocional from '@/components/questionario/QuestionarioSocioemocional'
 
-// Mock data para a aula baseado no ID
-const getMockAula = (id: string) => {
-  const aulas = {
-    '1': {
-      id: '1',
-      titulo: 'Geografia – Continentes',
-      professor: 'Prof. Ana Silva',
-      disciplina: 'Geografia',
-      data: new Date('2025-08-20'),
-      horario: '14:00 - 15:30',
-      sala: 'Sala 204',
-      descricao: 'Estudo detalhado dos continentes terrestres, suas características geográficas, climáticas e culturais. Análise dos aspectos físicos e humanos de cada continente.',
-      objetivos: [
-        'Identificar os continentes e suas características',
-        'Compreender a diversidade geográfica mundial',
-        'Analisar aspectos culturais e econômicos'
-      ],
-      status: 'CONCLUIDA',
-      jaAvaliada: false
-    },
-    '2': {
-      id: '2',
-      titulo: 'História – Revolução Francesa',
-      professor: 'Prof. Lucas Mendes',
-      disciplina: 'História',
-      data: new Date('2025-08-19'),
-      horario: '10:00 - 11:30',
-      sala: 'Sala 301',
-      descricao: 'Análise dos eventos que levaram à Revolução Francesa, suas causas, desenvolvimento e consequências para a sociedade francesa e mundial.',
-      objetivos: [
-        'Compreender as causas da Revolução Francesa',
-        'Analisar os principais eventos do período',
-        'Avaliar o impacto histórico da revolução'
-      ],
-      status: 'CONCLUIDA',
-      jaAvaliada: false
-    },
-    '3': {
-      id: '3',
-      titulo: 'Matemática – Porcentagem',
-      professor: 'Prof. Carla Santos',
-      disciplina: 'Matemática',
-      data: new Date('2025-08-18'),
-      horario: '08:00 - 09:30',
-      sala: 'Sala 102',
-      descricao: 'Conceitos fundamentais de porcentagem, cálculos percentuais, aplicações práticas em situações do cotidiano e resolução de problemas.',
-      objetivos: [
-        'Dominar o conceito de porcentagem',
-        'Realizar cálculos percentuais',
-        'Aplicar porcentagem em situações reais'
-      ],
-      status: 'CONCLUIDA',
-      jaAvaliada: true
-    }
-  }
-
-  return (aulas as any)[id] || {
-    id,
-    titulo: 'Aula não encontrada',
-    professor: 'Professor não definido',
-    disciplina: 'Disciplina não definida',
-    data: new Date(),
-    horario: 'Horário não definido',
-    sala: 'Sala não definida',
-    descricao: 'Descrição não disponível.',
-    objetivos: [],
-    status: 'AGENDADA',
-    jaAvaliada: false
-  }
+interface Aula {
+  id: string
+  titulo: string
+  materia: string
+  professor: string
+  dataHora: string
 }
+
+type Step = 'socioemocional' | 'didatica' | 'resumo'
 
 export default function AvaliarAulaPage() {
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  
   const aulaId = params.id as string
-  const aula = getMockAula(aulaId)
+  
+  const [aula, setAula] = useState<Aula | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [currentStep, setCurrentStep] = useState<Step>('socioemocional')
+  
+  // Dados da avaliação socioemocional
+  const [socioemocionaData, setSocioemocionaData] = useState<any>(null)
+  
+  // Dados da avaliação didática
+  const [compreensaoConteudo, setCompreensaoConteudo] = useState(3)
+  const [ritmoAula, setRitmoAula] = useState('adequado')
+  const [recursosDidaticos, setRecursosDidaticos] = useState(3)
+  const [engajamento, setEngajamento] = useState(3)
+  const [pontoPositivo, setPontoPositivo] = useState('')
+  const [pontoMelhoria, setPontoMelhoria] = useState('')
+  const [sugestao, setSugestao] = useState('')
 
-  const handleSubmit = async (data: AvaliacaoFormData) => {
-    setIsSubmitting(true)
+  useEffect(() => {
+    async function fetchAula() {
+      try {
+        const response = await fetch(`/api/aulas/${aulaId}`)
+        if (!response.ok) throw new Error('Aula não encontrada')
+        const data = await response.json()
+        setAula(data)
+      } catch (err) {
+        toast.error({
+          title: "Erro",
+          description: "Não foi possível carregar os dados da aula"
+        })
+        router.push('/aulas')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (aulaId) {
+      fetchAula()
+    }
+  }, [aulaId, router, toast])
+
+  const handleSocioemocionaComplete = async (resultado: any) => {
+    setSocioemocionaData(resultado)
+    setCurrentStep('didatica')
+  }
+
+  const handleSkipDidatica = () => {
+    setCurrentStep('resumo')
+  }
+
+  const handleSubmitFinal = async () => {
+    setSubmitting(true)
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log('Avaliação enviada:', { aulaId, aulaTitle: aula.titulo, ...data })
-      toast.success({
-        title: 'Avaliação enviada com sucesso!',
-        description: `Sua avaliação para "${aula.titulo}" foi registrada.`
+      // 1. Salvar avaliação socioemocional
+      const socioResponse = await fetch('/api/avaliacoes/socioemocional', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          aulaId,
+          valencia: socioemocionaData?.finalPosition?.x || 0,
+          ativacao: socioemocionaData?.finalPosition?.y || 0,
+          estadoPrimario: socioemocionaData?.primaryState || 'Neutro',
+          confianca: socioemocionaData?.confidence || 0,
+          totalPerguntas: socioemocionaData?.totalQuestions || 0,
+          tempoResposta: 180,
+          respostas: JSON.stringify(socioemocionaData?.responses || []),
+        }),
       })
-      setTimeout(() => { router.push('/avaliacoes') }, 1500)
+
+      if (!socioResponse.ok) throw new Error('Erro ao salvar avaliação socioemocional')
+
+      // 2. Salvar avaliação didática (se preenchida)
+      if (currentStep === 'resumo') {
+        const ritmoNumero = ritmoAula === 'muito-lento' ? 1 : ritmoAula === 'adequado' ? 3 : 5
+
+        const didaticaResponse = await fetch('/api/avaliacoes/didatica', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            aulaId,
+            compreensaoConteudo,
+            ritmoAula: ritmoNumero,
+            recursosDidaticos,
+            engajamento,
+            pontoPositivo: pontoPositivo || null,
+            pontoMelhoria: pontoMelhoria || null,
+            sugestao: sugestao || null,
+          }),
+        })
+
+        if (!didaticaResponse.ok) throw new Error('Erro ao salvar avaliação didática')
+      }
+
+      // 3. Redirecionar para página de sucesso
+      router.push(`/aulas/${aulaId}/avaliar/sucesso`)
     } catch (error) {
+      console.error('Erro ao enviar avaliação:', error)
       toast.error({
-        title: 'Erro ao enviar avaliação',
-        description: 'Tente novamente em alguns instantes.'
+        title: "Erro",
+        description: "Não foi possível enviar a avaliação. Tente novamente."
       })
     } finally {
-      setIsSubmitting(false)
+      setSubmitting(false)
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'CONCLUIDA':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Concluída</Badge>
-      case 'EM_ANDAMENTO':
-        return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Em Andamento</Badge>
-      case 'AGENDADA':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Agendada</Badge>
-      default:
-        return <Badge variant="secondary">{status}</Badge>
+  const getProgress = () => {
+    switch (currentStep) {
+      case 'socioemocional': return 33
+      case 'didatica': return 66
+      case 'resumo': return 100
+      default: return 0
     }
   }
 
-  if (aula.jaAvaliada) {
+  const getStepLabel = () => {
+    switch (currentStep) {
+      case 'socioemocional': return 'Etapa 1 de 2'
+      case 'didatica': return 'Etapa 2 de 2'
+      case 'resumo': return 'Revisão Final'
+      default: return ''
+    }
+  }
+
+  if (loading) {
     return (
-      <SidebarProvider>
-        <SidebarInset>
-          <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100 dark:from-emerald-900 dark:via-teal-900 dark:to-green-900">
-            <div className="max-w-4xl mx-auto px-6 py-12">
-              <div className="flex items-center gap-4 mb-8">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  onClick={() => router.back()}
-                  className="gap-2 bg-white/70 hover:bg-white/90 backdrop-blur-sm"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Voltar
-                </Button>
-              </div>
-              <Card className="overflow-hidden shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 p-8 text-white text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-full backdrop-blur-sm mb-6">
-                    <div className="text-4xl">✅</div>
-                  </div>
-                  <h1 className="text-3xl font-bold mb-2">Aula já avaliada!</h1>
-                  <p className="text-emerald-100 text-lg">Obrigado por compartilhar sua experiência</p>
-                </div>
-                <CardContent className="p-8 text-center space-y-6">
-                  <div className="space-y-4">
-                    <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-200">{aula.titulo}</h2>
-                    <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
-                      Sua avaliação para esta aula foi registrada com sucesso. Você pode visualizar ou gerenciar todas as suas avaliações na página de histórico.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-                    <div className="bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <User className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                        <div className="text-left">
-                          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Professor</p>
-                          <p className="text-sm text-emerald-600 dark:text-emerald-300">{aula.professor}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-teal-50 dark:bg-teal-900/30 p-4 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <BookOpen className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                        <div className="text-left">
-                          <p className="text-sm font-medium text-teal-800 dark:text-teal-200">Disciplina</p>
-                          <p className="text-sm text-teal-600 dark:text-teal-300">{aula.disciplina}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                    <Button onClick={() => router.push('/avaliacoes')} className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg hover:shadow-xl transition-all duration-300" size="lg">
-                      <span className="mr-2">📊</span>Ver Avaliações
-                    </Button>
-                    <Button variant="outline" onClick={() => router.push('/aulas')} className="border-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300" size="lg">
-                      <span className="mr-2">📚</span>Voltar às Aulas
-                    </Button>
-                  </div>
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-xl mt-8">
-                    <p className="text-slate-600 dark:text-slate-400 italic">"Sua opinião é valiosa e ajuda a melhorar a qualidade do ensino para todos!"</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     )
   }
 
+  if (!aula) {
+    return null
+  }
+
   return (
-    <SidebarProvider>
-      <SidebarInset>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900">
-            <div className="absolute inset-0 bg-black/10 backdrop-blur-sm" />
-            <div className="relative max-w-6xl mx-auto px-6 py-8">
-              <div className="flex items-center gap-4 mb-6">
-                <Button variant="secondary" size="sm" onClick={() => router.back()} className="gap-2 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm" disabled={isSubmitting}>
-                  <ArrowLeft className="h-4 w-4" />Voltar
-                </Button>
-              </div>
-              <div className="text-center space-y-3">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full backdrop-blur-sm mb-4">
-                  <BookOpen className="h-8 w-8 text-white" />
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white">Avaliar Aula</h1>
-                <p className="text-lg text-white/90 max-w-2xl mx-auto">Compartilhe sua experiência e ajude a melhorar o ensino para todos</p>
-              </div>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0">
-              <svg className="w-full h-12 text-slate-50 dark:text-slate-900" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" fill="currentColor" /></svg>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Header com informações da aula */}
+      <div className="bg-white dark:bg-gray-900 border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4 max-w-4xl">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push('/aulas')}
+            className="mb-3"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+          
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground mb-1">Avaliando:</p>
+            <h1 className="text-xl font-bold">{aula.titulo}</h1>
+            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-1">
+              <span>📚 {aula.materia}</span>
+              <span>👤 {aula.professor}</span>
             </div>
           </div>
-          <div className="max-w-6xl mx-auto px-6 py-8 -mt-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              <div className="lg:col-span-4 space-y-6">
-                <Card className="overflow-hidden shadow-xl border-0 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <h2 className="text-xl font-bold leading-tight">{aula.titulo}</h2>
-                        <div className="flex items-center gap-3 text-blue-100">
-                          <div className="flex items-center gap-1">
-                            <User className="h-4 w-4" />
-                            <span className="text-sm font-medium">{aula.professor}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                        <span className="text-xs font-medium">{aula.disciplina}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <CardContent className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center"><Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" /></div>
-                        <div>
-                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Data</p>
-                          <p className="text-sm text-blue-700 dark:text-blue-300">{format(aula.data, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-                        <div className="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center"><Clock className="h-5 w-5 text-purple-600 dark:text-purple-400" /></div>
-                        <div>
-                          <p className="text-sm font-medium text-purple-900 dark:text-purple-100">Horário</p>
-                          <p className="text-sm text-purple-700 dark:text-purple-300">{aula.horario}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
-                        <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-800 rounded-full flex items-center justify-center"><BookOpen className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /></div>
-                        <div>
-                          <p className="text-sm font-medium text-indigo-900 dark:text-indigo-100">Local</p>
-                          <p className="text-sm text-indigo-700 dark:text-indigo-300">{aula.sala}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="pt-2">{getStatusBadge(aula.status)}</div>
-                  </CardContent>
-                </Card>
-                <Card className="shadow-lg border-0 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold text-lg mb-3 text-slate-800 dark:text-slate-200">Sobre esta aula</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{aula.descricao}</p>
-                    {aula.objetivos.length > 0 && (
-                      <div>
-                        <h4 className="font-medium mb-3 text-slate-800 dark:text-slate-200">Objetivos de Aprendizagem</h4>
-                        <ul className="space-y-2">
-                          {aula.objetivos.map((objetivo: string, index: number) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-sm text-slate-600 dark:text-slate-400">{objetivo}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-              <div className="lg:col-span-8 md:col-span-7">
-                <div className="sticky top-8">
-                  <AvaliacaoForm
-                    aulaTitle={aula.titulo}
-                    onSubmit={handleSubmit}
-                    isLoading={isSubmitting}
-                    className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm"
-                  />
-                </div>
-              </div>
+
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="font-medium">{getStepLabel()}</span>
+              <span className="text-muted-foreground">{getProgress()}%</span>
             </div>
+            <Progress value={getProgress()} className="h-2" />
           </div>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </div>
+
+      {/* Conteúdo das Etapas */}
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {currentStep === 'socioemocional' && (
+          <div>
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="text-center">😊 Como você se sentiu nesta aula?</CardTitle>
+                <CardDescription className="text-center">
+                  Responda às perguntas para mapear suas emoções durante a aula
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <QuestionarioSocioemocional
+              onComplete={handleSocioemocionaComplete}
+              contexto="aula"
+            />
+          </div>
+        )}
+
+        {currentStep === 'didatica' && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>📖 Avalie os aspectos da aula</CardTitle>
+                <CardDescription>
+                  Esta etapa é opcional, mas seu feedback ajuda a melhorar as próximas aulas
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Compreensão do Conteúdo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Compreensão do Conteúdo</CardTitle>
+                <CardDescription>O quanto você entendeu o conteúdo apresentado?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  {[1, 2, 3, 4, 5].map((nivel) => (
+                    <button
+                      key={nivel}
+                      type="button"
+                      onClick={() => setCompreensaoConteudo(nivel)}
+                      className={`p-2 transition-colors ${compreensaoConteudo >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
+                    >
+                      <Star className="h-8 w-8" fill={compreensaoConteudo >= nivel ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+                <p className="text-sm text-center text-muted-foreground mt-2">
+                  {compreensaoConteudo === 1 && 'Não entendi quase nada'}
+                  {compreensaoConteudo === 2 && 'Entendi pouco'}
+                  {compreensaoConteudo === 3 && 'Entendi razoavelmente'}
+                  {compreensaoConteudo === 4 && 'Entendi bem'}
+                  {compreensaoConteudo === 5 && 'Entendi perfeitamente'}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Ritmo da Aula */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Ritmo da Aula</CardTitle>
+                <CardDescription>A velocidade da aula estava adequada?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[
+                    { value: 'muito-lento', label: 'Muito lento', emoji: '🐌' },
+                    { value: 'adequado', label: 'Adequado', emoji: '✅' },
+                    { value: 'muito-rapido', label: 'Muito rápido', emoji: '⚡' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setRitmoAula(option.value)}
+                      className={`w-full p-3 text-left rounded-lg border-2 transition-all ${
+                        ritmoAula === option.value
+                          ? 'border-primary bg-primary/5 shadow-sm'
+                          : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
+                      }`}
+                    >
+                      <span className="mr-2">{option.emoji}</span>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Recursos Didáticos */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Recursos Didáticos</CardTitle>
+                <CardDescription>Slides, exemplos, materiais foram úteis?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  {[1, 2, 3, 4, 5].map((nivel) => (
+                    <button
+                      key={nivel}
+                      type="button"
+                      onClick={() => setRecursosDidaticos(nivel)}
+                      className={`p-2 transition-colors ${recursosDidaticos >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
+                    >
+                      <Star className="h-8 w-8" fill={recursosDidaticos >= nivel ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Engajamento */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Seu Engajamento</CardTitle>
+                <CardDescription>O quanto você se envolveu com a aula?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  {[1, 2, 3, 4, 5].map((nivel) => (
+                    <button
+                      key={nivel}
+                      type="button"
+                      onClick={() => setEngajamento(nivel)}
+                      className={`p-2 transition-colors ${engajamento >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
+                    >
+                      <Star className="h-8 w-8" fill={engajamento >= nivel ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Feedback Texto */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Feedback Adicional (Opcional)</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="positivo">O que funcionou bem?</Label>
+                  <Textarea
+                    id="positivo"
+                    value={pontoPositivo}
+                    onChange={(e) => setPontoPositivo(e.target.value)}
+                    placeholder="Ex: Os exemplos práticos ajudaram muito"
+                    rows={2}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="melhoria">O que pode melhorar?</Label>
+                  <Textarea
+                    id="melhoria"
+                    value={pontoMelhoria}
+                    onChange={(e) => setPontoMelhoria(e.target.value)}
+                    placeholder="Ex: Poderia ter mais exercícios"
+                    rows={2}
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="sugestao">Sugestões</Label>
+                  <Textarea
+                    id="sugestao"
+                    value={sugestao}
+                    onChange={(e) => setSugestao(e.target.value)}
+                    placeholder="Suas sugestões para as próximas aulas"
+                    rows={2}
+                    className="mt-1"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Botões */}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleSkipDidatica}
+                className="flex-1"
+              >
+                Pular Esta Etapa
+              </Button>
+              <Button
+                type="button"
+                onClick={() => setCurrentStep('resumo')}
+                className="flex-1"
+              >
+                Continuar
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 'resumo' && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Resumo da Avaliação
+                </CardTitle>
+                <CardDescription>
+                  Revise suas respostas antes de enviar
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Resumo Socioemocional */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    😊 Avaliação Socioemocional
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Estado emocional: <strong>{socioemocionaData?.primaryState || 'Registrado'}</strong>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Valência: {(socioemocionaData?.finalPosition?.x || 0).toFixed(2)} • 
+                    Ativação: {(socioemocionaData?.finalPosition?.y || 0).toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Resumo Didático */}
+                <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    📖 Avaliação Didática
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Compreensão:</p>
+                      <div className="flex gap-1">
+                        {[...Array(compreensaoConteudo)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Recursos:</p>
+                      <div className="flex gap-1">
+                        {[...Array(recursosDidaticos)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Engajamento:</p>
+                      <div className="flex gap-1">
+                        {[...Array(engajamento)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Ritmo:</p>
+                      <p className="font-medium">
+                        {ritmoAula === 'muito-lento' && '🐌 Lento'}
+                        {ritmoAula === 'adequado' && '✅ Adequado'}
+                        {ritmoAula === 'muito-rapido' && '⚡ Rápido'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {(pontoPositivo || pontoMelhoria || sugestao) && (
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-xs text-muted-foreground">
+                        + Feedback adicional incluído
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <Alert>
+                  <AlertDescription>
+                    Ao enviar, sua avaliação será registrada e não poderá ser alterada posteriormente.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
+            {/* Botões */}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCurrentStep('didatica')}
+                className="flex-1"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSubmitFinal}
+                disabled={submitting}
+                className="flex-1"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Enviar Avaliação
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

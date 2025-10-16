@@ -11,12 +11,12 @@ import { PageContainer } from '@/components/shared/PageContainer'
 
 // Sugestões de páginas populares
 const suggestedPages = [
-  { name: 'Dashboard', path: '/dashboard', description: 'Visão geral das suas atividades' },
-  { name: 'Avaliações', path: '/avaliacoes', description: 'Avalie suas aulas e professores' },
-  { name: 'Relatórios', path: '/relatorios', description: 'Consulte relatórios e estatísticas' },
+  { name: 'Início', path: '/dashboard', description: 'Visão geral das suas atividades' },
+  { name: 'Minhas Avaliações', path: '/minhas-avaliacoes', description: 'Veja suas avaliações de aulas e professores' },
   { name: 'Aulas', path: '/aulas', description: 'Gerencie suas aulas e horários' },
+  { name: 'Check-in Diário', path: '/check-in', description: 'Registre seu estado emocional' },
+  { name: 'Relatórios', path: '/relatorios', description: 'Consulte relatórios e estatísticas' },
   { name: 'Central de Ajuda', path: '/ajuda', description: 'Encontre respostas para suas dúvidas' },
-  { name: 'Contato', path: '/contato', description: 'Entre em contato conosco' }
 ]
 
 // Links úteis
