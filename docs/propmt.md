@@ -1,257 +1,298 @@
-# 🧭 INSTRUÇÕES DE IMPLEMENTAÇÃO — FASE 2  
-## Consolidação de Conteúdo: Unificação de Questionários e Ajuda/Suporte  
-**Projeto:** ClassCheck v3.0  
-**Responsável Técnico:** [Nome do Desenvolvedor]  
-**Gerente de Projeto:** Felipe Allan  
-**Branch:** `refactor/phase2-forms-and-questionarios`  
-**Base:** `develop`
+# 🤖 PROMPT PARA GITHUB COPILOT — Refatoração da Página `/aulas`
+> **Objetivo:** Implementar as melhorias detalhadas no relatório “📊 Análise: Página de Aulas - Melhorias e Sugestões” do projeto **ClassCheck v3.0**
 
 ---
 
-## 🎯 OBJETIVO GERAL
+## 🎯 Contexto
 
-Unificar as páginas redundantes `/questionario` + `/avaliacao-socioemocional` e `/ajuda` + `/suporte`, criando fluxos coesos e modulares com navegação por **Tabs**.  
-O foco é melhorar **usabilidade**, **organização do código** e **descoberta de funcionalidades**, mantendo consistência visual e semântica em toda a aplicação.
+A página `/aulas` atual está funcional, mas apresenta:
+- Dados mockados (sem integração real)
+- Layout monótono
+- Falta de feedback de ações
+- Filtros limitados
+- Responsividade incompleta
 
----
-
-## 🧱 ESTRUTURA DE ALTO NÍVEL
-
-### **1. Avaliação Socioemocional (Nova Estrutura)**
-- **Rota unificada:** `/avaliacao-socioemocional`
-- **Tabs:**
-  - Nova Avaliação  
-  - Histórico  
-  - Análise
-
-### **2. Central de Ajuda (Nova Estrutura)**
-- **Rota unificada:** `/ajuda`
-- **Tabs:**
-  - Perguntas Frequentes  
-  - Falar com Suporte  
-  - Tutoriais  
-
-### **Rotas antigas redirecionadas:**
-- `/questionario` → `/avaliacao-socioemocional`
-- `/questionario/*` → `/avaliacao-socioemocional`
-- `/suporte` → `/ajuda?tab=suporte`
+Queremos **refatorar e evoluir** a página em **3 fases**, com foco em UX, performance e integração real.
 
 ---
 
-## ⚙️ ETAPAS DE IMPLEMENTAÇÃO
+## 🧩 Estrutura Técnica
 
-### **FASE A — Estrutura e Setup (Dia 1)**
+### **Localização do código**
+src/
+├── app/
+│ └── aulas/
+│ └── page.tsx
+├── components/
+│ └── aulas/
+│ ├── CardAulaEnhanced.tsx
+│ ├── FiltersBar.tsx
+│ ├── SidebarCalendarioEnhanced.tsx
+│ ├── AulaSkeleton.tsx
+│ ├── MobileDatePicker.tsx
+│ ├── QuickActionsBar.tsx
+│ └── ToggleFilter.tsx
+└── hooks/
+└── useAulas.ts
 
-#### 📋 Ações:
-1. Criar a nova branch:
-   ```bash
-   git checkout -b refactor/phase2-forms-and-questionarios develop
-Criar diretórios base:
-
-bash
+yaml
 Copiar código
-src/components/avaliacao/
-src/components/ajuda/
-Implementar layout base com Tabs para ambas as páginas:
 
-src/app/avaliacao-socioemocional/page.tsx
+---
 
-src/app/ajuda/page.tsx
+## ⚡ FASE 1 — FUNDAÇÃO (dados reais, feedback e loading)
 
-🧩 Exemplo base:
+### ✅ 1. Criar hook `useAulas.ts`
+```tsx
+// src/hooks/useAulas.ts
+// Hook responsável por buscar aulas reais com loading e tratamento de erros
+Requisitos:
+
+Fetch em /api/aulas?date=YYYY-MM-DD
+
+Estado: aulas, loading, error
+
+Atualiza automaticamente quando a data muda
+
+✅ 2. Adicionar Skeleton Loaders
 tsx
 Copiar código
-<Tabs defaultValue="novo" className="w-full">
-  <TabsList className="mb-4">
-    <TabsTrigger value="novo">Nova Avaliação</TabsTrigger>
-    <TabsTrigger value="historico">Histórico</TabsTrigger>
-    <TabsTrigger value="analise">Análise</TabsTrigger>
-  </TabsList>
-  <TabsContent value="novo">
-    <NovaAvaliacaoTab />
-  </TabsContent>
-  <TabsContent value="historico">
-    <HistoricoTab />
-  </TabsContent>
-  <TabsContent value="analise">
-    <AnaliseTab />
-  </TabsContent>
-</Tabs>
-✅ Commits esperados:
-bash
-Copiar código
-feat(avaliacao): create tabbed layout for unified evaluation page
-feat(ajuda): create base structure with tab navigation
-FASE B — Migração de Questionários (Dia 2)
-📋 Ações:
-Mover lógica dos componentes existentes em /questionario para dentro dos novos componentes:
+// src/components/aulas/AulaSkeleton.tsx
+// Skeleton animado para placeholder durante o carregamento
+Requisitos:
 
-NovaAvaliacaoTab.tsx → formulário principal
+Grid de placeholders (6 itens)
 
-HistoricoTab.tsx → listagem de respostas anteriores
+Suporte a dark mode (bg-gray-200 / bg-gray-700)
 
-AnaliseTab.tsx → gráficos e estatísticas
+Transição suave
 
-Criar QuestionarioForm.tsx com validação via Zod e integração com a lógica antiga.
+✅ 3. Sistema de Feedback
+Adicionar toast em todas as ações críticas:
 
-Implementar redirecionamento:
+Favoritar/desfavoritar
+
+Avaliar
+
+Erros de rede
+
+Requisitos:
+
+Optimistic updates (UI reflete ação antes da resposta)
+
+Toast de sucesso/erro usando useToast()
+
+🎨 FASE 2 — INTERFACE (UI/UX aprimorada)
+✅ 4. Criar CardAulaEnhanced.tsx
+Substituir o card simples atual.
+
+Requisitos:
+
+Título + Professor + Disciplina + Horário
+
+Descrição/preview da aula
+
+Barra colorida por disciplina
+
+Progresso de avaliação (se existir)
+
+Badge de status (avaliada / pendente)
+
+Ícone de humor se disponível
+
+Botão contextual (Ver ou Avaliar)
+
+✅ 5. Criar FiltersBar.tsx
+Nova barra de filtros combinados acima da listagem.
+
+Requisitos:
+
+Filtros:
+
+Favoritas (toggle)
+
+Status (avaliadas/pendentes)
+
+Disciplina (multi-select)
+
+Professor (multi-select)
+
+Badge com contadores
+
+Botão “Limpar filtros”
+
+Contador total de resultados
+
+✅ 6. Criar SidebarCalendarioEnhanced.tsx
+Reforçar o uso do calendário lateral.
+
+Requisitos:
+
+Destaque de dias com aulas
+
+Modifiers visuais:
+
+temAulas (cor primária)
+
+temAvaliadas (verde)
+
+temPendentes (laranja)
+
+Estatísticas da semana (aulas / avaliadas)
+
+Legenda explicativa
+
+✅ 7. Adicionar Visualizações Alternativas
+Implementar toggle entre Grid e List View:
 
 tsx
 Copiar código
-// src/app/questionario/page.tsx
-import { redirect } from 'next/navigation';
-export default function Redirect() {
-  redirect('/avaliacao-socioemocional');
-}
-Atualizar app-sidebar.tsx removendo /questionario.
+const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+Renderizar condicionalmente:
 
-✅ Commits esperados:
-bash
-Copiar código
-feat(avaliacao): migrate questionario components to unified structure
-refactor(routes): redirect /questionario to /avaliacao-socioemocional
-fix(sidebar): update navigation for unified evaluation
-FASE C — Migração de Ajuda e Suporte (Dia 3)
-📋 Ações:
-Criar os seguintes componentes:
+Grid: CardAulaEnhanced
 
-bash
-Copiar código
-src/components/ajuda/
-├── FAQSection.tsx
-├── SupportSection.tsx
-├── TutoriaisSection.tsx
-├── QuickContactCard.tsx
-└── SearchFAQ.tsx
-Implementar layout com tabs:
+List: CardAulaList (compacto)
 
+📱 FASE 3 — PERFORMANCE + MOBILE
+✅ 8. Criar MobileDatePicker.tsx
+Requisitos:
+
+Sheet (bottom drawer) para seleção de data
+
+Quick picks: “Hoje”, “Amanhã”, “Próxima semana”
+
+Mostra data atual no topo (🗓️ 13 de outubro, 2025 ▾)
+
+Usa mesmo componente Calendar da versão desktop
+
+✅ 9. Substituir FloatingButton por QuickActionsBar.tsx
+Requisitos:
+
+Card fixo inferior
+
+Mostra quantidade de aulas pendentes
+
+Exibe título da próxima aula a avaliar
+
+Botão “⚡ Avaliar agora”
+
+Opção “Ver todas (x)”
+
+✅ 10. Otimizações de Performance
+Virtualização com react-window se > 50 aulas
+
+Animações otimizadas (CSS puro, até 12 cards animados)
+
+will-change: transform para suavizar transições
+
+Lazy load de componentes pesados
+
+🧠 LÓGICA PRINCIPAL (resumo)
 tsx
 Copiar código
-<Tabs defaultValue="faq">
-  <TabsTrigger value="faq">Perguntas Frequentes</TabsTrigger>
-  <TabsTrigger value="suporte">Falar com Suporte</TabsTrigger>
-  <TabsTrigger value="tutoriais">Tutoriais</TabsTrigger>
-</Tabs>
-Adicionar busca em FAQs e formulário funcional de suporte.
+const { aulas, loading, error } = useAulas(dataSelecionada);
+const [filters, setFilters] = useState(defaultFilters);
+const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-Implementar redirecionamento:
+const aulasFiltradas = useMemo(() => {
+  return aulas
+    .filter(porDataSelecionada)
+    .filter(porFavoritasSeAtivo)
+    .filter(porStatus)
+    .filter(porDisciplina)
+    .filter(porProfessor);
+}, [aulas, filters]);
+✅ CHECKLIST DE IMPLEMENTAÇÃO
+Fase 1 – Fundação
+ Criar useAulas.ts
 
-tsx
-Copiar código
-// src/app/suporte/page.tsx
-import { redirect } from 'next/navigation';
-export default function Redirect() {
-  redirect('/ajuda?tab=suporte');
-}
-Atualizar sidebar removendo /suporte.
+ Criar endpoint /api/aulas
 
-✅ Commits esperados:
-bash
-Copiar código
-feat(ajuda): implement FAQ, Support, and Tutorials sections
-feat(ajuda): add search and quick contact features
-refactor(routes): redirect /suporte to /ajuda
-FASE D — Testes e Polimento (Dia 4)
-📋 Ações:
-Testar todos os fluxos de avaliação:
+ Adicionar AulaSkeleton.tsx
 
-Submissão de formulário
+ Implementar loading states
 
-Visualização de histórico
+ Adicionar toasts e optimistic update
 
-Exibição de gráficos
+ Testar fluxo completo
 
-Testar central de ajuda:
+Fase 2 – Interface
+ Implementar CardAulaEnhanced.tsx
 
-Busca em FAQ
+ Implementar FiltersBar.tsx
 
-Envio de formulário de suporte
+ Atualizar SidebarCalendarioEnhanced.tsx
 
-Redirecionamento com query ?tab=suporte
+ Adicionar visualizações Grid/List
 
-Validar responsividade e dark mode.
+ Testar com dados variados (0, 10, 100 aulas)
 
-Executar:
+Fase 3 – Performance e Mobile
+ Criar MobileDatePicker.tsx
 
-bash
-Copiar código
-npm run lint
-npm run build
-npm run test
-✅ Commits esperados:
-bash
-Copiar código
-test(avaliacao): validate evaluation flows and redirects
-test(ajuda): verify support and FAQ functionality
-docs(refactor): add phase 2 completion notes
-🧠 BOAS PRÁTICAS E DIRETRIZES
-Padrão visual: manter design system do shadcn/ui
+ Criar QuickActionsBar.tsx
 
-Performance: usar lazy loading em tabs não ativas
+ Adicionar virtualização condicional
 
-Acessibilidade: garantir suporte a teclado e aria-labels
+ Otimizar animações
 
-Responsividade:
+ Testes cross-device e Lighthouse audit
 
-Ocultar elementos não essenciais em mobile
+💡 ESTILO E UX
+Paleta: usar shadcn/ui padrão com contraste suave
 
-Reordenar layouts de grids para telas menores
+Responsivo completo (mobile/tablet/desktop)
 
-Feedback do usuário:
+Dark mode funcional
 
-Mostrar toast em redirecionamentos
+Feedback visual em todas as ações
 
-Banner “Nova Estrutura de Avaliação” nas primeiras execuções
+Skeleton → Toast → Atualização suave
 
-🚨 RISCOS E MITIGAÇÕES
-Risco	Mitigação
-Quebra de links externos	Redirects permanentes (Next.js middleware)
-Confusão de usuários	Toasts + changelog in-app
-Erros em formulários migrados	Testes E2E e validação com Zod
-Regressão de estilo	Snapshot visual e revisão por UI Lead
+🚀 DIRETRIZES DE CÓDIGO
+Padrão TypeScript + Next.js App Router
 
-🧾 CRITÉRIOS DE CONCLUSÃO
-✅ /questionario removido e redirecionado
-✅ /avaliacao-socioemocional consolidado com tabs
-✅ /ajuda unificado com /suporte
-✅ Responsividade validada
-✅ Testes e build sem erros
-✅ Documentação atualizada (docs/refactor/phase2.md)
+Importar componentes via aliases (@/components/...)
 
-💾 COMMITS RECOMENDADOS (Sequência)
-scss
-Copiar código
-feat(avaliacao): create tab layout for unified evaluation
-feat(avaliacao): migrate old questionario components
-feat(ajuda): unify help and support with tabs
-refactor(routes): redirect old paths to new structure
-fix(ui): improve mobile responsiveness and dark mode
-test(core): validate unified flows and redirects
-docs(refactor): complete phase 2 consolidation report
-📈 RESULTADO ESPERADO
-Redução de 4 para 2 rotas principais
+Usar hooks client-side apenas em 'use client'
 
-Eliminação de ~10 componentes duplicados
+Evitar duplicação de estado (single source of truth)
 
-Melhor experiência de navegação e consistência visual
+Usar useMemo e useCallback para performance
 
-Base sólida para futuras expansões do sistema (Fase 3)
+Código limpo, sem any, sem warnings no build
 
-🗓️ PRAZO E EXECUÇÃO
-Etapa	Duração	Responsável
-Fase A	1 dia	Dev
-Fase B	1 dia	Dev
-Fase C	1 dia	Dev
-Fase D	1 dia	QA + Dev
-Total	4 dias úteis	-
+📦 BRANCH E COMMITS
+Branch: refactor/phase3-aulas-ux-improvements
 
-✅ CONCLUSÃO
-Após esta fase, o ClassCheck v3.0 passará a ter:
+Commits sugeridos:
 
-Estrutura coesa e enxuta
+feat(aulas): integrar dados reais e loading states
 
-Fluxos de avaliação e suporte unificados
+feat(aulas): criar Cards e Filtros avançados
 
-Melhor UX, performance e manutenibilidade
+feat(aulas): otimizações de performance e mobile
 
-🧭 Próximo passo: Após testes e merge da Fase 2, iniciar planejamento da Fase 3 (Refinamentos e Gamificação).
+chore(aulas): ajustes finais e testes de responsividade
+
+🧩 REFERÊNCIAS DE DESIGN
+Inspiração visual:
+
+Google Classroom (cards por disciplina)
+
+Linear (filtros combinados)
+
+Notion (visualizações alternáveis)
+
+Asana (quick actions bar)
+
+🎯 MISSÃO PARA O COPILOT
+“Refatore e aprimore a página /aulas de acordo com este documento.
+Implemente os componentes listados, integre dados reais, adicione feedback visual e garanta responsividade total.
+Siga as boas práticas de performance, UX e organização modular conforme descrito acima.”
+
+📅 Prioridade: Alta
+👤 Responsável: Desenvolvedor Frontend
+🧭 Aprovação final: Felipe Allan (Gerente de Projeto)
+📄 Base técnica: Relatório “Análise: Página de Aulas - Melhorias e Sugestões (13/10/2025)”
