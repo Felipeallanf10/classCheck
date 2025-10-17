@@ -28,9 +28,11 @@ model Usuario {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  avaliacoes     Avaliacao[]
-  humorRegistros HumorRegistro[]
-  aulasFavoritas AulaFavorita[]
+  avaliacoes            Avaliacao[]
+  humorRegistros        HumorRegistro[]
+  aulasFavoritas        AulaFavorita[]
+  perfilGamificacao     PerfilGamificacao?
+  configuracoesRanking  ConfiguracaoRanking[]
 
   @@map("usuarios")
 }
@@ -71,6 +73,7 @@ model Aula {
   avaliacoes     Avaliacao[]
   aulasFavoritas AulaFavorita[]
   eventos        Evento[]
+  historicoXP    HistoricoXP[]
 
   @@map("aulas")
 }
@@ -178,4 +181,104 @@ enum TipoEvento {
   EVENTO
   FERIADO
   REUNIAO
+}
+
+enum PeriodoRanking {
+  SEMANAL
+  MENSAL
+  BIMESTRAL
+}
+
+enum VisibilidadeRanking {
+  PUBLICO
+  APENAS_TOP3
+  PRIVADO
+}
+
+// ==============================================
+// MODELOS DE GAMIFICAÇÃO
+// ==============================================
+
+// Perfil de Gamificação do Usuário
+model PerfilGamificacao {
+  id                    Int      @id @default(autoincrement())
+  usuarioId             Int      @unique
+  xpTotal               Int      @default(0)
+  nivel                 Int      @default(1)
+  streakAtual           Int      @default(0)
+  melhorStreak          Int      @default(0)
+  ultimaAtividade       DateTime?
+  totalAvaliacoes       Int      @default(0)
+  avaliacoesConsecutivas Int     @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relacionamentos
+  usuario        Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  historicoXP    HistoricoXP[]
+  rankingPosicoes RankingPosicao[]
+
+  @@map("perfis_gamificacao")
+}
+
+// Histórico de XP
+model HistoricoXP {
+  id            Int      @id @default(autoincrement())
+  perfilId      Int
+  xpGanho       Int
+  acao          String   @db.VarChar(100)
+  descricao     String?  @db.Text
+  aulaId        Int?
+  multiplicador Float    @default(1.0)
+  createdAt     DateTime @default(now())
+
+  // Relacionamentos
+  perfil PerfilGamificacao @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  aula   Aula?             @relation(fields: [aulaId], references: [id], onDelete: SetNull)
+
+  @@map("historico_xp")
+}
+
+// Configuração de Ranking
+model ConfiguracaoRanking {
+  id                    Int                  @id @default(autoincrement())
+  ativo                 Boolean              @default(true)
+  periodoCalculo        PeriodoRanking       @default(SEMANAL)
+  bonusPrimeiroLugar    Float                @default(0.3)
+  bonusSegundoLugar     Float                @default(0.2)
+  bonusTerceiroLugar    Float                @default(0.1)
+  minimoAvaliacoes      Int                  @default(5)
+  aplicarAutomaticamente Boolean             @default(true)
+  notificarAlunos       Boolean              @default(true)
+  visibilidadeRanking   VisibilidadeRanking  @default(PUBLICO)
+  materiaId             String?              @db.VarChar(255)
+  criadoPorId           Int
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  // Relacionamentos
+  criadoPor       Usuario          @relation(fields: [criadoPorId], references: [id])
+  rankingPosicoes RankingPosicao[]
+
+  @@map("configuracoes_ranking")
+}
+
+// Posição no Ranking
+model RankingPosicao {
+  id              Int      @id @default(autoincrement())
+  configuracaoId  Int
+  perfilId        Int
+  posicao         Int
+  xpPeriodo       Int
+  bonusAplicado   Float
+  periodoInicio   DateTime
+  periodoFim      DateTime
+  aplicadoEm      DateTime?
+  createdAt       DateTime @default(now())
+
+  // Relacionamentos
+  configuracao ConfiguracaoRanking @relation(fields: [configuracaoId], references: [id], onDelete: Cascade)
+  perfil       PerfilGamificacao   @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+
+  @@map("ranking_posicoes")
 }
