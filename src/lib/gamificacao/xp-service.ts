@@ -3,7 +3,6 @@
  * Gerencia a lógica de negócio para ganho de XP e progressão
  */
 
-import { PrismaClient } from '@prisma/client';
 import {
   TABELA_XP,
   calcularNivel,
@@ -11,7 +10,7 @@ import {
   ehFimDeSemana,
 } from './xp-calculator';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 /**
  * Interface para adicionar XP

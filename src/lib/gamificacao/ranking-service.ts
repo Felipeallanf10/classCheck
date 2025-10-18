@@ -3,9 +3,9 @@
  * Gerencia cálculo de rankings e aplicação de bônus
  */
 
-import { PrismaClient, PeriodoRanking } from '@prisma/client';
+import { PeriodoRanking } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 /**
  * Interface para calcular período
