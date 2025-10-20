@@ -11,6 +11,7 @@ import {
 } from './xp-calculator';
 
 import { prisma } from '@/lib/prisma';
+import { verificarConquistas } from './conquistas-service';
 
 /**
  * Interface para adicionar XP
@@ -111,6 +112,11 @@ export async function adicionarXP(
       aulaId,
       multiplicador: multiplicadorTotal,
     },
+  });
+
+  // Verifica conquistas de forma assíncrona (não bloqueia a resposta)
+  verificarConquistas({ usuarioId, acao }).catch((error) => {
+    console.error('Erro ao verificar conquistas:', error);
   });
 
   return {

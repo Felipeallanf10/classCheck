@@ -318,3 +318,93 @@ export async function criarConfiguracaoRanking(data: {
     data,
   });
 }
+
+/**
+ * Busca a posição de um usuário no ranking atual
+ */
+export async function buscarPosicaoUsuario(
+  usuarioId: number,
+  configuracaoId: number
+) {
+  const config = await prisma.configuracaoRanking.findUnique({
+    where: { id: configuracaoId },
+  });
+
+  if (!config) {
+    throw new Error('Configuração de ranking não encontrada');
+  }
+
+  const { inicio, fim } = calcularPeriodo(config.periodoCalculo);
+
+  // Busca perfil do usuário
+  const perfil = await prisma.perfilGamificacao.findUnique({
+    where: { usuarioId },
+    include: {
+      usuario: {
+        select: {
+          nome: true,
+          email: true,
+          avatar: true,
+        },
+      },
+      historicoXP: {
+        where: {
+          createdAt: {
+            gte: inicio,
+            lte: fim,
+          },
+        },
+      },
+    },
+  });
+
+  if (!perfil) {
+    throw new Error('Perfil não encontrado');
+  }
+
+  // Calcula XP do período
+  const xpPeriodo = perfil.historicoXP.reduce(
+    (total, historico) => total + historico.xpGanho,
+    0
+  );
+
+  // Conta quantos perfis têm mais XP no período
+  const perfisComMaisXP = await prisma.perfilGamificacao.findMany({
+    where: {
+      totalAvaliacoes: {
+        gte: config.minimoAvaliacoes,
+      },
+    },
+    include: {
+      historicoXP: {
+        where: {
+          createdAt: {
+            gte: inicio,
+            lte: fim,
+          },
+        },
+      },
+    },
+  });
+
+  // Calcula posição
+  const rankingComXP = perfisComMaisXP
+    .map(p => ({
+      perfilId: p.id,
+      xpPeriodo: p.historicoXP.reduce((total, h) => total + h.xpGanho, 0),
+    }))
+    .filter(p => p.xpPeriodo > 0)
+    .sort((a, b) => b.xpPeriodo - a.xpPeriodo);
+
+  const posicao = rankingComXP.findIndex(p => p.perfilId === perfil.id) + 1;
+
+  return {
+    usuario: perfil.usuario,
+    posicao: posicao || null,
+    xpPeriodo,
+    xpTotal: perfil.xpTotal,
+    nivel: perfil.nivel,
+    totalParticipantes: rankingComXP.length,
+  };
+}
+

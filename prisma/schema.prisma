@@ -214,9 +214,10 @@ model PerfilGamificacao {
   updatedAt             DateTime @updatedAt
 
   // Relacionamentos
-  usuario        Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  historicoXP    HistoricoXP[]
-  rankingPosicoes RankingPosicao[]
+  usuario                  Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  historicoXP              HistoricoXP[]
+  rankingPosicoes          RankingPosicao[]
+  conquistasDesbloqueadas  ConquistaUsuario[]
 
   @@map("perfis_gamificacao")
 }
@@ -282,3 +283,39 @@ model RankingPosicao {
 
   @@map("ranking_posicoes")
 }
+
+// Modelo Conquista
+model Conquista {
+  id            Int      @id @default(autoincrement())
+  tipo          String   @unique @db.VarChar(100)
+  nome          String   @db.VarChar(255)
+  descricao     String   @db.Text
+  icone         String   @db.VarChar(10)
+  categoria     String   @db.VarChar(50)
+  xpRecompensa  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relacionamentos
+  usuarios ConquistaUsuario[]
+
+  @@map("conquistas")
+}
+
+// Modelo ConquistaUsuario (relacionamento muitos-para-muitos)
+model ConquistaUsuario {
+  id              Int      @id @default(autoincrement())
+  perfilId        Int
+  conquistaId     Int
+  desbloqueadaEm  DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  // Relacionamentos
+  perfil     PerfilGamificacao @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  conquista  Conquista         @relation(fields: [conquistaId], references: [id], onDelete: Cascade)
+
+  // Um perfil não pode desbloquear a mesma conquista duas vezes
+  @@unique([perfilId, conquistaId])
+  @@map("conquistas_usuarios")
+}
+
