@@ -32,6 +32,9 @@ model Usuario {
   humorRegistros HumorRegistro[]
   aulasFavoritas AulaFavorita[]
 
+  @@index([email])
+  @@index([role])
+  @@index([ativo])
   @@map("usuarios")
 }
 
@@ -49,6 +52,9 @@ model Professor {
   // Relacionamentos
   aulas Aula[]
 
+  @@index([email])
+  @@index([materia])
+  @@index([ativo])
   @@map("professores")
 }
 
@@ -72,6 +78,10 @@ model Aula {
   aulasFavoritas AulaFavorita[]
   eventos        Evento[]
 
+  @@index([professorId])
+  @@index([dataHora])
+  @@index([materia])
+  @@index([status])
   @@map("aulas")
 }
 
@@ -92,6 +102,10 @@ model Avaliacao {
 
   // Um usuário só pode avaliar uma aula uma vez
   @@unique([usuarioId, aulaId])
+  @@index([usuarioId])
+  @@index([aulaId])
+  @@index([createdAt])
+  @@index([humor])
   @@map("avaliacoes")
 }
 
@@ -109,6 +123,9 @@ model HumorRegistro {
 
   // Um usuário só pode registrar humor uma vez por dia
   @@unique([usuarioId, data])
+  @@index([usuarioId])
+  @@index([data])
+  @@index([humor])
   @@map("humor_registros")
 }
 
@@ -144,6 +161,9 @@ model Evento {
   // Relacionamentos
   aula Aula? @relation(fields: [aulaId], references: [id])
 
+  @@index([dataInicio])
+  @@index([tipo])
+  @@index([aulaId])
   @@map("eventos")
 }
 
