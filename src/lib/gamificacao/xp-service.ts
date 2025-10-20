@@ -86,6 +86,18 @@ export async function adicionarXP(
   // Atualiza streak
   const novoStreak = await atualizarStreak(usuarioId, perfil);
 
+  const novasAvaliacoesConsecutivas = (() => {
+    if (!primeiraAvaliacaoDia) {
+      return perfil.avaliacoesConsecutivas;
+    }
+
+    if (novoStreak.reiniciou) {
+      return 1;
+    }
+
+    return perfil.avaliacoesConsecutivas + 1;
+  })();
+
   // Atualiza perfil
   await prisma.perfilGamificacao.update({
     where: { usuarioId },
@@ -96,9 +108,7 @@ export async function adicionarXP(
       melhorStreak: novoStreak.melhorStreak,
       ultimaAtividade: new Date(),
       totalAvaliacoes: { increment: 1 },
-      avaliacoesConsecutivas: primeiraAvaliacaoDia
-        ? { increment: 1 }
-        : perfil.avaliacoesConsecutivas,
+      avaliacoesConsecutivas: novasAvaliacoesConsecutivas,
     },
   });
 
@@ -163,7 +173,7 @@ async function atualizarStreak(
     melhorStreak: number;
     ultimaAtividade: Date | null;
   }
-): Promise<{ streakAtual: number; melhorStreak: number }> {
+): Promise<{ streakAtual: number; melhorStreak: number; reiniciou: boolean }> {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
 
@@ -171,6 +181,7 @@ async function atualizarStreak(
     return {
       streakAtual: 1,
       melhorStreak: Math.max(1, perfil.melhorStreak),
+      reiniciou: false,
     };
   }
 
@@ -183,6 +194,8 @@ async function atualizarStreak(
 
   let novoStreak = perfil.streakAtual;
 
+  let reiniciou = false;
+
   if (diferencaDias === 0) {
     // Mesmo dia, mantém streak
     novoStreak = perfil.streakAtual;
@@ -192,6 +205,7 @@ async function atualizarStreak(
   } else {
     // Quebrou o streak, reinicia
     novoStreak = 1;
+    reiniciou = true;
   }
 
   const melhorStreak = Math.max(novoStreak, perfil.melhorStreak);
@@ -199,6 +213,7 @@ async function atualizarStreak(
   return {
     streakAtual: novoStreak,
     melhorStreak,
+    reiniciou,
   };
 }
 

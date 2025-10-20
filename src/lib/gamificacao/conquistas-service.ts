@@ -76,6 +76,11 @@ export async function verificarConquistas(
 
   const conquistasDesbloqueadas: any[] = [];
 
+  if (perfil.xpTotal > 0 && !temConquista(perfil, 'PRIMEIRO_XP')) {
+    const conquista = await desbloquearConquista(usuarioId, 'PRIMEIRO_XP');
+    if (conquista) conquistasDesbloqueadas.push(conquista);
+  }
+
   // Conquistas de XP
   if (perfil.xpTotal >= 100 && !temConquista(perfil, 'XP_100')) {
     const conquista = await desbloquearConquista(usuarioId, 'XP_100');
