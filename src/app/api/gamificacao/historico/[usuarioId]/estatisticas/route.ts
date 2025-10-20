@@ -107,7 +107,7 @@ export async function GET(
         xpGanho: xpMes._sum.xpGanho || 0,
         acoes: xpMes._count,
       },
-      porAcao: porAcao.map(item => ({
+      porAcao: porAcao.map((item: any) => ({
         acao: item.acao,
         xpTotal: item._sum.xpGanho || 0,
         quantidade: item._count,

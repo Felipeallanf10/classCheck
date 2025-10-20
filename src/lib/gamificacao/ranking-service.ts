@@ -364,7 +364,7 @@ export async function buscarPosicaoUsuario(
 
   // Calcula XP do período
   const xpPeriodo = perfil.historicoXP.reduce(
-    (total, historico) => total + historico.xpGanho,
+    (total: number, historico: any) => total + historico.xpGanho,
     0
   );
 
@@ -389,14 +389,14 @@ export async function buscarPosicaoUsuario(
 
   // Calcula posição
   const rankingComXP = perfisComMaisXP
-    .map(p => ({
+    .map((p: any) => ({
       perfilId: p.id,
-      xpPeriodo: p.historicoXP.reduce((total, h) => total + h.xpGanho, 0),
+      xpPeriodo: p.historicoXP.reduce((total: number, h: any) => total + h.xpGanho, 0),
     }))
-    .filter(p => p.xpPeriodo > 0)
-    .sort((a, b) => b.xpPeriodo - a.xpPeriodo);
+    .filter((p: any) => p.xpPeriodo > 0)
+    .sort((a: any, b: any) => b.xpPeriodo - a.xpPeriodo);
 
-  const posicao = rankingComXP.findIndex(p => p.perfilId === perfil.id) + 1;
+  const posicao = rankingComXP.findIndex((p: any) => p.perfilId === perfil.id) + 1;
 
   return {
     usuario: perfil.usuario,

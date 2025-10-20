@@ -16,11 +16,12 @@ export const adicionarXPSchema = z.object({
 });
 
 /**
- * Schema para buscar histórico
+ * Schema para buscar histórico de XP
  */
 export const buscarHistoricoSchema = z.object({
+  usuarioId: z.number().int().positive(),
   limite: z.number().int().min(1).max(100).default(20),
-  pagina: z.number().int().min(1).default(1),
+  pagina: z.number().int().min(1).default(1).optional(),
   acao: z.string().optional(),
 });
 
@@ -61,7 +62,7 @@ export const verificarConquistasSchema = z.object({
  * Schema para parâmetros de rota com usuarioId
  */
 export const usuarioIdParamSchema = z.object({
-  usuarioId: z.string().regex(/^\d+$/, 'usuarioId deve ser um número'),
+  usuarioId: z.number().int().positive(),
 });
 
 /**

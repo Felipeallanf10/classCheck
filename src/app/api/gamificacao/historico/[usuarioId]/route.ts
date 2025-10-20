@@ -9,10 +9,11 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { usuarioId: string } }
+  { params }: { params: Promise<{ usuarioId: string }> }
 ) {
   try {
-    const usuarioId = parseInt(params.usuarioId)
+    const { usuarioId: usuarioIdStr } = await params
+    const usuarioId = parseInt(usuarioIdStr)
     const { searchParams } = new URL(request.url)
     
     const limite = parseInt(searchParams.get('limite') || '20')

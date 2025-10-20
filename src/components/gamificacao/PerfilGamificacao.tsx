@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star, TrendingUp, Flame, Award, Calendar } from "lucide-react"
+import { FaStar, FaTrophy, FaFire, FaAward, FaCalendar } from "react-icons/fa"
 
 interface PerfilGamificacaoData {
   xpTotal: number
@@ -103,7 +103,7 @@ export default function PerfilGamificacao({ usuarioId }: PerfilGamificacaoProps)
               <p className="text-sm text-muted-foreground">{perfil.usuario.email}</p>
             </div>
             <Badge variant="default" className="text-lg px-4 py-2">
-              <Star className="h-4 w-4 mr-1" />
+              <FaStar className="h-4 w-4 mr-1" />
               Nível {perfil.nivel}
             </Badge>
           </div>
@@ -126,7 +126,7 @@ export default function PerfilGamificacao({ usuarioId }: PerfilGamificacaoProps)
           {/* Estatísticas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
             <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <TrendingUp className="h-8 w-8 text-blue-600" />
+              <FaTrophy className="h-8 w-8 text-blue-600" />
               <div>
                 <p className="text-xs text-muted-foreground">XP Total</p>
                 <p className="text-lg font-bold text-blue-600">{perfil.xpTotal}</p>
@@ -134,7 +134,7 @@ export default function PerfilGamificacao({ usuarioId }: PerfilGamificacaoProps)
             </div>
 
             <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-              <Flame className="h-8 w-8 text-orange-600" />
+              <FaFire className="h-8 w-8 text-orange-600" />
               <div>
                 <p className="text-xs text-muted-foreground">Streak Atual</p>
                 <p className="text-lg font-bold text-orange-600">
@@ -144,7 +144,7 @@ export default function PerfilGamificacao({ usuarioId }: PerfilGamificacaoProps)
             </div>
 
             <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-              <Award className="h-8 w-8 text-purple-600" />
+              <FaAward className="h-8 w-8 text-purple-600" />
               <div>
                 <p className="text-xs text-muted-foreground">Melhor Streak</p>
                 <p className="text-lg font-bold text-purple-600">
@@ -154,7 +154,7 @@ export default function PerfilGamificacao({ usuarioId }: PerfilGamificacaoProps)
             </div>
 
             <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-              <Calendar className="h-8 w-8 text-green-600" />
+              <FaCalendar className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-xs text-muted-foreground">Avaliações</p>
                 <p className="text-lg font-bold text-green-600">{perfil.totalAvaliacoes}</p>

@@ -8,10 +8,11 @@ import { buscarPerfilGamificacao } from '@/lib/gamificacao/xp-service'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { usuarioId: string } }
+  { params }: { params: Promise<{ usuarioId: string }> }
 ) {
   try {
-    const usuarioId = parseInt(params.usuarioId)
+    const { usuarioId: usuarioIdStr } = await params
+    const usuarioId = parseInt(usuarioIdStr)
 
     if (isNaN(usuarioId)) {
       return NextResponse.json(

@@ -297,7 +297,7 @@ export async function buscarProgressoConquistas(usuarioId: number) {
     conquistasUsuario.map((c: any) => c.conquistaId)
   );
 
-  return todasConquistas.map((conquista) => {
+  return todasConquistas.map((conquista: any) => {
     const desbloqueada = idsDesbloqueadas.has(conquista.id);
     let progresso = 0;
 
