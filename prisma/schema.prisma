@@ -142,6 +142,9 @@ model AulaFavorita {
 
   // Um usuário não pode favoritar a mesma aula duas vezes
   @@unique([usuarioId, aulaId])
+  @@index([usuarioId])
+  @@index([aulaId])
+  @@index([createdAt])
   @@map("aulas_favoritas")
 }
 
