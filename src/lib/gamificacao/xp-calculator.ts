@@ -5,6 +5,7 @@
 
 // Tabela de XP por ação
 export const TABELA_XP = {
+  AVALIAR_AULA: 100,
   AVALIACAO_COMPLETA: 100,
   AVALIACAO_RAPIDA: 50,
   PRIMEIRO_DIA: 20,
