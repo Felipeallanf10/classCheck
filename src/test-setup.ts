@@ -1,4 +1,5 @@
-import '@testing-library/jest-dom'
+// Setup de testes para Vitest
+// Configuração para ambiente Node (backend)
 
 // Declaração de tipos para compatibilidade
 interface MockFunction {
@@ -26,20 +27,24 @@ global.ResizeObserver = class ResizeObserver {
   cb: any;
 }
 
-// Mock para localStorage (usado para persistir dados de sessão)
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: createMockFn(),
-    setItem: createMockFn(),
-    removeItem: createMockFn(),
-    clear: createMockFn(),
-  },
-  writable: true,
-})
+// Mock para localStorage (apenas se window estiver disponível - testes frontend)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: {
+      getItem: createMockFn(),
+      setItem: createMockFn(),
+      removeItem: createMockFn(),
+      clear: createMockFn(),
+    },
+    writable: true,
+  })
+}
 
 // Mock para crypto.randomUUID (usado para IDs de sessão)
-Object.defineProperty(global, 'crypto', {
-  value: {
-    randomUUID: () => 'test-uuid-' + Date.now(),
-  },
-})
+if (typeof global.crypto === 'undefined') {
+  Object.defineProperty(global, 'crypto', {
+    value: {
+      randomUUID: () => 'test-uuid-' + Date.now(),
+    },
+  })
+}
