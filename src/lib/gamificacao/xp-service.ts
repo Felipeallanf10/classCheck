@@ -98,31 +98,37 @@ export async function adicionarXP(
     return perfil.avaliacoesConsecutivas + 1;
   })();
 
-  // Atualiza perfil
-  await prisma.perfilGamificacao.update({
-    where: { usuarioId },
-    data: {
-      xpTotal: novoXPTotal,
-      nivel: novoNivel,
-      streakAtual: novoStreak.streakAtual,
-      melhorStreak: novoStreak.melhorStreak,
-      ultimaAtividade: new Date(),
-      totalAvaliacoes: { increment: 1 },
-      avaliacoesConsecutivas: novasAvaliacoesConsecutivas,
-    },
-  });
+  const agora = new Date();
 
-  // Registra no histórico
-  await prisma.historicoXP.create({
-    data: {
-      perfilId: perfil.id,
-      xpGanho: xpFinal,
-      acao,
-      descricao: descricao || `Ganhou ${xpFinal} XP por ${acao}`,
-      aulaId,
-      multiplicador: multiplicadorTotal,
-    },
-  });
+  const dadosPerfil = {
+    xpTotal: novoXPTotal,
+    nivel: novoNivel,
+    streakAtual: novoStreak.streakAtual,
+    melhorStreak: novoStreak.melhorStreak,
+    ultimaAtividade: agora,
+    totalAvaliacoes: { increment: 1 },
+    avaliacoesConsecutivas: novasAvaliacoesConsecutivas,
+  };
+
+  const dadosHistorico = {
+    perfilId: perfil.id,
+    xpGanho: xpFinal,
+    acao,
+    descricao: descricao || `Ganhou ${xpFinal} XP por ${acao}`,
+    aulaId,
+    multiplicador: multiplicadorTotal,
+  };
+
+  // Garante atomicidade entre atualização do perfil e histórico
+  await prisma.$transaction([
+    prisma.perfilGamificacao.update({
+      where: { usuarioId },
+      data: dadosPerfil,
+    }),
+    prisma.historicoXP.create({
+      data: dadosHistorico,
+    }),
+  ]);
 
   // Verifica conquistas de forma assíncrona (não bloqueia a resposta)
   verificarConquistas({ usuarioId, acao }).catch((error) => {
