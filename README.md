@@ -98,7 +98,12 @@ cp .env.example .env.local
 npx prisma migrate dev
 ```
 
-4. **Inicie o servidor:**
+4. **Popule as conquistas padrão (recomendado):**
+```bash
+npm run db:seed
+```
+
+5. **Inicie o servidor:**
 ```bash
 npm run dev
 ```
