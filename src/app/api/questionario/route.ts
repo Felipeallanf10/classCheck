@@ -43,19 +43,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Salvar avaliação no banco de dados (usando mock)
-    const avaliacao = await prisma.avaliacaoSocioemocional.create({
-      data: {
-        usuarioId,
-        estadoEmocional,
-        valencia: valencia || 0,
-        ativacao: ativacao || 0,
-        confianca: confianca || 0,
-        observacoes,
-        respostas: JSON.stringify(respostas),
-        dataAvaliacao: new Date()
-      }
-    })
+    // TODO: Salvar avaliação socioemocional no banco de dados
+    // Modelo ainda não criado no schema
+    const avaliacao = {
+      id: Date.now().toString(),
+      usuarioId,
+      estadoEmocional,
+      valencia: valencia || 0,
+      ativacao: ativacao || 0,
+      confianca: confianca || 0,
+      observacoes: observacoes || null,
+      respostas: JSON.stringify(respostas),
+      dataAvaliacao: new Date()
+    }
 
     return NextResponse.json({
       success: true,

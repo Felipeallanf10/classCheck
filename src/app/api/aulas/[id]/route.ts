@@ -16,11 +16,12 @@ const updateAulaSchema = z.object({
 })
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {
@@ -106,8 +107,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {
@@ -230,8 +232,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
+    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {
