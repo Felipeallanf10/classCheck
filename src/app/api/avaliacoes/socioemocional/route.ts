@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const aulaId = searchParams.get('aulaId')
-    const usuarioId = searchParams.get('usuarioId') || '1' // TODO: pegar do auth
+    const usuarioId = searchParams.get('usuarioId') || '52' // TODO: pegar do auth
 
     if (!aulaId) {
       return NextResponse.json(

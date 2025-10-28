@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PageHeader } from '@/components/ui/page-header';
-import { NovaAvaliacaoTab } from '@/components/avaliacao/NovaAvaliacaoTab';
+import { QuestionarioIniciar } from '@/components/avaliacoes/QuestionarioIniciar';
 import { HistoricoTab } from '@/components/avaliacao/HistoricoTab';
 import { AnaliseTab } from '@/components/avaliacao/AnaliseTab';
 import { ClipboardCheck, History, BarChart3 } from 'lucide-react';
@@ -36,7 +36,12 @@ export default function CheckInPage() {
           </TabsList>
 
           <TabsContent value="nova">
-            <NovaAvaliacaoTab />
+            <QuestionarioIniciar
+              questionarioId="questionario-checkin-diario"
+              contexto={{ tipo: 'CHECK_IN' }}
+              titulo="Check-in Diário"
+              descricao="Responda algumas perguntas rápidas sobre como você está se sentindo hoje"
+            />
           </TabsContent>
 
           <TabsContent value="historico">
