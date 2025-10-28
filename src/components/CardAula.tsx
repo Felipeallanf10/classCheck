@@ -6,7 +6,18 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
-export function CardAula({ aula }: { aula: any }) {
+// Tipo para Aula exibida no card
+interface AulaCard {
+  id: string | number;
+  titulo: string;
+  professor: string;
+  data: string;
+  favorita?: boolean;
+  avaliada?: boolean;
+  humor?: string;
+}
+
+export function CardAula({ aula }: { aula: AulaCard }) {
   const router = useRouter()
   return (
     <div className="bg-white dark:bg-muted border rounded-lg p-4 shadow space-y-3">
@@ -16,11 +27,11 @@ export function CardAula({ aula }: { aula: any }) {
           <p className="text-sm text-muted-foreground">{aula.professor}</p>
           <p className="text-sm text-muted-foreground">{aula.data}</p>
         </div>
-        <FavoritoButton favorito={aula.favorita} />
+        <FavoritoButton favorito={aula.favorita ?? false} />
       </div>
 
       <div className="flex items-center justify-between">
-        <BadgeStatus avaliada={aula.avaliada} />
+        <BadgeStatus avaliada={aula.avaliada ?? false} />
         {aula.humor && (
           <Image
             src={`/emotions/face-${aula.humor}.svg`}

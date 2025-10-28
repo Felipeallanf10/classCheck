@@ -576,9 +576,9 @@ const ExportadorRelatorios: React.FC<ExportadorRelatoriosProps> = ({
                   <label className="text-sm font-medium">Tipo de Visualização</label>
                   <Select 
                     value={configuracao.filtros.tipoVisualizacao}
-                    onValueChange={(value: any) => setConfiguracao(prev => ({
+                    onValueChange={(value) => setConfiguracao(prev => ({
                       ...prev,
-                      filtros: { ...prev.filtros, tipoVisualizacao: value }
+                      filtros: { ...prev.filtros, tipoVisualizacao: value as 'completo' | 'resumido' | 'executivo' }
                     }))}
                   >
                     <SelectTrigger>
@@ -697,9 +697,9 @@ const ExportadorRelatorios: React.FC<ExportadorRelatoriosProps> = ({
                   <label className="text-sm font-medium">Nível de Confidencialidade</label>
                   <Select 
                     value={configuracao.personalizacao.confidencialidade}
-                    onValueChange={(value: any) => setConfiguracao(prev => ({
+                    onValueChange={(value) => setConfiguracao(prev => ({
                       ...prev,
-                      personalizacao: { ...prev.personalizacao, confidencialidade: value }
+                      personalizacao: { ...prev.personalizacao, confidencialidade: value as 'publico' | 'interno' | 'confidencial' }
                     }))}
                   >
                     <SelectTrigger>
