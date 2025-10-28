@@ -33,7 +33,7 @@ export interface Alerta {
     theta?: number;
     confianca?: number;
     tempoResposta?: number;
-    [key: string]: any;
+    [key: string]: string | number | boolean | undefined;
   };
 }
 

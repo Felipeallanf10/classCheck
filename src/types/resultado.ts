@@ -2,6 +2,27 @@
  * Tipos para o sistema de resultados de avaliação
  */
 
+// Tipo para valores de resposta que podem ser diversos
+export type ValorResposta = string | number | string[] | number[] | boolean | null;
+
+// Tipo para opções de perguntas
+export interface OpcaoPerguntaResultado {
+  valor: string | number;
+  texto: string;
+  label?: string;
+  descricao?: string;
+  emoji?: string;
+  cor?: string;
+}
+
+// Tipo para recomendações (podem ser strings simples ou objetos estruturados)
+export type Recomendacao = string | {
+  tipo: string;
+  mensagem: string;
+  prioridade?: 'baixa' | 'media' | 'alta';
+  acoes?: string[];
+};
+
 export interface ResultadoSessao {
   success: boolean;
   sessao: {
@@ -57,7 +78,7 @@ export interface AlertaResultado {
   categoria: string;
   mensagem: string;
   descricao: string;
-  recomendacoes: any;
+  recomendacoes: Recomendacao[];
   criadoEm: Date;
 }
 
@@ -71,11 +92,11 @@ export interface RespostaResultado {
     categoria: string;
     dominio: string | null;
     tipo: string;
-    opcoes: any;
+    opcoes: OpcaoPerguntaResultado[];
     peso: number;
   };
   resposta: {
-    valor: any;
+    valor: ValorResposta;
     valorNormalizado: number;
     tempoResposta: number;
   };

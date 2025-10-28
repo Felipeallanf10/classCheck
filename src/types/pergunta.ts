@@ -2,6 +2,9 @@
  * Tipos para Perguntas Socioemocionais
  */
 
+// Tipo para valores de resposta
+export type ValorResposta = string | number | string[] | number[] | boolean | null;
+
 export type TipoPergunta =
   | 'LIKERT_5'
   | 'LIKERT_7'
@@ -92,7 +95,7 @@ export interface PerguntaSocioemocional {
 
 export interface RespostaForm {
   perguntaId: string;
-  valor: any; // Pode ser number, string, array, etc
+  valor: ValorResposta;
   tempoResposta: number; // em segundos
   timestamp: Date;
 }

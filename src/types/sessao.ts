@@ -2,6 +2,9 @@
  * Tipos para Progresso de Sessão
  */
 
+// Importa tipos compartilhados
+import type { ValorResposta, OpcaoPerguntaResultado } from './resultado';
+
 export type NivelAlerta = 'VERDE' | 'AMARELO' | 'LARANJA' | 'VERMELHO';
 
 export type StatusSessao = 
@@ -10,6 +13,18 @@ export type StatusSessao =
   | 'PAUSADA'
   | 'FINALIZADA'
   | 'CANCELADA';
+
+// Configurações específicas por tipo de pergunta
+export interface ConfiguracaoPergunta {
+  min?: number;
+  max?: number;
+  step?: number;
+  orientacao?: 'horizontal' | 'vertical';
+  showLabels?: boolean;
+  showValues?: boolean;
+  customEmojis?: string[];
+  [key: string]: string | number | boolean | string[] | undefined;
+}
 
 export interface ProgressoSessao {
   perguntasRespondidas: number;
@@ -40,7 +55,7 @@ export interface SessaoDetalhes {
   respostas?: Array<{
     id: string;
     perguntaId: string;
-    resposta: any;
+    resposta: ValorResposta;
     tempoResposta: number;
   }>;
   perguntaAtual?: {
@@ -49,8 +64,8 @@ export interface SessaoDetalhes {
     texto: string;
     dimensao?: string;
     obrigatoria: boolean;
-    opcoes?: any[];
-    configuracao?: any;
+    opcoes?: OpcaoPerguntaResultado[];
+    configuracao?: ConfiguracaoPergunta;
   };
   questionario: {
     id: string;
