@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, useMemo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { CheckCircle, TrendingUp, Calendar, Trophy, Star, Zap, Target } from 'lucide-react'
 
-export default function AvaliacaoConcluidaPage() {
+function AvaliacaoConcluidaContent() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -263,5 +264,13 @@ export default function AvaliacaoConcluidaPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function AvaliacaoConcluidaPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <AvaliacaoConcluidaContent />
+    </Suspense>
   )
 }
