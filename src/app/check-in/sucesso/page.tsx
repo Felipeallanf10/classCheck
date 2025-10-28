@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, TrendingUp, Heart, ArrowRight, Activity } from 'lucide-react'
 
-export default function CheckInSucessoPage() {
+function CheckInSucessoContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -155,5 +156,13 @@ export default function CheckInSucessoPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function CheckInSucessoPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <CheckInSucessoContent />
+    </Suspense>
   )
 }
