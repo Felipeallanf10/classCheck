@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ interface Aula {
   professor: string
 }
 
-export default function AvaliacaoDidaticaPage() {
+function AvaliacaoDidaticaContent() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -312,5 +312,13 @@ export default function AvaliacaoDidaticaPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function AvaliacaoDidaticaPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+      <AvaliacaoDidaticaContent />
+    </Suspense>
   )
 }
