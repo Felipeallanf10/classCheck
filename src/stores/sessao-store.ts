@@ -8,6 +8,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import type { ValorResposta } from '@/types/pergunta';
+import type { OpcaoPerguntaResultado } from '@/types/resultado';
+import type { ConfiguracaoPergunta } from '@/types/sessao';
 
 // ==============================================
 // TIPOS E INTERFACES
@@ -20,7 +23,7 @@ export interface Pergunta {
   categoria: string;
   dominio: string;
   tipoPergunta: string;
-  opcoes?: any;
+  opcoes?: OpcaoPerguntaResultado[];
   valorMinimo?: number;
   valorMaximo?: number;
   obrigatoria: boolean;
@@ -30,7 +33,7 @@ export interface Pergunta {
 export interface Resposta {
   id?: string;
   perguntaId: string;
-  valor: any;
+  valor: ValorResposta;
   valorNormalizado: number;
   tempoResposta: number;
   timestamp: Date;
@@ -138,7 +141,7 @@ interface SessaoAdaptativaState {
   /**
    * Atualiza resposta atual (enquanto usuário digita)
    */
-  atualizarRespostaAtual: (valor: any) => void;
+  atualizarRespostaAtual: (valor: ValorResposta) => void;
   
   /**
    * Submete resposta atual
@@ -352,7 +355,7 @@ export const useSessaoAdaptativaStore = create<SessaoAdaptativaState>()(
           
           const resposta: Resposta = {
             perguntaId: state.respostaAtual.perguntaId!,
-            valor: state.respostaAtual.valor,
+            valor: state.respostaAtual.valor ?? null,
             valorNormalizado: 0.5, // TODO: Calcular normalização
             tempoResposta,
             timestamp: new Date(),

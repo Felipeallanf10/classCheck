@@ -6,11 +6,12 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { SessaoDetalhes } from '@/types/sessao';
+import type { ValorResposta } from '@/types/pergunta';
 
 interface SubmeterRespostaParams {
   sessaoId: string;
   perguntaId: string;
-  resposta: any;
+  resposta: ValorResposta;
   tempoResposta?: number;
 }
 
