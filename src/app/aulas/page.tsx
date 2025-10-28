@@ -100,7 +100,7 @@ function AulasPageContent() {
     return todasAulas.filter(aula => aula.favorita).length
   }, [todasAulas])
 
-  const handleSubmitAvaliacao = (data: any) => {
+  const handleSubmitAvaliacao = (data: { aulaId: number; humor?: string; comentario?: string }) => {
     console.log("Avaliação submetida:", data)
     
     toast.success(
