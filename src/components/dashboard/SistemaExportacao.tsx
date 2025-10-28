@@ -60,10 +60,10 @@ interface ConfiguracaoExportacao {
   }
   destino: 'download' | 'email' | 'nuvem' | 'ftp'
   agendamento?: {
-    ativo: boolean
-    frequencia: 'diario' | 'semanal' | 'mensal'
+    ativo?: boolean
+    frequencia?: 'diario' | 'semanal' | 'mensal'
     dia?: number
-    hora: string
+    hora?: string
     email?: string
   }
 }
@@ -216,7 +216,10 @@ export function SistemaExportacao({ className }: SistemaExportacaoProps) {
   ]
 
   // Atualizar configuração
-  const atualizarConfiguracao = (campo: keyof ConfiguracaoExportacao, valor: any) => {
+  const atualizarConfiguracao = <K extends keyof ConfiguracaoExportacao>(
+    campo: K, 
+    valor: ConfiguracaoExportacao[K]
+  ) => {
     setConfiguracao(prev => ({
       ...prev,
       [campo]: valor
@@ -353,7 +356,7 @@ export function SistemaExportacao({ className }: SistemaExportacaoProps) {
                         "cursor-pointer transition-all hover:shadow-md",
                         configuracao.formato === formato.value && "ring-2 ring-primary"
                       )}
-                      onClick={() => atualizarConfiguracao('formato', formato.value)}
+                      onClick={() => atualizarConfiguracao('formato', formato.value as 'xlsx' | 'csv' | 'json' | 'pdf' | 'xml')}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-2">
@@ -429,7 +432,7 @@ export function SistemaExportacao({ className }: SistemaExportacaoProps) {
                         "cursor-pointer transition-all hover:shadow-md",
                         configuracao.destino === destino.value && "ring-2 ring-primary"
                       )}
-                      onClick={() => atualizarConfiguracao('destino', destino.value)}
+                      onClick={() => atualizarConfiguracao('destino', destino.value as 'download' | 'email' | 'nuvem' | 'ftp')}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-1">
@@ -571,7 +574,7 @@ export function SistemaExportacao({ className }: SistemaExportacaoProps) {
                       onCheckedChange={(checked) => 
                         atualizarConfiguracao('agendamento', {
                           ...configuracao.agendamento,
-                          ativo: checked
+                          ativo: checked as boolean
                         })
                       }
                     />
@@ -589,7 +592,7 @@ export function SistemaExportacao({ className }: SistemaExportacaoProps) {
                           onValueChange={(value) => 
                             atualizarConfiguracao('agendamento', {
                               ...configuracao.agendamento,
-                              frequencia: value
+                              frequencia: value as 'diario' | 'semanal' | 'mensal'
                             })
                           }
                         >

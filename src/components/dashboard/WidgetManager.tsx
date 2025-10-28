@@ -74,7 +74,7 @@ interface TipoWidget {
     nome: string
     tipo: 'text' | 'select' | 'number' | 'boolean'
     opcoes?: Array<{ value: string; label: string }>
-    padrao: any
+    padrao: string | number | boolean
   }>
 }
 

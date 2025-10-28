@@ -137,7 +137,7 @@ export function FiltrosAvancados({ filtros, onFiltrosChange, loading }: FiltrosA
     setFiltrosAtivos(count)
   }, [filtros])
 
-  const aplicarFiltro = (campo: keyof FilterState, valor: any) => {
+  const aplicarFiltro = (campo: keyof FilterState, valor: string | Date | undefined) => {
     onFiltrosChange({ [campo]: valor })
   }
 

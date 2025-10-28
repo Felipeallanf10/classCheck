@@ -39,7 +39,7 @@ interface AlertaUrgente {
 
 interface AlertasUrgentesProps {
   turmaId: string;
-  alertas: any[];
+  alertas: AlertaUrgente[];
 }
 
 const AlertasUrgentes: React.FC<AlertasUrgentesProps> = ({ 

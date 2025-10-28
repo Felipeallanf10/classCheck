@@ -135,8 +135,8 @@ const TabelaAlunos: React.FC<TabelaAlunosProps> = ({
   );
 
   const alunosOrdenados = [...alunosFiltrados].sort((a, b) => {
-    let valorA: any = a[ordenacao.campo];
-    let valorB: any = b[ordenacao.campo];
+    let valorA: string | number | Date | object = a[ordenacao.campo];
+    let valorB: string | number | Date | object = b[ordenacao.campo];
 
     if (ordenacao.campo === 'ultimaAvaliacao') {
       valorA = a.ultimaAvaliacao.getTime();
@@ -144,20 +144,25 @@ const TabelaAlunos: React.FC<TabelaAlunosProps> = ({
     }
 
     if (ordenacao.campo === 'risco') {
-      const ordemRisco = { 'baixo': 1, 'medio': 2, 'alto': 3 };
+      const ordemRisco: Record<string, number> = { 'baixo': 1, 'medio': 2, 'alto': 3 };
       valorA = ordemRisco[a.risco];
       valorB = ordemRisco[b.risco];
     }
 
-    if (typeof valorA === 'string') {
+    // Só comparar se forem tipos comparáveis
+    if (typeof valorA === 'string' && typeof valorB === 'string') {
       valorA = valorA.toLowerCase();
       valorB = valorB.toLowerCase();
     }
 
+    // Garantir que estamos comparando valores primitivos
+    const valA = typeof valorA === 'object' && valorA instanceof Date ? valorA.getTime() : valorA;
+    const valB = typeof valorB === 'object' && valorB instanceof Date ? valorB.getTime() : valorB;
+
     if (ordenacao.direcao === 'asc') {
-      return valorA < valorB ? -1 : valorA > valorB ? 1 : 0;
+      return valA < valB ? -1 : valA > valB ? 1 : 0;
     } else {
-      return valorA > valorB ? -1 : valorA < valorB ? 1 : 0;
+      return valA > valB ? -1 : valA < valB ? 1 : 0;
     }
   });
 
