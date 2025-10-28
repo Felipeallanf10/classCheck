@@ -14,9 +14,9 @@
  * 
  * Opções disponíveis no seed:
  * - ID 1: João Silva (aluno@teste.com) - seed-aulas.js
- * - ID 3: Seu usuário atual
+ * - ID 52: Usuário atual de testes
  */
-export const CURRENT_USER_ID = 3
+export const CURRENT_USER_ID = 52
 
 /**
  * Função helper para pegar o ID do usuário atual

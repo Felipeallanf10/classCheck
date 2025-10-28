@@ -23,6 +23,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
     '/professores',
     '/check-in',
     '/minhas-avaliacoes',
+    '/avaliacoes', // Adicionado para suportar /avaliacoes/questionarios, /avaliacoes/sessao, etc
     '/gamificacao',
     '/insights',
     '/relatorios',

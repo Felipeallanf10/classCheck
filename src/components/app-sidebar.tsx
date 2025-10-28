@@ -29,7 +29,9 @@ import {
   LifeBuoy,
   Activity,
   Users,
-  TrendingUp
+  TrendingUp,
+  Brain,
+  AlertTriangle
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -182,6 +184,7 @@ const navItems = [
   { label: "Aulas", icon: BookOpen, href: "/aulas" },
   { label: "Professores", icon: Star, href: "/professores" },
   { label: "Check-in Diário", icon: Heart, href: "/check-in" },
+  { label: "Avaliações", icon: Brain, href: "/avaliacoes/questionarios" },
   { label: "Minhas Avaliações", icon: Target, href: "/minhas-avaliacoes" },
   { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
 ]
