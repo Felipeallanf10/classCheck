@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -20,7 +20,7 @@ import { ptBR } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
 import { useAulas } from "@/hooks/useAulas"
 
-export default function AulasPage() {
+function AulasPageContent() {
   const searchParams = useSearchParams()
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date())
   const [isAvaliacaoModalOpen, setIsAvaliacaoModalOpen] = useState(false)
@@ -215,5 +215,13 @@ export default function AulasPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+export default function AulasPage() {
+  return (
+    <Suspense fallback={<AulasSkeletonGrid />}>
+      <AulasPageContent />
+    </Suspense>
   )
 }
