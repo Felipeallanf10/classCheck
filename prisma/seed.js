@@ -1,11 +1,19 @@
 const { PrismaClient } = require('@prisma/client')
+const { seedQuestionarioAula } = require('./seed-questionario-aula')
+const { seedQuestionarioCheckIn } = require('./seed-questionario-checkin')
 
 const prisma = new PrismaClient()
 
 async function main() {
   // Criar professores de exemplo
-  const professor1 = await prisma.professor.create({
-    data: {
+  const professor1 = await prisma.professor.upsert({
+    where: { email: 'maria.silva@escola.com' },
+    update: {
+      nome: 'Maria Silva',
+      materia: 'Matemática',
+      ativo: true,
+    },
+    create: {
       nome: 'Maria Silva',
       email: 'maria.silva@escola.com',
       materia: 'Matemática',
@@ -13,8 +21,14 @@ async function main() {
     },
   })
 
-  const professor2 = await prisma.professor.create({
-    data: {
+  const professor2 = await prisma.professor.upsert({
+    where: { email: 'joao.santos@escola.com' },
+    update: {
+      nome: 'João Santos',
+      materia: 'História',
+      ativo: true,
+    },
+    create: {
       nome: 'João Santos',
       email: 'joao.santos@escola.com',
       materia: 'História',
@@ -23,8 +37,14 @@ async function main() {
   })
 
   // Criar usuários de exemplo
-  const aluno1 = await prisma.usuario.create({
-    data: {
+  const aluno1 = await prisma.usuario.upsert({
+    where: { email: 'ana.costa@aluno.com' },
+    update: {
+      nome: 'Ana Costa',
+      role: 'ALUNO',
+      ativo: true,
+    },
+    create: {
       nome: 'Ana Costa',
       email: 'ana.costa@aluno.com',
       role: 'ALUNO',
@@ -32,8 +52,14 @@ async function main() {
     },
   })
 
-  const aluno2 = await prisma.usuario.create({
-    data: {
+  const aluno2 = await prisma.usuario.upsert({
+    where: { email: 'pedro.oliveira@aluno.com' },
+    update: {
+      nome: 'Pedro Oliveira',
+      role: 'ALUNO',
+      ativo: true,
+    },
+    create: {
       nome: 'Pedro Oliveira',
       email: 'pedro.oliveira@aluno.com',
       role: 'ALUNO',
@@ -100,6 +126,13 @@ async function main() {
   })
 
   console.log('Dados de exemplo criados com sucesso!')
+  
+  // Criar questionários adaptativos
+  console.log('\n📋 Criando questionários adaptativos...')
+  await seedQuestionarioAula()
+  await seedQuestionarioCheckIn()
+  
+  console.log('\n✅ Seed completo!')
 }
 
 main()
