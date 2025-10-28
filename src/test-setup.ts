@@ -1,5 +1,3 @@
-import '@testing-library/jest-dom'
-
 // Declaração de tipos para compatibilidade
 interface MockFunction {
   (): any;
@@ -16,26 +14,30 @@ const createMockFn = (): MockFunction => {
 };
 
 // Setup para testes psicométricos
-global.ResizeObserver = class ResizeObserver {
-  constructor(cb: any) {
-    this.cb = cb;
+if (typeof global !== 'undefined') {
+  (global as any).ResizeObserver = class ResizeObserver {
+    constructor(cb: any) {
+      this.cb = cb;
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    cb: any;
   }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-  cb: any;
 }
 
-// Mock para localStorage (usado para persistir dados de sessão)
-Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: createMockFn(),
-    setItem: createMockFn(),
-    removeItem: createMockFn(),
-    clear: createMockFn(),
-  },
-  writable: true,
-})
+// Mock para localStorage (usado para persistir dados de sessão) - apenas no browser
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: {
+      getItem: createMockFn(),
+      setItem: createMockFn(),
+      removeItem: createMockFn(),
+      clear: createMockFn(),
+    },
+    writable: true,
+  })
+}
 
 // Mock para crypto.randomUUID (usado para IDs de sessão)
 Object.defineProperty(global, 'crypto', {
@@ -43,3 +45,7 @@ Object.defineProperty(global, 'crypto', {
     randomUUID: () => 'test-uuid-' + Date.now(),
   },
 })
+
+// Mock do Prisma Client para testes UNITÁRIOS
+// Os testes de integração devem usar o Prisma real e não importar este setup
+import { vi } from 'vitest';
