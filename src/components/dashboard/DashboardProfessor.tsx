@@ -50,6 +50,15 @@ interface MetricasGerais {
   alunosRisco: number;
   alertasAtivos: number;
   tendenciaGeral: 'melhorando' | 'estavel' | 'deteriorando';
+  // Campos requeridos por MetricasTurma
+  participacaoMedia: number;
+  taxaConclusao: number;
+  distribuicaoEmocional: {
+    energizado_positivo: number;
+    energizado_negativo: number;
+    calmo_positivo: number;
+    calmo_negativo: number;
+  };
 }
 
 const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
@@ -60,7 +69,7 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
   const [alunos, setAlunos] = useState<AlunoStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroRisco, setFiltroRisco] = useState<'todos' | 'baixo' | 'medio' | 'alto'>('todos');
-  const [periodoAnalise, setPeriodoAnalise] = useState<'hoje' | 'semana' | 'mes'>('semana');
+  const [periodoAnalise] = useState<'hoje' | 'semana' | 'mes'>('semana');
 
   // Dados mockados para demonstração
   useEffect(() => {
@@ -70,18 +79,24 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
       // Simular carregamento
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const metricasMock: MetricasGerais = {
-        totalAlunos: 28,
-        avaliacoesHoje: 12,
-        avaliacoesSemana: 84,
-        mediaGeralValencia: 0.3,
-        mediaGeralArousal: 0.1,
-        alunosRisco: 3,
-        alertasAtivos: 5,
-        tendenciaGeral: 'melhorando'
-      };
-
-      const alunosMock: AlunoStatus[] = [
+  const metricasMock: MetricasGerais = {
+    totalAlunos: 28,
+    avaliacoesHoje: 12,
+    avaliacoesSemana: 84,
+    mediaGeralValencia: 0.3,
+    mediaGeralArousal: 0.1,
+    alunosRisco: 3,
+    alertasAtivos: 5,
+    tendenciaGeral: 'melhorando',
+    participacaoMedia: 85.5,
+    taxaConclusao: 92.3,
+    distribuicaoEmocional: {
+      energizado_positivo: 8,
+      energizado_negativo: 3,
+      calmo_positivo: 12,
+      calmo_negativo: 5,
+    },
+  };      const alunosMock: AlunoStatus[] = [
         {
           id: 'aluno-001',
           nome: 'Ana Silva',
@@ -311,11 +326,13 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
             <TabsContent value="visao-geral" className="space-y-4 sm:space-y-6">
               <div className="overflow-x-auto">
                 <div className="min-w-[600px] sm:min-w-0">
-                  <MetricasTurma 
-                    turmaId={turmaId}
-                    periodo={periodoAnalise}
-                    metricas={metricas}
-                  />
+                  {metricas && (
+                    <MetricasTurma 
+                      turmaId={turmaId}
+                      periodo={periodoAnalise}
+                      metricas={metricas}
+                    />
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -348,7 +365,19 @@ const DashboardProfessor: React.FC<DashboardProfessorProps> = ({
             <TabsContent value="alertas" className="space-y-4 sm:space-y-6">
               <AlertasUrgentes 
                 turmaId={turmaId}
-                alertas={alunos.filter(a => a.alertas > 0)}
+                alertas={alunos
+                  .filter(a => a.alertas > 0)
+                  .map(aluno => ({
+                    id: `alerta-${aluno.id}`,
+                    alunoId: aluno.id,
+                    alunoNome: aluno.nome,
+                    tipo: aluno.risco === 'alto' ? 'risco_alto' as const : 'declinio_consistente' as const,
+                    prioridade: aluno.risco === 'alto' ? 'critica' as const : 'alta' as const,
+                    descricao: `Aluno apresenta ${aluno.alertas} alertas ativos`,
+                    recomendacoes: ['Acompanhamento individualizado recomendado'],
+                    criadoEm: aluno.ultimaAvaliacao,
+                    status: 'pendente' as const,
+                  }))}
               />
             </TabsContent>
 
