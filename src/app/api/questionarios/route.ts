@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 /**
  * Schema de validação para query params
  */

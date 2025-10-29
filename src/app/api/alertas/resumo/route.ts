@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Força a rota a ser dinâmica (não pré-renderizada no build)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/alertas/resumo
  * 
