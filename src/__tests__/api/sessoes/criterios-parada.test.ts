@@ -22,7 +22,7 @@ describe('Critérios de Parada - CAT', () => {
     const theta = 0.5;
     const sem = calcularSEM(respostas, theta);
 
-    const { deveparar, motivo } = verificarCriteriosParada(respostas, theta, sem);
+    const { deveparar } = verificarCriteriosParada(respostas, theta, sem);
 
     // Mesmo com SEM baixo, não deve parar com menos de 5 respostas
     expect(respostas.length).toBeLessThan(5);

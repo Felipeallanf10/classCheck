@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, ArrowRight, Loader2, Star, CheckCircle, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Loader2, Star, CheckCircle, ChevronRight } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import QuestionarioSocioemocional from '@/components/questionario/QuestionarioSocioemocional'
 
@@ -52,7 +52,7 @@ export default function AvaliarAulaPage() {
         if (!response.ok) throw new Error('Aula não encontrada')
         const data = await response.json()
         setAula(data)
-      } catch (err) {
+      } catch {
         toast.error({
           title: "Erro",
           description: "Não foi possível carregar os dados da aula"

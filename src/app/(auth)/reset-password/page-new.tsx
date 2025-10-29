@@ -22,7 +22,6 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
 export default function ResetPasswordPage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const { toast } = useToast()
@@ -47,7 +46,7 @@ export default function ResetPasswordPage() {
       
       toast.success("Link de recuperação enviado para seu email!")
       setEmailSent(true)
-    } catch (error) {
+    } catch {
       toast.error("Erro ao enviar email. Tente novamente.")
     } finally {
       setIsLoading(false)
@@ -60,7 +59,7 @@ export default function ResetPasswordPage() {
       // Simula reenvio
       await new Promise(resolve => setTimeout(resolve, 1500))
       toast.info("Email reenviado com sucesso!")
-    } catch (error) {
+    } catch {
       toast.error("Erro ao reenviar email.")
     } finally {
       setIsLoading(false)

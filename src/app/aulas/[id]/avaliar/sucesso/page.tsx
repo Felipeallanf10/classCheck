@@ -1,15 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, TrendingUp, Flame, Trophy, ArrowRight, BookOpen } from 'lucide-react'
 
 export default function AvaliacaoSucessoPage() {
-  const params = useParams()
   const router = useRouter()
-  const aulaId = params.id as string
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4">

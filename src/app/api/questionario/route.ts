@@ -11,27 +11,13 @@ interface AvaliacaoData {
   observacoes?: string
 }
 
-interface AvaliacaoResult {
-  id: string
-  estadoEmocional: string
-  valencia: number
-  ativacao: number
-  confianca: number
-  observacoes: string | null
-  dataAvaliacao: Date
-  respostas: string | null
-}
-
 export async function POST(request: NextRequest) {
   try {
     const data: AvaliacaoData = await request.json()
     const { 
       usuarioId, 
       respostas, 
-      estadoEmocional, 
-      valencia, 
-      ativacao, 
-      confianca,
+      estadoEmocional,
       observacoes 
     } = data
 

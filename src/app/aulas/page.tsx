@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarCalendario } from "@/components/SidebarCalendario"
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs"
 import { NoAulasEmptyState, NoResultsEmptyState } from "@/components/ui/empty-states"
@@ -11,10 +10,9 @@ import { CardAulaEnhanced } from "@/components/aulas/CardAulaEnhanced"
 import { QuickActionsBar } from "@/components/aulas/QuickActionsBar"
 import { MobileDatePicker } from "@/components/aulas/MobileDatePicker"
 import { FiltersBar, type AulasFilters } from "@/components/aulas/FiltersBar"
-import { AvaliacaoModal } from "@/components/avaliacao"
 import { AulasSkeletonGrid } from "@/components/aulas/AulaSkeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Star, AlertCircle, Calendar } from "lucide-react"
+import { AlertCircle, Calendar } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
@@ -23,7 +21,6 @@ import { useAulas } from "@/hooks/useAulas"
 function AulasPageContent() {
   const searchParams = useSearchParams()
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date())
-  const [isAvaliacaoModalOpen, setIsAvaliacaoModalOpen] = useState(false)
   const [aulaParaAvaliar, setAulaParaAvaliar] = useState<any>(null)
   const { toast } = useToast()
 
@@ -99,17 +96,6 @@ function AulasPageContent() {
     if (!Array.isArray(todasAulas)) return 0
     return todasAulas.filter(aula => aula.favorita).length
   }, [todasAulas])
-
-  const handleSubmitAvaliacao = (data: { aulaId: number; humor?: string; comentario?: string }) => {
-    console.log("Avaliação submetida:", data)
-    
-    toast.success(
-      `Obrigado por avaliar a aula "${aulaParaAvaliar?.titulo}".`
-    )
-    
-    setIsAvaliacaoModalOpen(false)
-    setAulaParaAvaliar(null)
-  }
 
   return (
     <SidebarProvider>

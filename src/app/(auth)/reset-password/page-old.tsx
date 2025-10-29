@@ -24,7 +24,6 @@ const resetPasswordSchema = z.object({
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
 export default function ResetPasswordPage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   
   const {
