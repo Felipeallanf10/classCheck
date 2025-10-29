@@ -21,8 +21,6 @@ import { useAulas } from "@/hooks/useAulas"
 function AulasPageContent() {
   const searchParams = useSearchParams()
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date())
-  const [aulaParaAvaliar, setAulaParaAvaliar] = useState<any>(null)
-  const { toast } = useToast()
 
   // Usar hook useAulas para buscar dados reais
   const { aulas: todasAulas, loading, error, refetch } = useAulas(dataSelecionada)
@@ -181,16 +179,6 @@ function AulasPageContent() {
             )}
           </main>
 
-          {/* Quick Actions Bar para avaliação rápida */}
-          {!loading && (
-            <QuickActionsBar 
-              aulas={aulasFiltradas}
-              onAvaliar={(aula) => {
-                setAulaParaAvaliar(aula)
-                setIsAvaliacaoModalOpen(true)
-              }}
-            />
-          )}
           {/* Sidebar com calendário */}
           <SidebarCalendario
             dataSelecionada={dataSelecionada}

@@ -335,7 +335,8 @@ function calcularCircumplex(respostas: any[]): { valencia: number; ativacao: num
  */
 function gerarRecomendacoes(
   nivelAlerta: string,
-  scores: Record<string, number>
+  scores: Record<string, number>,
+  tipoQuestionario: string
 ): string[] {
   const recomendacoes: string[] = [];
 
