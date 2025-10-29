@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 const prisma = new PrismaClient()
 
 interface RouteParams {

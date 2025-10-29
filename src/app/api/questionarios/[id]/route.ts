@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/questionarios/[id]
  * 

@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { determinarProximaPergunta } from '@/lib/adaptive/proxima-pergunta-service';
 import { validarRespostaPorTipo } from '@/lib/validations/resposta-schemas';
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 /**
  * Schema de validação para submissão de resposta
  */
