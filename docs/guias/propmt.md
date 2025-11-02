@@ -1,298 +1,180 @@
-# 🤖 PROMPT PARA GITHUB COPILOT — Refatoração da Página `/aulas`
-> **Objetivo:** Implementar as melhorias detalhadas no relatório “📊 Análise: Página de Aulas - Melhorias e Sugestões” do projeto **ClassCheck v3.0**
+# 🧠 PLANO DE APRIMORAMENTO DOS QUESTIONÁRIOS ADAPTATIVOS E RELATÓRIOS ANALÍTICOS  
+**Projeto:** ClassCheck v3.0  
+**Responsável Técnico:** [Seu nome ou Gerente de Projeto]  
+**Data de início:** [inserir data]
 
 ---
 
-## 🎯 Contexto
+## 🎯 OBJETIVO PRINCIPAL
 
-A página `/aulas` atual está funcional, mas apresenta:
-- Dados mockados (sem integração real)
-- Layout monótono
-- Falta de feedback de ações
-- Filtros limitados
-- Responsividade incompleta
+Aprimorar o módulo de **questionários adaptativos (CAT + IRT)** e **relatórios analíticos**, garantindo:
+1. Escolha da próxima pergunta com base em dados psicométricos reais (não apenas regras simples);
+2. Relatórios alimentados diretamente pelos dados armazenados no banco;
+3. Métricas interpretativas e visuais que agreguem valor clínico e educacional;
+4. Código limpo, padronizado e sem redundâncias entre backend e frontend.
 
-Queremos **refatorar e evoluir** a página em **3 fases**, com foco em UX, performance e integração real.
-
----
-
-## 🧩 Estrutura Técnica
-
-### **Localização do código**
-src/
-├── app/
-│ └── aulas/
-│ └── page.tsx
-├── components/
-│ └── aulas/
-│ ├── CardAulaEnhanced.tsx
-│ ├── FiltersBar.tsx
-│ ├── SidebarCalendarioEnhanced.tsx
-│ ├── AulaSkeleton.tsx
-│ ├── MobileDatePicker.tsx
-│ ├── QuickActionsBar.tsx
-│ └── ToggleFilter.tsx
-└── hooks/
-└── useAulas.ts
-
-yaml
-Copiar código
+> ⚠️ **Importante:** Todas as alterações devem ser feitas em **nova branch** baseada em `develop`, conforme padrão:
+> ```
+> git checkout develop
+> git pull
+> git checkout -b refactor/phase3-analytics-and-adaptive-flow
+> ```
 
 ---
 
-## ⚡ FASE 1 — FUNDAÇÃO (dados reais, feedback e loading)
+## 🧩 1. MELHORAR O FLUXO ADAPTATIVO (CAT)
 
-### ✅ 1. Criar hook `useAulas.ts`
-```tsx
-// src/hooks/useAulas.ts
-// Hook responsável por buscar aulas reais com loading e tratamento de erros
-Requisitos:
+### 🧱 Arquivos-chave:
+- `src/lib/adaptive/proxima-pergunta-service.ts`
+- `src/lib/adaptive/engine.ts`
+- `src/lib/adaptive/selecao-avancada-service.ts`
 
-Fetch em /api/aulas?date=YYYY-MM-DD
+### 🧠 Melhorias obrigatórias:
+1. **Otimizar seleção da próxima pergunta**
+   - Garantir que os parâmetros IRT (`a`, `b`, `c`) estejam sendo usados corretamente;
+   - Se estiverem com valores padrão (1.0, 0.0, 0.0), implementar fallback inteligente baseado na média dos parâmetros por categoria.
 
-Estado: aulas, loading, error
+2. **Adicionar diversidade e contexto**
+   - Evitar repetição excessiva de escalas e domínios;
+   - Incluir lógica de “contexto emocional” para adaptar o tipo de pergunta conforme o padrão detectado (ex: se ansiedade alta → reforçar bem-estar).
 
-Atualiza automaticamente quando a data muda
+3. **Permitir navegação reversa controlada**
+   - Adicionar função `perguntaAnterior()` no Zustand Store (`src/stores/sessao-store.ts`);
+   - Permitir editar até as 3 últimas respostas com recalibração do θ (theta).
 
-✅ 2. Adicionar Skeleton Loaders
-tsx
+4. **Gerar logs técnicos de adaptação**
+   - Criar tabela `LogAdaptativo` (timestamp, sessão, perguntaId, regra aplicada);
+   - Registrar todas as transições de perguntas e gatilhos ativados.
+
+---
+
+## 📊 2. CONECTAR RELATÓRIOS AO BANCO (FASE 1)
+
+### 🔧 Nova pasta:
+src/lib/analytics/
+
+bash
 Copiar código
-// src/components/aulas/AulaSkeleton.tsx
-// Skeleton animado para placeholder durante o carregamento
-Requisitos:
 
-Grid de placeholders (6 itens)
+### 🔹 Criar arquivo:
+`src/lib/analytics/queries.ts`
 
-Suporte a dark mode (bg-gray-200 / bg-gray-700)
+**Funções obrigatórias:**
+```ts
+export async function buscarSessoesUsuario(usuarioId: number, periodo: { inicio: Date; fim: Date }) { ... }
+export async function calcularScoresPorCategoria(sessoes) { ... }
+export async function calcularTendencia(sessoes) { ... }
+🔹 Atualizar:
+src/app/api/questionario/analise/route.ts
 
-Transição suave
+Substituir dados mock por queries reais.
 
-✅ 3. Sistema de Feedback
-Adicionar toast em todas as ações críticas:
+Incluir cálculo de:
 
-Favoritar/desfavoritar
+estadoDominante
 
-Avaliar
+tendência
 
-Erros de rede
+pontuacaoGeral
 
-Requisitos:
+recomendacoes baseadas em scores reais.
 
-Optimistic updates (UI reflete ação antes da resposta)
+🔹 Teste:
+Validar com 10 sessões reais;
 
-Toast de sucesso/erro usando useToast()
+Garantir resposta <500ms para requisições analíticas.
 
-🎨 FASE 2 — INTERFACE (UI/UX aprimorada)
-✅ 4. Criar CardAulaEnhanced.tsx
-Substituir o card simples atual.
+📈 3. IMPLEMENTAR RELATÓRIOS PROFUNDOS (FASE 2)
+🧠 Objetivo:
+Transformar relatórios de “gráficos genéricos” em painéis de análise socioemocional real.
 
-Requisitos:
+🔹 Componentes a criar:
+src/components/relatorios/GraficoCircumplex.tsx
 
-Título + Professor + Disciplina + Horário
+Exibir estado emocional (Valência × Ativação) conforme modelo de Russell.
 
-Descrição/preview da aula
+src/components/relatorios/LinhaTemporalScores.tsx
 
-Barra colorida por disciplina
+Exibir evolução de categorias ao longo do tempo.
 
-Progresso de avaliação (se existir)
+src/components/relatorios/HeatmapEmocional.tsx
 
-Badge de status (avaliada / pendente)
+Distribuir emoções por hora/dia.
 
-Ícone de humor se disponível
+src/components/relatorios/RadarCategorias.tsx
 
-Botão contextual (Ver ou Avaliar)
+Comparar ansiedades, bem-estar, sono, estresse etc.
 
-✅ 5. Criar FiltersBar.tsx
-Nova barra de filtros combinados acima da listagem.
+🔹 Bibliotecas:
+Recharts (já instalado)
 
-Requisitos:
+Zod para validação dos dados antes do render
 
-Filtros:
+🧭 4. INTELIGÊNCIA CLÍNICA (FASE 3)
+🔹 Objetivos:
+Criar módulo src/lib/analytics/interpretacao-clinica.ts
 
-Favoritas (toggle)
+Implementar funções:
 
-Status (avaliadas/pendentes)
-
-Disciplina (multi-select)
-
-Professor (multi-select)
-
-Badge com contadores
-
-Botão “Limpar filtros”
-
-Contador total de resultados
-
-✅ 6. Criar SidebarCalendarioEnhanced.tsx
-Reforçar o uso do calendário lateral.
-
-Requisitos:
-
-Destaque de dias com aulas
-
-Modifiers visuais:
-
-temAulas (cor primária)
-
-temAvaliadas (verde)
-
-temPendentes (laranja)
-
-Estatísticas da semana (aulas / avaliadas)
-
-Legenda explicativa
-
-✅ 7. Adicionar Visualizações Alternativas
-Implementar toggle entre Grid e List View:
-
-tsx
+ts
 Copiar código
-const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-Renderizar condicionalmente:
+interpretarPHQ9(score)
+interpretarGAD7(score)
+interpretarWHO5(score)
+Gerar alertas automáticos e notificações via AlertaSocioemocional:
 
-Grid: CardAulaEnhanced
+Severidade grave → alerta visual e log
 
-List: CardAulaList (compacto)
+Moderada → recomendação personalizada
 
-📱 FASE 3 — PERFORMANCE + MOBILE
-✅ 8. Criar MobileDatePicker.tsx
-Requisitos:
+Integrar painel de alertas no dashboard do coordenador.
 
-Sheet (bottom drawer) para seleção de data
+🧩 5. DADOS E RELATÓRIOS FUTUROS (FASE 4)
+🔹 Objetivo:
+Preparar terreno para análises preditivas e benchmarking.
 
-Quick picks: “Hoje”, “Amanhã”, “Próxima semana”
+Criar tabela MetricaSocioemocional (pré-agregação de scores por semana/mês)
 
-Mostra data atual no topo (🗓️ 13 de outubro, 2025 ▾)
+Implementar exportações CSV e API de pesquisa (/api/relatorios/export)
 
-Usa mesmo componente Calendar da versão desktop
+Documentar o modelo de dados analítico.
 
-✅ 9. Substituir FloatingButton por QuickActionsBar.tsx
-Requisitos:
+✅ 6. PADRÕES DE DESENVOLVIMENTO
+Nenhuma modificação direta em develop.
 
-Card fixo inferior
+Commits padronizados (Conventional Commits).
 
-Mostra quantidade de aulas pendentes
+Adicionar documentação inline nos serviços IRT e analytics.
 
-Exibe título da próxima aula a avaliar
+Criar testes unitários para:
 
-Botão “⚡ Avaliar agora”
+calcularTendencia()
 
-Opção “Ver todas (x)”
+interpretarPHQ9()
 
-✅ 10. Otimizações de Performance
-Virtualização com react-window se > 50 aulas
+buscarSessoesUsuario()
 
-Animações otimizadas (CSS puro, até 12 cards animados)
+🧩 7. TESTES E VALIDAÇÃO
+Teste	Descrição	Resultado Esperado
+Teste de API /api/questionario/analise	Deve retornar dados reais, não mock	✅
+Teste de tempo de resposta	Query analytics < 500ms	✅
+Teste de integração IRT	Seleção de perguntas conforme Fisher Info	✅
+Teste de relatórios	Exibir gráficos Circumplex e Longitudinal	✅
+Teste de alertas	Gerar alertas em caso de score grave	✅
 
-will-change: transform para suavizar transições
+📅 CRONOGRAMA SUGERIDO
+Fase	Duração	Entregas Principais
+Fase 1	1 semana	Queries reais + API real
+Fase 2	1 semana	Relatórios científicos
+Fase 3	2 semanas	Interpretação + alertas
+Fase 4	2 semanas	Benchmarking + exportação
 
-Lazy load de componentes pesados
+💬 COMUNICAÇÃO
+Dúvidas técnicas devem ser documentadas em docs/relatorios/diarios/.
 
-🧠 LÓGICA PRINCIPAL (resumo)
-tsx
-Copiar código
-const { aulas, loading, error } = useAulas(dataSelecionada);
-const [filters, setFilters] = useState(defaultFilters);
-const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+Atualizações de progresso via commits diários.
 
-const aulasFiltradas = useMemo(() => {
-  return aulas
-    .filter(porDataSelecionada)
-    .filter(porFavoritasSeAtivo)
-    .filter(porStatus)
-    .filter(porDisciplina)
-    .filter(porProfessor);
-}, [aulas, filters]);
-✅ CHECKLIST DE IMPLEMENTAÇÃO
-Fase 1 – Fundação
- Criar useAulas.ts
+Pull Request revisado somente após testes de dados reais.
 
- Criar endpoint /api/aulas
-
- Adicionar AulaSkeleton.tsx
-
- Implementar loading states
-
- Adicionar toasts e optimistic update
-
- Testar fluxo completo
-
-Fase 2 – Interface
- Implementar CardAulaEnhanced.tsx
-
- Implementar FiltersBar.tsx
-
- Atualizar SidebarCalendarioEnhanced.tsx
-
- Adicionar visualizações Grid/List
-
- Testar com dados variados (0, 10, 100 aulas)
-
-Fase 3 – Performance e Mobile
- Criar MobileDatePicker.tsx
-
- Criar QuickActionsBar.tsx
-
- Adicionar virtualização condicional
-
- Otimizar animações
-
- Testes cross-device e Lighthouse audit
-
-💡 ESTILO E UX
-Paleta: usar shadcn/ui padrão com contraste suave
-
-Responsivo completo (mobile/tablet/desktop)
-
-Dark mode funcional
-
-Feedback visual em todas as ações
-
-Skeleton → Toast → Atualização suave
-
-🚀 DIRETRIZES DE CÓDIGO
-Padrão TypeScript + Next.js App Router
-
-Importar componentes via aliases (@/components/...)
-
-Usar hooks client-side apenas em 'use client'
-
-Evitar duplicação de estado (single source of truth)
-
-Usar useMemo e useCallback para performance
-
-Código limpo, sem any, sem warnings no build
-
-📦 BRANCH E COMMITS
-Branch: refactor/phase3-aulas-ux-improvements
-
-Commits sugeridos:
-
-feat(aulas): integrar dados reais e loading states
-
-feat(aulas): criar Cards e Filtros avançados
-
-feat(aulas): otimizações de performance e mobile
-
-chore(aulas): ajustes finais e testes de responsividade
-
-🧩 REFERÊNCIAS DE DESIGN
-Inspiração visual:
-
-Google Classroom (cards por disciplina)
-
-Linear (filtros combinados)
-
-Notion (visualizações alternáveis)
-
-Asana (quick actions bar)
-
-🎯 MISSÃO PARA O COPILOT
-“Refatore e aprimore a página /aulas de acordo com este documento.
-Implemente os componentes listados, integre dados reais, adicione feedback visual e garanta responsividade total.
-Siga as boas práticas de performance, UX e organização modular conforme descrito acima.”
-
-📅 Prioridade: Alta
-👤 Responsável: Desenvolvedor Frontend
-🧭 Aprovação final: Felipe Allan (Gerente de Projeto)
-📄 Base técnica: Relatório “Análise: Página de Aulas - Melhorias e Sugestões (13/10/2025)”
+Resumo:
+O foco agora é dar vida aos dados coletados — eliminando mocks e gerando relatórios que realmente refletem o estado emocional, progresso e bem-estar dos usuários. O sistema já coleta tudo o que precisa — só falta conectar, analisar e apresentar com profundidade.
