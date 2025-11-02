@@ -321,6 +321,51 @@ export default function SessaoPage() {
                   disabled={submeter.isPending}
                 />
 
+                {/* Botão Voltar para Pergunta Anterior */}
+                {progresso.perguntasRespondidas > 0 && progresso.perguntasRespondidas <= 3 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          // Chama função da store para voltar
+                          const response = await fetch(
+                            `/api/questionario/recalibrar-theta`,
+                            {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ sessaoId }),
+                            }
+                          );
+
+                          if (!response.ok) {
+                            throw new Error('Erro ao voltar para pergunta anterior');
+                          }
+
+                          // Recarregar dados da sessão
+                          window.location.reload();
+                          
+                          toast.success('Voltou para a pergunta anterior');
+                        } catch (error) {
+                          console.error('Erro ao voltar:', error);
+                          toast.error('Não foi possível voltar para a pergunta anterior');
+                        }
+                      }}
+                      className="gap-2"
+                      disabled={submeter.isPending}
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      Voltar (máx. 3 perguntas)
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Você pode voltar até {3 - progresso.perguntasRespondidas} pergunta(s)
+                    </p>
+                  </div>
+                )}
+
                 {submeter.isPending && (
                   <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />

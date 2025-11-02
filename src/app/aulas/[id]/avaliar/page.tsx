@@ -4,13 +4,9 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Progress } from '@/components/ui/progress'
-import { ArrowLeft, Loader2, Star, CheckCircle, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Loader2, Brain, Sparkles, Info } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
-import QuestionarioSocioemocional from '@/components/questionario/QuestionarioSocioemocional'
 
 interface Aula {
   id: string
@@ -20,7 +16,14 @@ interface Aula {
   dataHora: string
 }
 
-type Step = 'socioemocional' | 'didatica' | 'resumo'
+// TODO: Substituir por autenticação real
+const CURRENT_USER_ID = 52
+
+// ID do questionário adaptativo de triagem
+// IMPORTANTE: Obter o ID correto executando:
+// npx prisma studio -> QuestionarioSocioemocional -> filtrar por adaptativo=true
+// OU executar: SELECT id, titulo FROM questionarios_socioemocionais WHERE adaptativo = true;
+const QUESTIONARIO_TRIAGEM_ID = '51' // Ajustar após verificar no banco
 
 export default function AvaliarAulaPage() {
   const params = useParams()
@@ -30,20 +33,7 @@ export default function AvaliarAulaPage() {
   
   const [aula, setAula] = useState<Aula | null>(null)
   const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
-  const [currentStep, setCurrentStep] = useState<Step>('socioemocional')
-  
-  // Dados da avaliação socioemocional
-  const [socioemocionaData, setSocioemocionaData] = useState<any>(null)
-  
-  // Dados da avaliação didática
-  const [compreensaoConteudo, setCompreensaoConteudo] = useState(3)
-  const [ritmoAula, setRitmoAula] = useState('adequado')
-  const [recursosDidaticos, setRecursosDidaticos] = useState(3)
-  const [engajamento, setEngajamento] = useState(3)
-  const [pontoPositivo, setPontoPositivo] = useState('')
-  const [pontoMelhoria, setPontoMelhoria] = useState('')
-  const [sugestao, setSugestao] = useState('')
+  const [iniciando, setIniciando] = useState(false)
 
   useEffect(() => {
     async function fetchAula() {
@@ -68,87 +58,57 @@ export default function AvaliarAulaPage() {
     }
   }, [aulaId, router, toast])
 
-  const handleSocioemocionaComplete = async (resultado: any) => {
-    setSocioemocionaData(resultado)
-    setCurrentStep('didatica')
-  }
-
-  const handleSkipDidatica = () => {
-    setCurrentStep('resumo')
-  }
-
-  const handleSubmitFinal = async () => {
-    setSubmitting(true)
+  const handleIniciarAvaliacaoAdaptativa = async () => {
+    setIniciando(true)
 
     try {
-      // 1. Salvar avaliação socioemocional
-      const socioResponse = await fetch('/api/avaliacoes/socioemocional', {
+      // Iniciar sessão adaptativa vinculada à aula
+      const response = await fetch('/api/sessoes/iniciar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          aulaId,
-          valencia: socioemocionaData?.finalPosition?.x || 0,
-          ativacao: socioemocionaData?.finalPosition?.y || 0,
-          estadoPrimario: socioemocionaData?.primaryState || 'Neutro',
-          confianca: socioemocionaData?.confidence || 0,
-          totalPerguntas: socioemocionaData?.totalQuestions || 0,
-          tempoResposta: 180,
-          respostas: JSON.stringify(socioemocionaData?.responses || []),
+          questionarioId: QUESTIONARIO_TRIAGEM_ID,
+          usuarioId: CURRENT_USER_ID,
+          aulaId: parseInt(aulaId), // Vincular à aula
+          contexto: {
+            origem: 'avaliacao-aula',
+            dispositivo: 'desktop',
+            aulaId: aulaId,
+            aulaTitulo: aula?.titulo,
+            aulaMateria: aula?.materia,
+          },
         }),
       })
 
-      if (!socioResponse.ok) throw new Error('Erro ao salvar avaliação socioemocional')
-
-      // 2. Salvar avaliação didática (se preenchida)
-      if (currentStep === 'resumo') {
-        const ritmoNumero = ritmoAula === 'muito-lento' ? 1 : ritmoAula === 'adequado' ? 3 : 5
-
-        const didaticaResponse = await fetch('/api/avaliacoes/didatica', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            aulaId,
-            compreensaoConteudo,
-            ritmoAula: ritmoNumero,
-            recursosDidaticos,
-            engajamento,
-            pontoPositivo: pontoPositivo || null,
-            pontoMelhoria: pontoMelhoria || null,
-            sugestao: sugestao || null,
-          }),
-        })
-
-        if (!didaticaResponse.ok) throw new Error('Erro ao salvar avaliação didática')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.erro || 'Erro ao iniciar avaliação')
       }
 
-      // 3. Redirecionar para página de sucesso
-      router.push(`/aulas/${aulaId}/avaliar/sucesso`)
+      const data = await response.json()
+      const sessaoId = data.sessao?.id || data.sessaoId
+      
+      if (!sessaoId) {
+        throw new Error('Sessão criada mas ID não retornado')
+      }
+
+      toast.success({
+        title: 'Avaliação iniciada!',
+        description: 'Responda às perguntas sobre como se sentiu nesta aula.'
+      })
+
+      // Redirecionar para a sessão adaptativa
+      router.push(`/avaliacoes/sessao/${sessaoId}`)
     } catch (error) {
-      console.error('Erro ao enviar avaliação:', error)
+      console.error('Erro ao iniciar avaliação:', error)
       toast.error({
-        title: "Erro",
-        description: "Não foi possível enviar a avaliação. Tente novamente."
+        title: 'Erro',
+        description: error instanceof Error ? error.message : 'Não foi possível iniciar a avaliação'
       })
     } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const getProgress = () => {
-    switch (currentStep) {
-      case 'socioemocional': return 33
-      case 'didatica': return 66
-      case 'resumo': return 100
-      default: return 0
-    }
-  }
-
-  const getStepLabel = () => {
-    switch (currentStep) {
-      case 'socioemocional': return 'Etapa 1 de 2'
-      case 'didatica': return 'Etapa 2 de 2'
-      case 'resumo': return 'Revisão Final'
-      default: return ''
+      setIniciando(false)
     }
   }
 
@@ -165,9 +125,9 @@ export default function AvaliarAulaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header com informações da aula */}
-      <div className="bg-white dark:bg-gray-900 border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-900 border-b">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           <Button
             variant="ghost"
@@ -178,346 +138,138 @@ export default function AvaliarAulaPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
-          
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground mb-1">Avaliando:</p>
-            <h1 className="text-xl font-bold">{aula.titulo}</h1>
-            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-1">
-              <span>📚 {aula.materia}</span>
-              <span>👤 {aula.professor}</span>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="font-medium">{getStepLabel()}</span>
-              <span className="text-muted-foreground">{getProgress()}%</span>
-            </div>
-            <Progress value={getProgress()} className="h-2" />
-          </div>
         </div>
       </div>
 
-      {/* Conteúdo das Etapas */}
+      {/* Conteúdo Principal */}
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {currentStep === 'socioemocional' && (
-          <div>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="text-center">😊 Como você se sentiu nesta aula?</CardTitle>
-                <CardDescription className="text-center">
-                  Responda às perguntas para mapear suas emoções durante a aula
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <QuestionarioSocioemocional
-              onComplete={handleSocioemocionaComplete}
-              contexto="aula"
-            />
-          </div>
-        )}
-
-        {currentStep === 'didatica' && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>📖 Avalie os aspectos da aula</CardTitle>
-                <CardDescription>
-                  Esta etapa é opcional, mas seu feedback ajuda a melhorar as próximas aulas
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Compreensão do Conteúdo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Compreensão do Conteúdo</CardTitle>
-                <CardDescription>O quanto você entendeu o conteúdo apresentado?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  {[1, 2, 3, 4, 5].map((nivel) => (
-                    <button
-                      key={nivel}
-                      type="button"
-                      onClick={() => setCompreensaoConteudo(nivel)}
-                      className={`p-2 transition-colors ${compreensaoConteudo >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
-                    >
-                      <Star className="h-8 w-8" fill={compreensaoConteudo >= nivel ? 'currentColor' : 'none'} />
-                    </button>
-                  ))}
-                </div>
-                <p className="text-sm text-center text-muted-foreground mt-2">
-                  {compreensaoConteudo === 1 && 'Não entendi quase nada'}
-                  {compreensaoConteudo === 2 && 'Entendi pouco'}
-                  {compreensaoConteudo === 3 && 'Entendi razoavelmente'}
-                  {compreensaoConteudo === 4 && 'Entendi bem'}
-                  {compreensaoConteudo === 5 && 'Entendi perfeitamente'}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Ritmo da Aula */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Ritmo da Aula</CardTitle>
-                <CardDescription>A velocidade da aula estava adequada?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {[
-                    { value: 'muito-lento', label: 'Muito lento', emoji: '🐌' },
-                    { value: 'adequado', label: 'Adequado', emoji: '✅' },
-                    { value: 'muito-rapido', label: 'Muito rápido', emoji: '⚡' },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setRitmoAula(option.value)}
-                      className={`w-full p-3 text-left rounded-lg border-2 transition-all ${
-                        ritmoAula === option.value
-                          ? 'border-primary bg-primary/5 shadow-sm'
-                          : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600'
-                      }`}
-                    >
-                      <span className="mr-2">{option.emoji}</span>
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recursos Didáticos */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Recursos Didáticos</CardTitle>
-                <CardDescription>Slides, exemplos, materiais foram úteis?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  {[1, 2, 3, 4, 5].map((nivel) => (
-                    <button
-                      key={nivel}
-                      type="button"
-                      onClick={() => setRecursosDidaticos(nivel)}
-                      className={`p-2 transition-colors ${recursosDidaticos >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
-                    >
-                      <Star className="h-8 w-8" fill={recursosDidaticos >= nivel ? 'currentColor' : 'none'} />
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Engajamento */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Seu Engajamento</CardTitle>
-                <CardDescription>O quanto você se envolveu com a aula?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center">
-                  {[1, 2, 3, 4, 5].map((nivel) => (
-                    <button
-                      key={nivel}
-                      type="button"
-                      onClick={() => setEngajamento(nivel)}
-                      className={`p-2 transition-colors ${engajamento >= nivel ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
-                    >
-                      <Star className="h-8 w-8" fill={engajamento >= nivel ? 'currentColor' : 'none'} />
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Feedback Texto */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Feedback Adicional (Opcional)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="positivo">O que funcionou bem?</Label>
-                  <Textarea
-                    id="positivo"
-                    value={pontoPositivo}
-                    onChange={(e) => setPontoPositivo(e.target.value)}
-                    placeholder="Ex: Os exemplos práticos ajudaram muito"
-                    rows={2}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="melhoria">O que pode melhorar?</Label>
-                  <Textarea
-                    id="melhoria"
-                    value={pontoMelhoria}
-                    onChange={(e) => setPontoMelhoria(e.target.value)}
-                    placeholder="Ex: Poderia ter mais exercícios"
-                    rows={2}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="sugestao">Sugestões</Label>
-                  <Textarea
-                    id="sugestao"
-                    value={sugestao}
-                    onChange={(e) => setSugestao(e.target.value)}
-                    placeholder="Suas sugestões para as próximas aulas"
-                    rows={2}
-                    className="mt-1"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Botões */}
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleSkipDidatica}
-                className="flex-1"
-              >
-                Pular Esta Etapa
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setCurrentStep('resumo')}
-                className="flex-1"
-              >
-                Continuar
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </Button>
+        {/* Hero Card */}
+        <Card className="border-2 mb-8">
+          <CardHeader className="text-center space-y-4 pb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mx-auto">
+              <Brain className="h-8 w-8 text-primary" />
             </div>
-          </div>
-        )}
-
-        {currentStep === 'resumo' && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  Resumo da Avaliação
-                </CardTitle>
-                <CardDescription>
-                  Revise suas respostas antes de enviar
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Resumo Socioemocional */}
-                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    😊 Avaliação Socioemocional
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Estado emocional: <strong>{socioemocionaData?.primaryState || 'Registrado'}</strong>
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Valência: {(socioemocionaData?.finalPosition?.x || 0).toFixed(2)} • 
-                    Ativação: {(socioemocionaData?.finalPosition?.y || 0).toFixed(2)}
-                  </p>
-                </div>
-
-                {/* Resumo Didático */}
-                <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    📖 Avaliação Didática
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Compreensão:</p>
-                      <div className="flex gap-1">
-                        {[...Array(compreensaoConteudo)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Recursos:</p>
-                      <div className="flex gap-1">
-                        {[...Array(recursosDidaticos)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Engajamento:</p>
-                      <div className="flex gap-1">
-                        {[...Array(engajamento)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 text-yellow-500" fill="currentColor" />
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Ritmo:</p>
-                      <p className="font-medium">
-                        {ritmoAula === 'muito-lento' && '🐌 Lento'}
-                        {ritmoAula === 'adequado' && '✅ Adequado'}
-                        {ritmoAula === 'muito-rapido' && '⚡ Rápido'}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {(pontoPositivo || pontoMelhoria || sugestao) && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs text-muted-foreground">
-                        + Feedback adicional incluído
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <Alert>
-                  <AlertDescription>
-                    Ao enviar, sua avaliação será registrada e não poderá ser alterada posteriormente.
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
-
-            {/* Botões */}
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setCurrentStep('didatica')}
-                className="flex-1"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-              <Button
-                type="button"
-                onClick={handleSubmitFinal}
-                disabled={submitting}
-                className="flex-1"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Enviar Avaliação
-                  </>
-                )}
-              </Button>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Você está avaliando:</p>
+              <CardTitle className="text-2xl md:text-3xl font-bold">
+                {aula.titulo}
+              </CardTitle>
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground mt-3">
+                <span className="flex items-center gap-2">
+                  📚 {aula.materia}
+                </span>
+                <span className="text-muted-foreground/50">•</span>
+                <span className="flex items-center gap-2">
+                  👤 {aula.professor}
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          </CardHeader>
+        </Card>
+
+        {/* Informações sobre Avaliação Adaptativa */}
+        <Alert className="mb-6 border-2 border-primary/20 bg-primary/5">
+          <Info className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-sm">
+            <strong className="font-semibold text-primary">Avaliação Adaptativa com IA</strong>
+            <p className="mt-2 text-muted-foreground">
+              Esta avaliação usa inteligência artificial para adaptar as perguntas ao seu perfil.
+              O sistema seleciona as questões mais relevantes com base nas suas respostas,
+              tornando o processo mais rápido e preciso.
+            </p>
+          </AlertDescription>
+        </Alert>
+
+        {/* Features */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <Card className="border hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3">
+                <Sparkles className="h-5 w-5 text-blue-600" />
+              </div>
+              <h3 className="font-semibold mb-1">Perguntas Inteligentes</h3>
+              <p className="text-sm text-muted-foreground">
+                O sistema adapta as questões em tempo real baseado nas suas respostas
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6">
+              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mb-3">
+                <Brain className="h-5 w-5 text-green-600" />
+              </div>
+              <h3 className="font-semibold mb-1">Análise Profunda</h3>
+              <p className="text-sm text-muted-foreground">
+                Avalia seu estado emocional usando escalas científicas validadas
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3">
+                <svg className="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-1">Rápido e Eficiente</h3>
+              <p className="text-sm text-muted-foreground">
+                Menos perguntas, mais precisão. Economize tempo com avaliações inteligentes
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Call to Action */}
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div className="text-center space-y-3">
+              <h3 className="text-xl font-bold">Pronto para começar?</h3>
+              <p className="text-sm text-muted-foreground">
+                A avaliação leva aproximadamente 2-5 minutos e suas respostas são totalmente confidenciais.
+              </p>
+            </div>
+
+            <Button
+              size="lg"
+              className="w-full h-12 text-base gap-2"
+              onClick={handleIniciarAvaliacaoAdaptativa}
+              disabled={iniciando}
+            >
+              {iniciando ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Iniciando...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  Iniciar Avaliação Adaptativa
+                </>
+              )}
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Você pode pausar e continuar depois a qualquer momento
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Dicas */}
+        <Card className="mt-6 bg-muted/30">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              💡 Dicas para uma avaliação eficaz
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <p>• Escolha um momento tranquilo, sem interrupções</p>
+            <p>• Seja honesto(a) - não há respostas certas ou erradas</p>
+            <p>• Pense em como você se sentiu durante toda a aula</p>
+            <p>• Leia cada pergunta com atenção antes de responder</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
