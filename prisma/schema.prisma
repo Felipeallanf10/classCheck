@@ -51,6 +51,7 @@ model Usuario {
   alertasSocioemocionais   AlertaSocioemocional[]
   historicoEmocional       HistoricoEmocional[]
   logsAdaptativos          LogAdaptativo[]
+  metricasSocioemocionais  MetricaSocioemocional[]
 
   // Relacionamentos - Gamificação
   conquistas UsuarioConquista[]
@@ -717,6 +718,81 @@ model LogAdaptativo {
   @@index([regraAplicada, timestamp])
   @@index([algoritmo, timestamp])
   @@map("logs_adaptativos")
+}
+
+// Modelo MetricaSocioemocional (Agregações para Performance)
+model MetricaSocioemocional {
+  id        String @id @default(uuid())
+  usuarioId Int
+
+  // Período de agregação
+  periodoInicio DateTime
+  periodoFim    DateTime
+  granularidade GranularidadeMetrica // DIARIA, SEMANAL, MENSAL, TRIMESTRAL
+
+  // Categoria/Domínio
+  categoria CategoriaPergunta?
+  dominio   DominioEmocional?
+
+  // Scores agregados (0-10)
+  scoreMinimo Float
+  scoreMaximo Float
+  scoreMedio  Float
+  scoreMediana Float?
+  desvioPadrao Float?
+
+  // IRT agregado
+  thetaMedio      Float?
+  thetaMinimo     Float?
+  thetaMaximo     Float?
+  confiancaMedia  Float?
+
+  // Modelo Circumplex
+  valenciaMedia  Float? // -1.0 a 1.0
+  ativacaoMedia  Float? // -1.0 a 1.0
+
+  // Estatísticas
+  totalSessoes    Int
+  totalRespostas  Int
+  taxaResposta    Float? // % de perguntas respondidas
+  tempoMedioResposta Float? // segundos
+
+  // Tendências
+  tendencia       String? // "ASCENDENTE", "ESTAVEL", "DESCENDENTE"
+  variacaoPercent Float? // % de mudança em relação ao período anterior
+
+  // Alertas gerados no período
+  alertasVermelhos Int @default(0)
+  alertasLaranjas  Int @default(0)
+  alertasAmarelos  Int @default(0)
+
+  // Escalas clínicas (quando aplicável)
+  scorePHQ9       Float?
+  scoreGAD7       Float?
+  scoreWHO5       Float?
+
+  // Metadata
+  calculadoEm DateTime @default(now())
+  versao      String   @default("1.0") // Para versionamento de cálculos
+
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, categoria, granularidade, periodoInicio], name: "usuarioId_categoria_granularidade_periodoInicio")
+  @@index([usuarioId, periodoInicio, periodoFim])
+  @@index([categoria, periodoInicio])
+  @@index([granularidade, periodoInicio])
+  @@index([calculadoEm])
+  @@map("metricas_socioemocionais")
+}
+
+// Enum para granularidade
+enum GranularidadeMetrica {
+  DIARIA
+  SEMANAL
+  MENSAL
+  TRIMESTRAL
+  ANUAL
 }
 
 // Modelo HistoricoEmocional (Evolução Temporal)
