@@ -33,14 +33,7 @@ export async function GET(
 
     // Buscar pergunta com todas as relações necessárias
     const pergunta = await prisma.perguntaSocioemocional.findUnique({
-      where: { id },
-      include: {
-        opcoes: {
-          orderBy: { valor: 'asc' }
-        },
-        parametrosIRT: true,
-        categoria: true
-      }
+      where: { id }
     });
 
     if (!pergunta) {
@@ -61,39 +54,46 @@ export async function GET(
       });
     }
 
+    // Parse opções se estiverem em JSON
+    let opcoesArray: any[] = [];
+    if (pergunta.opcoes) {
+      try {
+        opcoesArray = typeof pergunta.opcoes === 'string' 
+          ? JSON.parse(pergunta.opcoes as string)
+          : Array.isArray(pergunta.opcoes) 
+            ? pergunta.opcoes 
+            : [];
+      } catch (e) {
+        console.error('Erro ao parsear opções:', e);
+      }
+    }
+
     // Formatar resposta
     const response = {
       id: pergunta.id,
       texto: pergunta.texto,
       textoAuxiliar: pergunta.textoAuxiliar,
-      categoria: pergunta.categoria.nome,
+      categoria: pergunta.categoria,
       dominio: pergunta.dominio,
       tipoPergunta: pergunta.tipoPergunta,
-      opcoes: pergunta.opcoes.map(opcao => ({
-        id: opcao.id,
-        texto: opcao.texto,
-        valor: opcao.valor,
-        emoji: opcao.emoji,
-        cor: opcao.cor
-      })),
+      opcoes: opcoesArray,
       valorMinimo: pergunta.valorMinimo,
       valorMaximo: pergunta.valorMaximo,
       obrigatoria: pergunta.obrigatoria,
       ordem: pergunta.ordem,
       
-      // Dados IRT (se existirem)
-      parametrosIRT: pergunta.parametrosIRT ? {
-        discriminacao: pergunta.parametrosIRT.parametroA,
-        dificuldade: pergunta.parametrosIRT.parametroB,
-        acerto: pergunta.parametrosIRT.parametroC,
-        informacaoMaxima: pergunta.parametrosIRT.informacaoMaxima
-      } : null,
+      // Dados IRT (campos diretos da pergunta)
+      parametrosIRT: {
+        discriminacao: pergunta.discriminacao,
+        dificuldade: pergunta.dificuldade,
+        peso: pergunta.peso
+      },
       
       // Resposta existente (se houver)
       respostaExistente: respostaExistente ? {
         valor: respostaExistente.valor,
         valorNormalizado: respostaExistente.valorNumerico,
-        timestamp: respostaExistente.criadoEm
+        timestamp: respostaExistente.respondidoEm
       } : null
     };
 
