@@ -50,6 +50,7 @@ model Usuario {
   respostasSocioemocionais RespostaSocioemocional[]
   alertasSocioemocionais   AlertaSocioemocional[]
   historicoEmocional       HistoricoEmocional[]
+  logsAdaptativos          LogAdaptativo[]
 
   // Relacionamentos - Gamificação
   conquistas UsuarioConquista[]
@@ -538,11 +539,12 @@ model SessaoAdaptativa {
   eventoId    String? // ID do evento (se contexto = EVENTO)
 
   // Relacionamentos
-  usuario      Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
-  aula         Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
-  respostas    RespostaSocioemocional[]
-  alertas      AlertaSocioemocional[]
+  usuario         Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  questionario    QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
+  aula            Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
+  respostas       RespostaSocioemocional[]
+  alertas         AlertaSocioemocional[]
+  logsAdaptativos LogAdaptativo[]
 
   @@index([usuarioId, status])
   @@index([questionarioId, status])
@@ -592,10 +594,10 @@ model RespostaSocioemocional {
   ordem     Int // Ordem da resposta na sessão
 
   // Relacionamentos
-  sessao        SessaoAdaptativa        @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
-  pergunta      PerguntaSocioemocional? @relation(fields: [perguntaId], references: [id])
+  sessao        SessaoAdaptativa          @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
+  pergunta      PerguntaSocioemocional?   @relation(fields: [perguntaId], references: [id])
   perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
-  usuario       Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario       Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([sessaoId, ordem])
   @@index([usuarioId, timestamp])
@@ -659,6 +661,62 @@ model AlertaSocioemocional {
   @@index([nivel, status, criadoEm])
   @@index([categoria, nivel])
   @@map("alertas_socioemocionais")
+}
+
+// Modelo LogAdaptativo (Logs Técnicos de Adaptação)
+model LogAdaptativo {
+  id        String @id @default(uuid())
+  sessaoId  String
+  usuarioId Int
+
+  // Informações da pergunta
+  perguntaId      String // UUID da pergunta selecionada
+  perguntaBancoId String? // ID da pergunta no banco adaptativo
+
+  // Decisão adaptativa
+  regraAplicada String // Nome da regra/algoritmo que selecionou esta pergunta
+  motivoSelecao String? // Motivo da seleção (ex: "Máxima informação IRT", "Regra clínica X")
+  algoritmo     String  @default("IRT") // IRT, REGRA, HIBRIDO, ALEATORIO
+
+  // Parâmetros IRT no momento da seleção
+  thetaAtual       Float? // Theta estimado no momento
+  informacaoFisher Float? // Informação de Fisher da pergunta
+  parametroA       Float? // Discriminação
+  parametroB       Float? // Dificuldade
+  parametroC       Float? // Acerto casual
+
+  // Contexto da decisão
+  perguntasDisponiveis Int? // Quantas perguntas estavam disponíveis
+  categoria            String? // Categoria da pergunta selecionada
+  dominio              String? // Domínio emocional
+
+  // Resultado da resposta
+  respostaValor     Json? // Valor da resposta dada
+  thetaAposResposta Float? // Theta após processar esta resposta
+  erroAposResposta  Float? // Erro padrão após esta resposta
+
+  // Gatilhos e condições
+  gatilhosAtivados   String[] // Gatilhos que foram acionados
+  condicoesAvaliadas Json? // Condições que foram avaliadas
+
+  // Metadata
+  ordem        Int // Ordem desta pergunta na sessão
+  timestamp    DateTime @default(now())
+  tempoDecisao Int? // Tempo em ms para tomar a decisão
+
+  // Performance
+  cacheHit Boolean @default(false) // Se a próxima pergunta veio do cache
+  fonte    String? // "BANCO", "QUESTIONARIO_BASE", "REGRA_CLINICA"
+
+  // Relacionamentos
+  sessao  SessaoAdaptativa @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
+  usuario Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([sessaoId, ordem])
+  @@index([usuarioId, timestamp])
+  @@index([regraAplicada, timestamp])
+  @@index([algoritmo, timestamp])
+  @@map("logs_adaptativos")
 }
 
 // Modelo HistoricoEmocional (Evolução Temporal)
