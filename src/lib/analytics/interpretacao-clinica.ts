@@ -5,7 +5,7 @@
  * @date 2025-11-02
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../prisma';
 import { CategoriaPergunta } from '@prisma/client';
 
 /**
@@ -253,7 +253,7 @@ export function interpretarWHO5(score: number): InterpretacaoClinica {
 export async function gerarAlertaSocioemocional(
   usuarioId: number,
   interpretacao: InterpretacaoClinica,
-  sessaoId: number,
+  sessaoId: string,
   questionarioId: string
 ): Promise<void> {
   if (!interpretacao.necessitaAlerta) {
@@ -296,7 +296,7 @@ export async function gerarAlertaSocioemocional(
       await prisma.alertaSocioemocional.create({
         data: {
           usuarioId,
-          sessaoId: String(sessaoId),
+          sessaoId,
           questionarioId,
           nivel: nivelAlerta,
           tipo: tipoAlerta,

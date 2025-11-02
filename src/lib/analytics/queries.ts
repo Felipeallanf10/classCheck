@@ -5,7 +5,7 @@
  * @date 2025-11-02
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../prisma';
 import { SessaoAdaptativa, RespostaSocioemocional, CategoriaPergunta } from '@prisma/client';
 
 /**
@@ -219,9 +219,9 @@ export async function buscarHistoricoTheta(
     });
 
     return sessoes
-      .map((s: any) => ({
+      .map((s) => ({
         data: s.iniciadoEm,
-        theta: s.thetaEstimado || 0,
+        theta: s.thetaEstimado ?? 0,
         sessaoId: s.id,
       }))
       .reverse();
