@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { CategoriaSocioemocional } from '@prisma/client';
+import { CategoriaPergunta } from '@prisma/client';
 
 /**
  * Níveis de severidade clínica
@@ -248,11 +248,13 @@ export function interpretarWHO5(score: number): InterpretacaoClinica {
  * @param usuarioId ID do usuário
  * @param interpretacao Interpretação clínica
  * @param sessaoId ID da sessão que gerou o alerta
+ * @param questionarioId ID do questionário
  */
 export async function gerarAlertaSocioemocional(
   usuarioId: number,
   interpretacao: InterpretacaoClinica,
-  sessaoId: number
+  sessaoId: number,
+  questionarioId: string
 ): Promise<void> {
   if (!interpretacao.necessitaAlerta) {
     return;
@@ -263,10 +265,10 @@ export async function gerarAlertaSocioemocional(
     const alertaExistente = await prisma.alertaSocioemocional.findFirst({
       where: {
         usuarioId,
-        createdAt: {
+        criadoEm: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
         },
-        resolvido: false,
+        status: 'PENDENTE',
       },
     });
 
@@ -275,19 +277,39 @@ export async function gerarAlertaSocioemocional(
       await prisma.alertaSocioemocional.update({
         where: { id: alertaExistente.id },
         data: {
-          severidade: interpretacao.nivelSeveridade,
           mensagem: `${interpretacao.escala}: ${interpretacao.descricao}`,
         },
       });
     } else {
       // Criar novo alerta
+      // Mapear NivelSeveridade para NivelAlerta e TipoAlerta
+      const nivelAlerta = interpretacao.nivelSeveridade === 'GRAVE' ? 'VERMELHO'
+        : interpretacao.nivelSeveridade === 'MODERADAMENTE_GRAVE' ? 'LARANJA'
+        : interpretacao.nivelSeveridade === 'MODERADO' ? 'AMARELO'
+        : 'VERDE';
+      
+      const tipoAlerta = interpretacao.nivelSeveridade === 'GRAVE' ? 'CRISE_IMEDIATA'
+        : interpretacao.nivelSeveridade === 'MODERADAMENTE_GRAVE' ? 'RISCO_ALTO'
+        : interpretacao.nivelSeveridade === 'MODERADO' ? 'RISCO_MODERADO'
+        : 'RISCO_BAIXO';
+
       await prisma.alertaSocioemocional.create({
         data: {
           usuarioId,
-          tipo: 'AVALIACAO_AUTOMATICA',
-          severidade: interpretacao.nivelSeveridade,
+          sessaoId: String(sessaoId),
+          questionarioId,
+          nivel: nivelAlerta,
+          tipo: tipoAlerta,
+          categoria: 'BEM_ESTAR', // Categoria padrão, pode ser ajustada
+          titulo: `Alerta: ${interpretacao.escala}`,
           mensagem: `${interpretacao.escala}: ${interpretacao.descricao}`,
-          resolvido: false,
+          descricao: interpretacao.recomendacoes.join('; '),
+          dadosContexto: {
+            escala: interpretacao.escala,
+            score: interpretacao.score,
+            nivelSeveridade: interpretacao.nivelSeveridade,
+          },
+          regrasAcionadas: ['INTERPRETACAO_AUTOMATICA'],
         },
       });
     }
@@ -305,7 +327,7 @@ export async function gerarAlertaSocioemocional(
  * @returns Interpretação clínica
  */
 export function interpretarCategoria(
-  categoria: CategoriaSocioemocional,
+  categoria: CategoriaPergunta,
   score: number
 ): InterpretacaoClinica {
   switch (categoria) {
@@ -313,11 +335,10 @@ export function interpretarCategoria(
       return interpretarPHQ9(score);
     
     case 'ANSIEDADE':
-    case 'ANSIEDADE_GENERALIZADA':
       return interpretarGAD7(score);
     
     case 'BEM_ESTAR':
-    case 'QUALIDADE_VIDA':
+    case 'SATISFACAO_VIDA':
       return interpretarWHO5(score);
     
     default:

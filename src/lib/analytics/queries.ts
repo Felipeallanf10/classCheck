@@ -6,7 +6,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { SessaoQuestionario, RespostaQuestionario, CategoriaSocioemocional } from '@prisma/client';
+import { SessaoAdaptativa, RespostaSocioemocional, CategoriaPergunta } from '@prisma/client';
 
 /**
  * Interface para período de análise
@@ -19,15 +19,15 @@ export interface PeriodoAnalise {
 /**
  * Interface para sessão com respostas
  */
-export interface SessaoComRespostas extends SessaoQuestionario {
-  respostas: RespostaQuestionario[];
+export interface SessaoComRespostas extends SessaoAdaptativa {
+  respostas: RespostaSocioemocional[];
 }
 
 /**
  * Interface para scores por categoria
  */
 export interface ScoresPorCategoria {
-  categoria: CategoriaSocioemocional;
+  categoria: CategoriaPergunta;
   score: number;
   count: number;
   media: number;
@@ -37,7 +37,7 @@ export interface ScoresPorCategoria {
  * Interface para tendência
  */
 export interface Tendencia {
-  categoria: CategoriaSocioemocional;
+  categoria: CategoriaPergunta;
   direcao: 'ascendente' | 'descendente' | 'estavel';
   variacao: number; // percentual de mudança
   confianca: number; // 0-1
@@ -54,28 +54,25 @@ export async function buscarSessoesUsuario(
   periodo: PeriodoAnalise
 ): Promise<SessaoComRespostas[]> {
   try {
-    const sessoes = await prisma.sessaoQuestionario.findMany({
+    const sessoes = await prisma.sessaoAdaptativa.findMany({
       where: {
         usuarioId,
-        createdAt: {
+        iniciadoEm: {
           gte: periodo.inicio,
           lte: periodo.fim,
         },
-        status: 'COMPLETA',
+        status: 'FINALIZADA',
       },
       include: {
         respostas: {
           include: {
-            pergunta: {
-              include: {
-                categoria: true,
-              },
-            },
+            pergunta: true,
+            perguntaBanco: true,
           },
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        iniciadoEm: 'asc',
       },
     });
 
@@ -94,12 +91,12 @@ export async function buscarSessoesUsuario(
 export async function calcularScoresPorCategoria(
   sessoes: SessaoComRespostas[]
 ): Promise<ScoresPorCategoria[]> {
-  const scoresPorCategoria = new Map<CategoriaSocioemocional, number[]>();
+  const scoresPorCategoria = new Map<CategoriaPergunta, number[]>();
 
   // Agregar scores por categoria
   for (const sessao of sessoes) {
     for (const resposta of sessao.respostas) {
-      const categoria = (resposta.pergunta as any)?.categoria?.nome as CategoriaSocioemocional;
+      const categoria = resposta.categoria;
       
       if (!categoria) continue;
 
@@ -107,8 +104,9 @@ export async function calcularScoresPorCategoria(
         scoresPorCategoria.set(categoria, []);
       }
 
-      // Adicionar score da resposta
-      scoresPorCategoria.get(categoria)!.push(resposta.score || 0);
+      // Adicionar score da resposta (usar valorNumerico ou valorNormalizado)
+      const score = resposta.valorNumerico || resposta.valorNormalizado || 0;
+      scoresPorCategoria.get(categoria)!.push(score);
     }
   }
 
@@ -201,29 +199,29 @@ export async function calcularTendencia(
 export async function buscarHistoricoTheta(
   usuarioId: number,
   limite: number = 30
-): Promise<Array<{ data: Date; theta: number; sessaoId: number }>> {
+): Promise<Array<{ data: Date; theta: number; sessaoId: string }>> {
   try {
-    const sessoes = await prisma.sessaoQuestionario.findMany({
+    const sessoes = await prisma.sessaoAdaptativa.findMany({
       where: {
         usuarioId,
-        status: 'COMPLETA',
-        theta: { not: null },
+        status: 'FINALIZADA',
+        thetaEstimado: { not: null },
       },
       select: {
         id: true,
-        theta: true,
-        createdAt: true,
+        thetaEstimado: true,
+        iniciadoEm: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        iniciadoEm: 'desc',
       },
       take: limite,
     });
 
     return sessoes
-      .map(s => ({
-        data: s.createdAt,
-        theta: s.theta || 0,
+      .map((s: any) => ({
+        data: s.iniciadoEm,
+        theta: s.thetaEstimado || 0,
         sessaoId: s.id,
       }))
       .reverse();
@@ -249,7 +247,7 @@ export async function calcularEstatisticasUsuario(
   const totalRespostas = sessoes.reduce((acc, s) => acc + s.respostas.length, 0);
   
   const thetaValues = sessoes
-    .map(s => s.theta)
+    .map(s => s.thetaEstimado)
     .filter((t): t is number => t !== null);
   
   const thetaMedio = thetaValues.length > 0
