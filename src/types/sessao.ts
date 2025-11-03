@@ -52,6 +52,11 @@ export interface SessaoDetalhes {
   finalizadoEm?: Date | null;
   totalPerguntasEstimado: number;
   scoresPorCategoria?: Record<string, number>; // Scores finais por categoria (0-10)
+  usuario: {
+    id: number;
+    nome: string;
+    avatar?: string | null;
+  };
   respostas?: Array<{
     id: string;
     perguntaId: string;
