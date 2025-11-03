@@ -357,8 +357,22 @@ export default function SessaoPage() {
                   value={respostaAtual}
                   onChange={setRespostaAtual}
                   onComplete={() => {
-                    if (respostaAtual !== null && respostaAtual !== undefined) {
-                      handleSubmeterResposta(respostaAtual);
+                    // Para perguntas opcionais de texto, enviar string vazia se não respondido
+                    let valorFinal = respostaAtual;
+                    
+                    if ((respostaAtual === null || respostaAtual === undefined) && 
+                        sessao?.perguntaAtual && 
+                        !sessao.perguntaAtual.obrigatoria) {
+                      // Pergunta opcional não respondida
+                      const pergunta = sessao.perguntaAtual as any;
+                      if (pergunta.tipoPergunta === 'TEXTO_CURTO' || 
+                          pergunta.tipoPergunta === 'TEXTO_LONGO') {
+                        valorFinal = ''; // Envia string vazia para perguntas de texto
+                      }
+                    }
+                    
+                    if (valorFinal !== null && valorFinal !== undefined) {
+                      handleSubmeterResposta(valorFinal);
                     }
                   }}
                   disabled={submeter.isPending}

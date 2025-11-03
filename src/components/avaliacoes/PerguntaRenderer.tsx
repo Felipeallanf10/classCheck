@@ -326,17 +326,23 @@ export function PerguntaRenderer({
             <Button
               onClick={() => {
                 console.log('[PerguntaRenderer] Botão clicado, valor:', value);
-                if (value !== null && value !== undefined) {
+                // Permitir submissão se: valor existe OU pergunta é opcional
+                const podeSubmeter = value !== null && value !== undefined;
+                const perguntaOpcional = !pergunta.obrigatoria;
+                
+                if (podeSubmeter || perguntaOpcional) {
                   onComplete();
                 } else {
-                  console.warn('[PerguntaRenderer] Valor null/undefined, não submetendo');
+                  console.warn('[PerguntaRenderer] Valor null/undefined em pergunta obrigatória, não submetendo');
                 }
               }}
-              disabled={disabled || value === null || value === undefined}
+              disabled={disabled || (pergunta.obrigatoria && (value === null || value === undefined))}
               size="lg"
               className="gap-2"
             >
-              Próxima Pergunta
+              {!pergunta.obrigatoria && (value === null || value === undefined || value === '')
+                ? 'Pular Pergunta'
+                : 'Próxima Pergunta'}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
