@@ -49,7 +49,7 @@ interface QuestionarioIniciarProps {
 
 export function QuestionarioIniciar({
   questionarioId,
-  usuarioId = 3, // TODO: Pegar do contexto de autenticação
+  usuarioId = 52, // TODO: Pegar do contexto de autenticação
   contexto = { tipo: 'GERAL' },
   titulo,
   descricao,
