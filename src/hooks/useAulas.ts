@@ -56,13 +56,19 @@ export function useAulas(date: Date): UseAulasResult {
         data: format(new Date(aula.dataHora), 'yyyy-MM-dd'),
         professor: aula.professor?.nome || 'Professor não informado',
         disciplina: aula.materia,
-        avaliada: aula._count?.avaliacoes > 0,
+        // ATUALIZADO: Considerar aula avaliada se tem avaliações socioemocional E didática
+        avaliada: (
+          aula._count?.avaliacoesSocioemocionais > 0 && 
+          aula._count?.avaliacoesDidaticas > 0
+        ) || aula.status === 'CONCLUIDA',
         favorita: aula._count?.aulasFavoritas > 0,
         humor: null, // TODO: buscar da avaliação se existir
         descricao: aula.descricao || undefined,
         horario: format(new Date(aula.dataHora), 'HH:mm'),
-        avaliacoes: aula._count?.avaliacoes > 0 ? {
-          participacao: Math.min(100, (aula._count.avaliacoes / 30) * 100) // Assumindo turma de 30 alunos
+        avaliacoes: (aula._count?.avaliacoesSocioemocionais > 0 || aula._count?.avaliacoesDidaticas > 0) ? {
+          participacao: Math.min(100, (
+            (aula._count?.avaliacoesSocioemocionais || 0) / 30
+          ) * 100) // Assumindo turma de 30 alunos
         } : undefined
       }))
       

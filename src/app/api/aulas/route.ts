@@ -103,6 +103,8 @@ export async function GET(request: NextRequest) {
           _count: {
             select: {
               avaliacoes: true,
+              avaliacoesSocioemocionais: true,
+              avaliacoesDidaticas: true,
               aulasFavoritas: true
             }
           }
