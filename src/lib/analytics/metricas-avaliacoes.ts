@@ -16,7 +16,6 @@ export interface AvaliacaoAulaCompleta {
     ativacao: number;
     estadoPrimario: string;
     confianca: number;
-    thetaEstimado: number;
     totalPerguntas: number;
   };
   didatica?: {
@@ -42,7 +41,6 @@ export interface MetricasAgregadas {
     ativacaoMedia: number;
     ativacaoDesvio: number;
     confiancaMedia: number;
-    thetaMedio: number;
     estadosPredominantes: { estado: string; frequencia: number; percentual: number }[];
   };
   
@@ -152,12 +150,10 @@ export function calcularMetricasAgregadas(avaliacoes: AvaliacaoAulaCompleta[]): 
   const valencias = comSocioemocional.map(a => a.socioemocional!.valencia);
   const ativacoes = comSocioemocional.map(a => a.socioemocional!.ativacao);
   const confiancas = comSocioemocional.map(a => a.socioemocional!.confianca);
-  const thetas = comSocioemocional.map(a => a.socioemocional!.thetaEstimado);
   
   const valenciaMedia = valencias.reduce((a, b) => a + b, 0) / valencias.length;
   const ativacaoMedia = ativacoes.reduce((a, b) => a + b, 0) / ativacoes.length;
   const confiancaMedia = confiancas.reduce((a, b) => a + b, 0) / confiancas.length;
-  const thetaMedio = thetas.reduce((a, b) => a + b, 0) / thetas.length;
   
   // Estados predominantes
   const estadosCount = comSocioemocional.reduce((acc, av) => {
@@ -243,7 +239,6 @@ export function calcularMetricasAgregadas(avaliacoes: AvaliacaoAulaCompleta[]): 
       ativacaoMedia,
       ativacaoDesvio: calcularDesvio(ativacoes, ativacaoMedia),
       confiancaMedia,
-      thetaMedio,
       estadosPredominantes,
     },
     

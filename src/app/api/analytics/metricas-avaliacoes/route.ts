@@ -97,7 +97,6 @@ export async function GET(request: NextRequest) {
           ativacao: socio.ativacao,
           estadoPrimario: socio.estadoPrimario,
           confianca: socio.confianca,
-          thetaEstimado: socio.thetaEstimado,
           totalPerguntas: socio.totalPerguntas,
         },
         didatica: didatica ? {

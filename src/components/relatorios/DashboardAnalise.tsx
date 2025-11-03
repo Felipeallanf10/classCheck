@@ -164,7 +164,7 @@ export function DashboardAnalise({ metricas }: DashboardAnaliseProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Confiança IRT
+              Confiança Média
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -172,7 +172,7 @@ export function DashboardAnalise({ metricas }: DashboardAnaliseProps) {
               {(metricas.socioemocional.confiancaMedia * 100).toFixed(0)}%
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Theta: {metricas.socioemocional.thetaMedio.toFixed(2)}
+              Precisão das medições adaptativas
             </p>
           </CardContent>
         </Card>
