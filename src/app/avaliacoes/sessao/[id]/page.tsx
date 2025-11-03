@@ -90,18 +90,61 @@ export default function SessaoPage() {
         tempoResposta,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
           console.log('[handleSubmeterResposta] Sucesso:', data);
           toast.success('Resposta registrada!');
           
           // Se foi a última pergunta
           if (data.finalizada) {
-            toast.success('Avaliação concluída!', {
-              description: 'Redirecionando para os resultados...',
-            });
-            setTimeout(() => {
-              router.push(`/avaliacoes/resultado/${sessaoId}`);
-            }, 1500);
+            // Verificar se deve iniciar questionário didático
+            if (data.proximoQuestionario) {
+              toast.success('Parte 1 concluída!', {
+                description: 'Iniciando avaliação didática...',
+              });
+              
+              try {
+                // Iniciar sessão do questionário didático
+                const response = await fetch('/api/sessoes/iniciar', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    questionarioId: data.proximoQuestionario.id,
+                    usuarioId: sessao.usuario.id,
+                    aulaId: data.proximoQuestionario.aulaId,
+                    contexto: {
+                      tipo: 'AULA',
+                      aulaId: data.proximoQuestionario.aulaId,
+                      origem: 'continuacao-socioemocional',
+                    },
+                  }),
+                });
+
+                if (!response.ok) {
+                  throw new Error('Erro ao iniciar questionário didático');
+                }
+
+                const novaSessao = await response.json();
+                const novaSessaoId = novaSessao.sessao?.id || novaSessao.sessaoId;
+
+                setTimeout(() => {
+                  router.push(`/avaliacoes/sessao/${novaSessaoId}`);
+                }, 1500);
+              } catch (error) {
+                console.error('Erro ao iniciar questionário didático:', error);
+                toast.error('Erro ao continuar avaliação. Redirecionando...');
+                setTimeout(() => {
+                  router.push(`/avaliacoes/resultado/${sessaoId}`);
+                }, 1500);
+              }
+            } else {
+              // Avaliação totalmente concluída
+              toast.success('Avaliação concluída!', {
+                description: 'Redirecionando para os resultados...',
+              });
+              setTimeout(() => {
+                router.push(`/avaliacoes/resultado/${sessaoId}`);
+              }, 1500);
+            }
           }
         },
         onError: (error) => {
