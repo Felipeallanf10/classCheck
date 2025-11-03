@@ -19,11 +19,9 @@ interface Aula {
 // TODO: Substituir por autenticação real
 const CURRENT_USER_ID = 52
 
-// ID do questionário adaptativo de triagem
-// IMPORTANTE: Obter o ID correto executando:
-// npx prisma studio -> QuestionarioSocioemocional -> filtrar por adaptativo=true
-// OU executar: SELECT id, titulo FROM questionarios_socioemocionais WHERE adaptativo = true;
-const QUESTIONARIO_TRIAGEM_ID = '51' // Ajustar após verificar no banco
+// ID do questionário adaptativo para avaliação de impacto de aula
+// Referência: prisma/seed-questionario-aula.js
+const QUESTIONARIO_TRIAGEM_ID = 'questionario-impacto-aula'
 
 export default function AvaliarAulaPage() {
   const params = useParams()
@@ -75,7 +73,7 @@ export default function AvaliarAulaPage() {
           contexto: {
             origem: 'avaliacao-aula',
             dispositivo: 'desktop',
-            aulaId: aulaId,
+            aulaId: parseInt(aulaId), // Convertido para número
             aulaTitulo: aula?.titulo,
             aulaMateria: aula?.materia,
           },
