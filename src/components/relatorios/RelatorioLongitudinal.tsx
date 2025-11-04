@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -41,28 +41,8 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
   usuarioId = 52,
   periodo = 'mes'
 }) => {
-  const [isMounted, setIsMounted] = useState(false);
   const diasRetroativos = DIAS_POR_PERIODO[periodo];
   const { data, isLoading, error } = useRelatorioLongitudinal(usuarioId, diasRetroativos);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Evita erro de hidratação renderizando skeleton até montar no cliente
-  if (!isMounted) {
-    return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96 mt-2" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-96 w-full" />
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -203,8 +183,14 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {estatisticas.variacaoPercentual > 0 ? '+' : ''}
-                {estatisticas.variacaoPercentual.toFixed(1)}%
+                {estatisticas.variacaoPercentual !== null ? (
+                  <>
+                    {estatisticas.variacaoPercentual > 0 ? '+' : ''}
+                    {estatisticas.variacaoPercentual.toFixed(1)}%
+                  </>
+                ) : (
+                  'N/A'
+                )}
               </p>
             </CardContent>
           </Card>
@@ -276,8 +262,16 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
           <AlertDescription>
             <strong>Análise do Período:</strong> Foram analisadas avaliações de {dadosTemporais.length} dias
             no período de <strong>{periodo}</strong>. A tendência geral é{' '}
-            <strong className={corTendencia()}>{estatisticas.tendencia}</strong> com variação de{' '}
-            <strong>{estatisticas.variacaoPercentual > 0 ? '+' : ''}{estatisticas.variacaoPercentual.toFixed(1)}%</strong>.
+            <strong className={corTendencia()}>{estatisticas.tendencia}</strong>
+            {estatisticas.variacaoPercentual !== null && (
+              <>
+                {' '}com variação de{' '}
+                <strong>
+                  {estatisticas.variacaoPercentual > 0 ? '+' : ''}
+                  {estatisticas.variacaoPercentual.toFixed(1)}%
+                </strong>
+              </>
+            )}.
           </AlertDescription>
         </Alert>
       </CardContent>
