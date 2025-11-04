@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -41,8 +41,28 @@ const RelatorioLongitudinal: React.FC<RelatorioLongitudinalProps> = ({
   usuarioId = 52,
   periodo = 'mes'
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const diasRetroativos = DIAS_POR_PERIODO[periodo];
   const { data, isLoading, error } = useRelatorioLongitudinal(usuarioId, diasRetroativos);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Evita erro de hidratação renderizando skeleton até montar no cliente
+  if (!isMounted) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96 mt-2" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-96 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
