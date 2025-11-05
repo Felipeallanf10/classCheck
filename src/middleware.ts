@@ -6,30 +6,13 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Redireciona root para o dashboard apropriado baseado no role
+    // Redireciona root `/` para dashboard apropriado baseado no role
     if (path === "/" && token) {
-      if (token.role === "ADMIN") {
-        return NextResponse.redirect(new URL("/admin", req.url))
-      } else if (token.role === "PROFESSOR") {
-        return NextResponse.redirect(new URL("/professor", req.url))
+      if (token.role === "ADMIN" || token.role === "PROFESSOR") {
+        return NextResponse.redirect(new URL("/analytics", req.url))
       } else {
-        return NextResponse.redirect(new URL("/aluno", req.url))
+        return NextResponse.redirect(new URL("/dashboard", req.url))
       }
-    }
-
-    // Proteção de rotas de admin
-    if (path.startsWith("/admin") && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url))
-    }
-
-    // Proteção de rotas de professor
-    if (path.startsWith("/professor") && token?.role !== "PROFESSOR" && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url))
-    }
-
-    // Proteção de rotas de aluno
-    if (path.startsWith("/aluno") && token?.role !== "ALUNO" && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url))
     }
 
     return NextResponse.next()
