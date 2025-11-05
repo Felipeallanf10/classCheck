@@ -1,13 +1,6 @@
-// NextAuth.js route handler
-import { NextResponse } from 'next/server'
+import NextAuth from "next-auth"
+import { authOptions } from "@/lib/auth"
 
-// Força a rota a ser dinâmica
-export const dynamic = 'force-dynamic';
+const handler = NextAuth(authOptions)
 
-export async function GET() {
-  return NextResponse.json({ message: 'NextAuth endpoint' })
-}
-
-export async function POST() {
-  return NextResponse.json({ message: 'NextAuth endpoint' })
-}
+export { handler as GET, handler as POST }

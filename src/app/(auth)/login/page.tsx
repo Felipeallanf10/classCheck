@@ -6,6 +6,7 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { EmailInput, PasswordInput, LoadingButton } from '@/components/ui'
@@ -63,18 +64,25 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    console.log('Dados do login:', data)
     
     try {
-      // Simula chamada de API
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast.success("Login realizado com sucesso!")
-      
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
+      const result = await signIn('credentials', {
+        email: data.email,
+        senha: data.password, // O NextAuth espera 'senha' como definido em authOptions
+        redirect: false,
+      })
+
+      if (result?.error) {
+        toast.error("Email ou senha inválidos")
+      } else {
+        toast.success("Login realizado com sucesso!")
+        
+        // Redirecionamento após sucesso (o middleware vai redirecionar para o dashboard correto)
+        router.push('/')
+        router.refresh()
+      }
     } catch {
-      toast.error("Verifique suas credenciais e tente novamente.")
+      toast.error("Erro ao fazer login. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -82,19 +90,12 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true)
-    console.log("Login com Google")
     
     try {
-      // Simula chamada de API do Google
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast.success("Login com Google realizado!")
-      
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
+      // TODO: Configurar Google Provider no NextAuth
+      await signIn('google', { callbackUrl: '/' })
     } catch {
       toast.error("Erro no login com Google. Tente novamente.")
-    } finally {
       setIsGoogleLoading(false)
     }
   }
