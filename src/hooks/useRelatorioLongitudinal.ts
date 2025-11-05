@@ -35,12 +35,29 @@ async function fetchRelatorioLongitudinal(
   diasRetroativos: number = 30
 ): Promise<RelatorioLongitudinalData> {
   const hoje = new Date();
-  const inicio = subDays(hoje, diasRetroativos);
+  let inicio: Date;
+  let fim: Date;
+
+  // Se diasRetroativos for 90+ (trimestre ou semestre), busca desde início de novembro
+  // Caso contrário, usa dias retroativos normais
+  if (diasRetroativos >= 90) {
+    // Busca desde 1º de novembro de 2025
+    inicio = new Date(2025, 10, 1); // Mês 10 = novembro (zero-indexed)
+    fim = hoje;
+  } else if (diasRetroativos >= 30) {
+    // Para período mensal, busca todo novembro
+    inicio = new Date(2025, 10, 1);
+    fim = new Date(2025, 10, 30, 23, 59, 59);
+  } else {
+    // Para períodos curtos (semana), usa dias retroativos
+    inicio = subDays(hoje, diasRetroativos);
+    fim = hoje;
+  }
 
   const params = new URLSearchParams({
     usuarioId: usuarioId.toString(),
     periodoInicio: inicio.toISOString(),
-    periodoFim: hoje.toISOString(),
+    periodoFim: fim.toISOString(),
   });
 
   const response = await fetch(`/api/analytics/relatorio-longitudinal?${params}`);

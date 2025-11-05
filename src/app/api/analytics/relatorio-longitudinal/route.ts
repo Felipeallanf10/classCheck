@@ -33,16 +33,24 @@ export async function GET(request: NextRequest) {
     const dataFim = parseISO(periodoFim);
 
     // Buscar avaliações socioemocionais no período
+    // Filtra pela data da AULA, não pela data de criação da avaliação
     const avaliacoes = await prisma.avaliacaoSocioemocional.findMany({
       where: {
         usuarioId: parseInt(usuarioId),
-        createdAt: {
-          gte: dataInicio,
-          lte: dataFim,
+        aula: {
+          dataHora: {
+            gte: dataInicio,
+            lte: dataFim,
+          },
         },
       },
+      include: {
+        aula: true,
+      },
       orderBy: {
-        createdAt: 'asc',
+        aula: {
+          dataHora: 'asc',
+        },
       },
     });
 
@@ -63,11 +71,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Agrupar avaliações por dia
+    // Agrupar avaliações por dia (usando data da AULA)
     const avaliacoesPorDia = new Map<string, typeof avaliacoes>();
 
     avaliacoes.forEach((av) => {
-      const dia = format(av.createdAt, 'yyyy-MM-dd');
+      const dia = format(av.aula.dataHora, 'yyyy-MM-dd');
       if (!avaliacoesPorDia.has(dia)) {
         avaliacoesPorDia.set(dia, []);
       }
