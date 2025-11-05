@@ -21,10 +21,11 @@ datasource db {
 // MODELOS DO CLASSCHECK
 // ==============================================
 
-// Modelo Usuario
+// Modelo Usuario (Unificado: ALUNO, PROFESSOR, ADMIN)
 model Usuario {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  senha     String   // Hash bcrypt da senha
   nome      String
   avatar    String?
   role      Role     @default(ALUNO)
@@ -32,31 +33,40 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Gamificação
+  // Campos específicos de PROFESSOR (nullable)
+  materia String? // Apenas para role PROFESSOR
+
+  // Gamificação (para ALUNO)
   xpTotal      Int @default(0)
   nivel        Int @default(1)
   proximoNivel Int @default(100)
 
-  // Relacionamentos - Sistema Original
+  // Relacionamentos - Como ALUNO
   avaliacoes                Avaliacao[]
   avaliacoesSocioemocionais AvaliacaoSocioemocional[]
   avaliacoesDidaticas       AvaliacaoDidatica[]
-  avaliacoesProfessores     AvaliacaoProfessor[]
+  avaliacoesProfessores     AvaliacaoProfessor[] // Como aluno avaliando professor
   humorRegistros            HumorRegistro[]
   aulasFavoritas            AulaFavorita[]
-
-  // Relacionamentos - Sistema Adaptativo
-  sessoesAdaptativas       SessaoAdaptativa[]
-  respostasSocioemocionais RespostaSocioemocional[]
-  alertasSocioemocionais   AlertaSocioemocional[]
-  historicoEmocional       HistoricoEmocional[]
-  logsAdaptativos          LogAdaptativo[]
-  metricasSocioemocionais  MetricaSocioemocional[]
+  sessoesAdaptativas        SessaoAdaptativa[]
+  respostasSocioemocionais  RespostaSocioemocional[]
+  alertasSocioemocionais    AlertaSocioemocional[]
+  historicoEmocional        HistoricoEmocional[]
+  logsAdaptativos           LogAdaptativo[]
+  metricasSocioemocionais   MetricaSocioemocional[]
 
   // Relacionamentos - Gamificação
   conquistas UsuarioConquista[]
   badges     UsuarioBadge[]
   checkIns   CheckIn[]
+
+  // Relacionamentos - Como PROFESSOR
+  aulasMinistradas           Aula[]               @relation("ProfessorAulas")
+  avaliacoesRecebidas        AvaliacaoProfessor[] @relation("AvaliacoesProfessor") // Como professor sendo avaliado
+  turmasProfessor            TurmaProfessor[]     // Turmas que leciona (como professor)
+
+  // Relacionamentos - Como ALUNO
+  turmasAluno TurmaAluno[] // Turmas que frequenta (como aluno)
 
   // Relacionamentos - Sistema
   notificacoes Notificacao[]
@@ -65,23 +75,76 @@ model Usuario {
   @@map("usuarios")
 }
 
-// Modelo Professor  
-model Professor {
+// ==============================================
+// MODELOS DE TURMAS E ORGANIZAÇÃO
+// ==============================================
+
+// Modelo Turma
+model Turma {
   id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  materia   String
-  avatar    String?
+  nome      String // "3º Ano A", "Turma 301", etc.
+  codigo    String   @unique // "3A", "301", etc.
+  ano       String // "2025", "3º Ano", etc.
+  periodo   Periodo  @default(MANHA)
+  ativa     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  aulas      Aula[]
+  alunos     TurmaAluno[]
+  professores TurmaProfessor[]
+
+  @@map("turmas")
+}
+
+// Tabela de junção: Turma ↔ Aluno (N:N)
+model TurmaAluno {
+  id        Int      @id @default(autoincrement())
+  turmaId   Int
+  alunoId   Int
+  matricula String? // Número de matrícula (opcional)
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  aulas                 Aula[]
-  avaliacoesProfessores AvaliacaoProfessor[]
+  turma Turma   @relation(fields: [turmaId], references: [id])
+  aluno Usuario @relation(fields: [alunoId], references: [id])
 
-  @@map("professores")
+  @@unique([turmaId, alunoId])
+  @@map("turmas_alunos")
 }
+
+// Tabela de junção: Turma ↔ Professor (N:N)
+model TurmaProfessor {
+  id          Int      @id @default(autoincrement())
+  turmaId     Int
+  professorId Int
+  materia     String // Matéria que leciona nessa turma
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  turma     Turma   @relation(fields: [turmaId], references: [id])
+  professor Usuario @relation(fields: [professorId], references: [id])
+
+  @@unique([turmaId, professorId, materia])
+  @@map("turmas_professores")
+}
+
+// Enum para períodos
+enum Periodo {
+  MANHA
+  TARDE
+  NOITE
+  INTEGRAL
+}
+
+// ==============================================
+// MODELO AULA (atualizado com turmaId)
+// ==============================================
 
 // Modelo Aula
 model Aula {
@@ -92,13 +155,15 @@ model Aula {
   dataHora    DateTime
   duracao     Int // em minutos
   professorId Int
+  turmaId     Int? // Turma onde a aula acontece (nullable para aulas sem turma definida)
   sala        String?
   status      StatusAula @default(AGENDADA)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   // Relacionamentos
-  professor                 Professor                 @relation(fields: [professorId], references: [id])
+  professor                 Usuario                   @relation("ProfessorAulas", fields: [professorId], references: [id])
+  turma                     Turma?                    @relation(fields: [turmaId], references: [id])
   avaliacoes                Avaliacao[]
   avaliacoesSocioemocionais AvaliacaoSocioemocional[]
   avaliacoesDidaticas       AvaliacaoDidatica[]
@@ -213,8 +278,8 @@ model AvaliacaoProfessor {
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
-  professor Professor @relation(fields: [professorId], references: [id])
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  professor Usuario @relation("AvaliacoesProfessor", fields: [professorId], references: [id])
 
   // Um usuário só pode avaliar um professor uma vez por período
   @@unique([usuarioId, professorId, periodo])
