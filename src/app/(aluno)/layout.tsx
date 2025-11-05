@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { AlunoNav } from '@/components/navigation/AlunoNav'
 
 export default async function AlunoLayout({
   children,
@@ -24,41 +25,13 @@ export default async function AlunoLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Layout específico do aluno */}
-      <div className="flex flex-col">
-        {/* Header do aluno */}
-        <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-800 shadow-sm">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ClassCheck
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Olá, {session.user.name}!
-                </p>
-              </div>
-              <nav className="flex items-center gap-4">
-                <a href="/aluno" className="text-sm font-medium hover:text-primary-600">
-                  Dashboard
-                </a>
-                <a href="/aluno/avaliacoes" className="text-sm font-medium hover:text-primary-600">
-                  Minhas Avaliações
-                </a>
-                <a href="/aluno/progresso" className="text-sm font-medium hover:text-primary-600">
-                  Meu Progresso
-                </a>
-              </nav>
-            </div>
-          </div>
-        </header>
-
-        {/* Conteúdo */}
-        <main className="flex-1">
-          {children}
-        </main>
-      </div>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      <aside className="w-64 flex-shrink-0">
+        <AlunoNav />
+      </aside>
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </div>
   )
 }

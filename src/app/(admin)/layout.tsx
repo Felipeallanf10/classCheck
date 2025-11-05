@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { AdminNav } from '@/components/navigation/AdminNav'
 
 export default async function AdminLayout({
   children,
@@ -24,43 +25,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col">
-        {/* Header do admin */}
-        <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-white">
-                  ClassCheck - Administração
-                </h1>
-                <p className="text-sm text-purple-100">
-                  {session.user.name} • Administrador
-                </p>
-              </div>
-              <nav className="flex items-center gap-4 text-white">
-                <a href="/admin" className="text-sm font-medium hover:text-purple-200">
-                  Dashboard
-                </a>
-                <a href="/admin/usuarios" className="text-sm font-medium hover:text-purple-200">
-                  Usuários
-                </a>
-                <a href="/admin/turmas" className="text-sm font-medium hover:text-purple-200">
-                  Turmas
-                </a>
-                <a href="/admin/relatorios" className="text-sm font-medium hover:text-purple-200">
-                  Relatórios Gerais
-                </a>
-              </nav>
-            </div>
-          </div>
-        </header>
-
-        {/* Conteúdo */}
-        <main className="flex-1">
-          {children}
-        </main>
-      </div>
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      <aside className="w-64 flex-shrink-0">
+        <AdminNav />
+      </aside>
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </div>
   )
 }
