@@ -2,6 +2,23 @@
 @import "tw-animate-css";
 @import "../styles/avaliar-animations.css";
 
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 /* Toast customizations */
 .toast-container {
   z-index: 100 !important;
@@ -146,4 +163,151 @@
 /* Sidebar z-index - garantir que não interfira nos toasts */
 [data-sidebar] {
   z-index: 10 !important;
+}
+
+/* Melhorias para quebra de texto em mobile */
+.word-break-break-word {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Garantir que containers não causem overflow horizontal */
+.container-no-overflow {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+/* Classe para forçar quebra de texto sem truncamento */
+.text-wrap-force {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  text-overflow: unset !important;
+  overflow: visible !important;
+  hyphens: auto !important;
+  line-height: 1.5 !important;
+}
+
+/* Garantir overflow visível em navegação de índices */
+.nav-item-container {
+  overflow: visible !important;
+}
+
+.nav-item-container button {
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.nav-item-container button div {
+  overflow: visible !important;
+}
+
+/* FAQ específico - garantir quebra de linha em textos longos */
+.faq-text {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.6;
+  max-width: 100%;
+  white-space: normal;
+  display: block;
+  overflow: visible;
+}
+
+/* Limitar largura de containers em mobile */
+@media (max-width: 640px) {
+  .mobile-constrain {
+    max-width: calc(100vw - 2rem);
+    overflow-x: hidden;
+  }
+  
+  /* Forçar quebra em textos muito longos em mobile */
+  .faq-text {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+  
+  /* Garantir que cards não excedam a largura da tela */
+  .card {
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+}
+
+/* Forçar overflow visible em elementos que podem estar cortando texto */
+@media (max-width: 480px) {
+  .faq-text {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    max-width: 100% !important;
+  }
+  
+  /* Garantir que botões não cortem texto */
+  button[data-faq-button="true"] {
+    height: auto !important;
+    min-height: 60px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    align-items: flex-start !important;
+  }
+  
+  button[data-faq-button="true"] span {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+  }
+  
+  /* Garantir que botões em páginas institucionais não cortem texto */
+  button a, a button {
+    white-space: normal !important;
+    height: auto !important;
+    min-height: 40px !important;
+  }
+  
+  button a span, a button span {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow: visible !important;
+  }
+}
+
+/* Animação bounce-once para página de conclusão */
+@keyframes bounce-once {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-15px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-7px);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.6s ease-in-out;
+}
+
+/* Fade in up para cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

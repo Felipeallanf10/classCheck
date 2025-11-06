@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 const updateProfessorSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório').optional(),
   email: z.string().email('Email inválido').optional(),
@@ -15,8 +18,8 @@ interface RouteParams {
 }
 
 export async function GET(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
-    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {
@@ -74,8 +77,8 @@ export async function GET(request: NextRequest, context: RouteParams) {
 }
 
 export async function PUT(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
-    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {
@@ -146,8 +149,8 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 }
 
 export async function DELETE(request: NextRequest, context: RouteParams) {
+  const params = await context.params
   try {
-    const params = await context.params
     const id = parseInt(params.id)
     
     if (isNaN(id)) {

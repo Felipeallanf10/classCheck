@@ -1,0 +1,642 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-10-21T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_list_questionarios",
+      "parentId": "fld_questionarios",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/questionarios",
+      "name": "Listar Questionários",
+      "description": "Lista todos os questionários disponíveis com filtros opcionais.\n\n**Filtros:**\n- tipo: WHO5 | PHQ9 | GAD7 | CIRCUMPLEX | PERSONALIZADO\n- categoria: BEM_ESTAR | ANSIEDADE | DEPRESSAO | HUMOR | ENERGIA | etc\n- adaptativo: true | false\n- ativo: true | false\n- oficial: true | false",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697846400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_questionarios_filtros",
+      "parentId": "fld_questionarios",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/questionarios?tipo=WHO5&adaptativo=true&ativo=true",
+      "name": "Listar Questionários (com filtros)",
+      "description": "Exemplo com filtros: apenas WHO-5, adaptativos e ativos",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_tipo",
+          "name": "tipo",
+          "value": "WHO5",
+          "description": "Tipo do questionário",
+          "disabled": false
+        },
+        {
+          "id": "pair_adaptativo",
+          "name": "adaptativo",
+          "value": "true",
+          "description": "Apenas adaptativos",
+          "disabled": false
+        },
+        {
+          "id": "pair_ativo",
+          "name": "ativo",
+          "value": "true",
+          "description": "Apenas ativos",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697846300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_questionario_id",
+      "parentId": "fld_questionarios",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/questionarios/{{ _.questionario_id }}",
+      "name": "Buscar Questionário por ID",
+      "description": "Busca um questionário específico com todas as perguntas e regras.\n\n**Retorna:**\n- Dados completos do questionário\n- Lista de perguntas (ordenadas por ordem)\n- Regras ativas\n- Estatísticas de uso",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697846200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_iniciar_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/iniciar",
+      "name": "Iniciar Sessão Adaptativa",
+      "description": "Inicia uma nova sessão de questionário adaptativo.\n\n**Body:**\n- questionarioId: UUID do questionário\n- usuarioId: ID do usuário\n- contexto (opcional): objeto com dados extras\n- aulaId (opcional): ID da aula relacionada\n\n**Retorna:**\n- sessaoId: UUID da sessão criada\n- primeiraPergunta: Objeto com primeira pergunta\n- progresso: Status inicial (0%)\n- irt: Parâmetros IRT iniciais",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"questionarioId\": \"{{ _.questionario_id }}\",\n  \"usuarioId\": 1,\n  \"contexto\": {\n    \"origem\": \"dashboard\",\n    \"dispositivo\": \"desktop\"\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697846100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_iniciar_sessao_com_aula",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/iniciar",
+      "name": "Iniciar Sessão (com Aula)",
+      "description": "Exemplo de início de sessão vinculada a uma aula específica",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"questionarioId\": \"{{ _.questionario_id }}\",\n  \"usuarioId\": 1,\n  \"aulaId\": 1,\n  \"contexto\": {\n    \"origem\": \"pos-aula\",\n    \"dispositivo\": \"mobile\",\n    \"localizacao\": \"sala_101\"\n  }\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697846050000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_submeter_resposta",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}/resposta",
+      "name": "Submeter Resposta",
+      "description": "Submete uma resposta para a sessão ativa.\n\n**Body:**\n- perguntaId: UUID da pergunta\n- valor: Valor da resposta (depende do tipo da pergunta)\n- tempoResposta: Tempo em segundos para responder\n\n**Retorna:**\n- próximaPergunta: Próxima pergunta (se houver)\n- progresso: Status atualizado\n- irt: Parâmetros IRT atualizados\n- finalizada: true se sessão foi concluída",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"perguntaId\": \"{{ _.pergunta_id }}\",\n  \"valor\": 3,\n  \"tempoResposta\": 5\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697846000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_submeter_resposta_likert",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}/resposta",
+      "name": "Submeter Resposta (Likert 5)",
+      "description": "Exemplo de resposta para pergunta tipo LIKERT_5 (escala 1-5)",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"perguntaId\": \"{{ _.pergunta_id }}\",\n  \"valor\": 4,\n  \"tempoResposta\": 8\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845950000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_submeter_resposta_multipla",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}/resposta",
+      "name": "Submeter Resposta (Múltipla Escolha)",
+      "description": "Exemplo de resposta para pergunta tipo MULTIPLA_ESCOLHA",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"perguntaId\": \"{{ _.pergunta_id }}\",\n  \"valor\": \"opcao_a\",\n  \"tempoResposta\": 12\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_pausar_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}",
+      "name": "Pausar Sessão",
+      "description": "Pausa uma sessão em andamento.\n\n**Estados válidos:** EM_ANDAMENTO → PAUSADA",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"action\": \"pausar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_retomar_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}",
+      "name": "Retomar Sessão",
+      "description": "Retoma uma sessão pausada.\n\n**Estados válidos:** PAUSADA → EM_ANDAMENTO",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"action\": \"retomar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_finalizar_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}",
+      "name": "Finalizar Sessão",
+      "description": "Finaliza uma sessão em andamento.\n\n**Estados válidos:** EM_ANDAMENTO → FINALIZADA\n\n**Retorna:**\n- Scores finais por categoria\n- Theta final (IRT)\n- Total de perguntas respondidas\n- Tempo total e médio\n- XP ganho",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"action\": \"finalizar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_cancelar_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}",
+      "name": "Cancelar Sessão",
+      "description": "Cancela uma sessão em andamento ou pausada.\n\n**Estados válidos:** EM_ANDAMENTO/PAUSADA → CANCELADA",
+      "method": "PATCH",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"action\": \"cancelar\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1697845500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_get_sessao",
+      "parentId": "fld_sessoes",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/sessoes/{{ _.sessao_id }}",
+      "name": "Buscar Detalhes da Sessão",
+      "description": "Busca informações completas de uma sessão.\n\n**Retorna:**\n- Dados da sessão (status, timestamps, progresso)\n- Informações do questionário\n- Dados do usuário\n- Lista de respostas\n- Alertas ativos\n- Parâmetros IRT\n- Scores por categoria",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697845400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_alertas",
+      "parentId": "fld_alertas",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/alertas?usuarioId=1",
+      "name": "Listar Alertas do Usuário",
+      "description": "Lista alertas socioemocionais de um usuário.\n\n**Filtros:**\n- usuarioId: ID do usuário (recomendado)\n- nivel: VERDE | AMARELO | LARANJA | VERMELHO\n- tipo: string (ex: 'depressao', 'ansiedade')\n- ativo: true | false (padrão: true)\n- questionarioId: UUID do questionário",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_usuario",
+          "name": "usuarioId",
+          "value": "1",
+          "description": "ID do usuário",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697845300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_alertas_vermelhos",
+      "parentId": "fld_alertas",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/alertas?usuarioId=1&nivel=VERMELHO&ativo=true",
+      "name": "Listar Alertas VERMELHO",
+      "description": "Lista apenas alertas de nível VERMELHO (críticos)",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_usuario2",
+          "name": "usuarioId",
+          "value": "1",
+          "description": "ID do usuário",
+          "disabled": false
+        },
+        {
+          "id": "pair_nivel",
+          "name": "nivel",
+          "value": "VERMELHO",
+          "description": "Nível de alerta",
+          "disabled": false
+        },
+        {
+          "id": "pair_ativo2",
+          "name": "ativo",
+          "value": "true",
+          "description": "Apenas ativos",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697845200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_list_alertas_questionario",
+      "parentId": "fld_alertas",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "url": "{{ _.base_url }}/api/alertas?usuarioId=1&questionarioId={{ _.questionario_id }}",
+      "name": "Listar Alertas por Questionário",
+      "description": "Lista alertas de um questionário específico",
+      "method": "GET",
+      "body": {},
+      "parameters": [
+        {
+          "id": "pair_usuario3",
+          "name": "usuarioId",
+          "value": "1",
+          "description": "ID do usuário",
+          "disabled": false
+        },
+        {
+          "id": "pair_questionario",
+          "name": "questionarioId",
+          "value": "{{ _.questionario_id }}",
+          "description": "ID do questionário",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1697845100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_questionarios",
+      "parentId": "wrk_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "📋 Questionários",
+      "description": "Endpoints relacionados aos questionários socioemocionais",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697846400000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_sessoes",
+      "parentId": "wrk_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "🎯 Sessões Adaptativas",
+      "description": "Endpoints para gerenciar sessões de questionários adaptativos",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697846300000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_alertas",
+      "parentId": "wrk_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "🚨 Alertas Socioemocionais",
+      "description": "Endpoints para gerenciar alertas de saúde mental",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1697846200000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_main",
+      "parentId": null,
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "ClassCheck - API Socioemocionais",
+      "description": "Coleção completa de APIs para o sistema de questionários adaptativos do ClassCheck",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_main",
+      "parentId": "wrk_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "questionario_id": "",
+        "sessao_id": "",
+        "pergunta_id": "",
+        "usuario_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "questionario_id",
+          "sessao_id",
+          "pergunta_id",
+          "usuario_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1697846400000,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_dev",
+      "parentId": "env_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "Development",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "questionario_id": "clxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "sessao_id": "clxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "pergunta_id": "clxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "usuario_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "questionario_id",
+          "sessao_id",
+          "pergunta_id",
+          "usuario_id"
+        ]
+      },
+      "color": "#7d69cb",
+      "isPrivate": false,
+      "metaSortKey": 1697846300000,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_prod",
+      "parentId": "env_main",
+      "modified": 1697846400000,
+      "created": 1697846400000,
+      "name": "Production",
+      "data": {
+        "base_url": "https://classcheck.vercel.app",
+        "questionario_id": "",
+        "sessao_id": "",
+        "pergunta_id": "",
+        "usuario_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "questionario_id",
+          "sessao_id",
+          "pergunta_id",
+          "usuario_id"
+        ]
+      },
+      "color": "#ff6b6b",
+      "isPrivate": false,
+      "metaSortKey": 1697846200000,
+      "_type": "environment"
+    }
+  ]
+}

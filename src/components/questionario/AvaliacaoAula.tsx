@@ -15,6 +15,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import QuestionarioSocioemocional from './QuestionarioSocioemocional';
+import type { ResultadoSessao } from '@/types/resultado';
 
 interface AvaliacaoAulaProps {
   aulaId: string;
@@ -22,7 +23,7 @@ interface AvaliacaoAulaProps {
   tituloAula?: string;
   duracao?: number;
   participantes?: number;
-  onAvaliacaoCompleta?: (resultado: any) => void;
+  onAvaliacaoCompleta?: (resultado: ResultadoSessao) => void;
 }
 
 const AvaliacaoAula: React.FC<AvaliacaoAulaProps> = ({
@@ -34,38 +35,32 @@ const AvaliacaoAula: React.FC<AvaliacaoAulaProps> = ({
   onAvaliacaoCompleta
 }) => {
   const [etapa, setEtapa] = useState<'pre-aula' | 'questionario' | 'pos-aula' | 'completo'>('pre-aula');
-  const [resultadoPreAula, setResultadoPreAula] = useState<any>(null);
-  const [resultadoPosAula, setResultadoPosAula] = useState<any>(null);
+  const [resultadoPreAula, setResultadoPreAula] = useState<ResultadoSessao | null>(null);
+  const [resultadoPosAula, setResultadoPosAula] = useState<ResultadoSessao | null>(null);
 
   // Manipular avaliação pré-aula
-  const handlePreAula = (resultado: any) => {
+  const handlePreAula = (resultado: ResultadoSessao) => {
     setResultadoPreAula(resultado);
     setEtapa('pos-aula');
   };
 
   // Manipular avaliação pós-aula
-  const handlePosAula = (resultado: any) => {
+  const handlePosAula = (resultado: ResultadoSessao) => {
     setResultadoPosAula(resultado);
     setEtapa('completo');
     
     // Combinar resultados e notificar componente pai
-    const avaliacaoCompleta = {
-      aulaId,
-      preAula: resultadoPreAula,
-      posAula: resultado,
-      mudancaEmocional: calcularMudancaEmocional(resultadoPreAula, resultado),
-      timestamp: new Date().toISOString()
-    };
-    
-    onAvaliacaoCompleta?.(avaliacaoCompleta);
+    if (onAvaliacaoCompleta) {
+      onAvaliacaoCompleta(resultado);
+    }
   };
 
-  // Calcular mudança emocional entre pré e pós aula
-  const calcularMudancaEmocional = (pre: any, pos: any) => {
+  // Calcular mudança emocional
+  const calcularMudancaEmocional = (pre: ResultadoSessao | null, pos: ResultadoSessao | null) => {
     if (!pre || !pos) return null;
     
-    const mudancaValencia = pos.finalPosition.valence - pre.finalPosition.valence;
-    const mudancaAtivacao = pos.finalPosition.arousal - pre.finalPosition.arousal;
+    const mudancaValencia = pos.circumplex.valencia - pre.circumplex.valencia;
+    const mudancaAtivacao = pos.circumplex.ativacao - pre.circumplex.ativacao;
     
     return {
       valencia: mudancaValencia,
@@ -153,12 +148,12 @@ const AvaliacaoAula: React.FC<AvaliacaoAulaProps> = ({
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-green-700">Estado Principal:</span>
-                <span className="ml-2 font-medium">{resultadoPreAula?.primaryState}</span>
+                <span className="ml-2 font-medium">{resultadoPreAula?.circumplex.estado}</span>
               </div>
               <div>
                 <span className="text-green-700">Confiança:</span>
                 <span className="ml-2 font-medium">
-                  {Math.round((resultadoPreAula?.confidence || 0) * 100)}%
+                  {Math.round((resultadoPreAula?.irt.confianca || 0) * 100)}%
                 </span>
               </div>
             </div>
@@ -205,15 +200,15 @@ const AvaliacaoAula: React.FC<AvaliacaoAulaProps> = ({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Estado:</span>
-                    <Badge variant="secondary">{resultadoPreAula?.primaryState}</Badge>
+                    <Badge variant="secondary">{resultadoPreAula?.circumplex.estado}</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Valência:</span>
-                    <span>{resultadoPreAula?.finalPosition?.valence?.toFixed(2)}</span>
+                    <span>{resultadoPreAula?.circumplex.valencia.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Ativação:</span>
-                    <span>{resultadoPreAula?.finalPosition?.arousal?.toFixed(2)}</span>
+                    <span>{resultadoPreAula?.circumplex.ativacao.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -224,15 +219,15 @@ const AvaliacaoAula: React.FC<AvaliacaoAulaProps> = ({
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Estado:</span>
-                    <Badge variant="secondary">{resultadoPosAula?.primaryState}</Badge>
+                    <Badge variant="secondary">{resultadoPosAula?.circumplex.estado}</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Valência:</span>
-                    <span>{resultadoPosAula?.finalPosition?.valence?.toFixed(2)}</span>
+                    <span>{resultadoPosAula?.circumplex.valencia.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Ativação:</span>
-                    <span>{resultadoPosAula?.finalPosition?.arousal?.toFixed(2)}</span>
+                    <span>{resultadoPosAula?.circumplex.ativacao.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -243,13 +243,13 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
     return (
       <div className="space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
-          <div className="h-96 bg-gray-200 rounded"></div>
+          <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
         </div>
       </div>
     );
@@ -260,10 +260,10 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Gráfico de Tendências da Turma
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Análise temporal de {periodo} - Turma 8A ({dadosTendencia[dadosTendencia.length - 1]?.numeroAlunos || 0} alunos)
           </p>
         </div>
@@ -291,19 +291,19 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Tendência Geral</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Tendência Geral</p>
                   <div className={`flex items-center ${getCorTendencia(estatisticas.tendenciaGeral)}`}>
                     {getIconeTendencia(estatisticas.tendenciaGeral)}
                     <span className="ml-1 font-bold capitalize">
                       {estatisticas.tendenciaGeral}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {estatisticas.mudancaPercentual > 0 ? '+' : ''}{estatisticas.mudancaPercentual.toFixed(1)}% vs período anterior
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </CardContent>
@@ -313,16 +313,16 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Bem-estar Médio</p>
-                  <p className="text-xl font-bold">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Bem-estar Médio</p>
+                  <p className="text-xl font-bold dark:text-gray-100">
                     {formatarPorcentagem(estatisticas.mediaRecente)}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Últimos 7 dias
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Users className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                  <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
@@ -332,7 +332,7 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Consistência</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Consistência</p>
                   <div className="flex items-center">
                     <Badge variant={
                       estatisticas.consistencia === 'alta' ? 'default' :
@@ -341,12 +341,12 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
                       {estatisticas.consistencia}
                     </Badge>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Volatilidade: {(estatisticas.volatilidade * 100).toFixed(1)}%
                   </p>
                 </div>
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                  <Activity className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </CardContent>
@@ -367,7 +367,7 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
             <CardHeader>
               <CardTitle>Evolução do Bem-estar da Turma</CardTitle>
               {mostrarPrevisao && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Linha sólida: dados históricos | Linha tracejada: previsão
                 </p>
               )}
@@ -537,22 +537,22 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
             {dadosTendencia
               .filter(d => d.eventos && d.eventos.length > 0)
               .map((dia, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center space-x-3">
                     <div className={`h-3 w-3 rounded-full ${
                       dia.eventos?.[0].tipo === 'positivo' ? 'bg-green-500' :
                       dia.eventos?.[0].tipo === 'negativo' ? 'bg-red-500' : 'bg-gray-500'
                     }`}></div>
                     <div>
-                      <p className="font-medium">{dia.eventos?.[0].descricao}</p>
-                      <p className="text-sm text-gray-600">{dia.data}</p>
+                      <p className="font-medium dark:text-gray-100">{dia.eventos?.[0].descricao}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{dia.data}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium dark:text-gray-100">
                       {formatarPorcentagem(dia.valenciaMedia)}
                     </p>
-                    <p className="text-xs text-gray-500">bem-estar médio</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">bem-estar médio</p>
                   </div>
                 </div>
               ))}
@@ -569,20 +569,20 @@ const GraficoTendenciasTurma: React.FC<GraficoTendenciasTurmaProps> = ({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
               {previsoes.map((previsao, index) => (
-                <div key={index} className="text-center p-3 border rounded-lg">
-                  <p className="font-medium text-sm">{previsao.data}</p>
-                  <p className="text-lg font-bold text-blue-600">
+                <div key={index} className="text-center p-3 border dark:border-gray-700 rounded-lg">
+                  <p className="font-medium text-sm dark:text-gray-100">{previsao.data}</p>
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
                     {formatarPorcentagem(previsao.valenciaPrevista)}
                   </p>
                   <div className="flex items-center justify-center mt-1">
-                    <div className={`h-2 w-full rounded-full bg-gray-200`}>
+                    <div className={`h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700`}>
                       <div 
-                        className="h-2 bg-blue-500 rounded-full transition-all"
+                        className="h-2 bg-blue-500 dark:bg-blue-400 rounded-full transition-all"
                         style={{ width: `${previsao.confianca * 100}%` }}
                       ></div>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {(previsao.confianca * 100).toFixed(0)}% confiança
                   </p>
                 </div>

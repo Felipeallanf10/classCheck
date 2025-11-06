@@ -1,0 +1,55 @@
+[
+  {
+    "id": "phq9_1",
+    "texto": "Pouco interesse ou prazer em fazer as coisas",
+    "categoria": "DEPRESSAO",
+    "tipoPergunta": "ESCALA_FREQUENCIA",
+    "obrigatoria": true,
+    "ordem": 1,
+    "opcoes": [
+      { "valor": 0, "texto": "Nenhuma vez" },
+      { "valor": 1, "texto": "Vários dias" },
+      { "valor": 2, "texto": "Mais da metade" },
+      { "valor": 3, "texto": "Quase todos os dias" }
+    ]
+  },
+  {
+    "id": "p118_panas_1",
+    "texto": "Feliz",
+    "categoria": "HUMOR",
+    "tipoPergunta": "ESCALA_INTENSIDADE",
+    "obrigatoria": false,
+    "ordem": 2,
+    "opcoes": [
+      { "valor": 1, "texto": "Nada" },
+      { "valor": 2, "texto": "Pouco" },
+      { "valor": 3, "texto": "Moderado" },
+      { "valor": 4, "texto": "Bastante" },
+      { "valor": 5, "texto": "Extremamente" }
+    ]
+  },
+  {
+    "id": "p_visual_1",
+    "texto": "Como você se sente agora?",
+    "categoria": "HUMOR",
+    "tipoPergunta": "ESCALA_VISUAL",
+    "obrigatoria": false,
+    "ordem": 3
+  },
+  {
+    "id": "q_sim_nao_1",
+    "texto": "Você conseguiu dormir bem ontem?",
+    "categoria": "SONO",
+    "tipoPergunta": "SIM_NAO",
+    "obrigatoria": false,
+    "ordem": 4
+  },
+  {
+    "id": "q_likert5_1",
+    "texto": "Como você avalia sua energia hoje?",
+    "categoria": "ENERGIA",
+    "tipoPergunta": "LIKERT_5",
+    "obrigatoria": false,
+    "ordem": 5
+  }
+]

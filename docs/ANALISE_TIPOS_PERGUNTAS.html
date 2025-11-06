@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Tipos de Perguntas - ClassCheck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .alert-box strong {
+            color: #856404;
+            font-size: 1.2em;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning-box {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+        }
+        
+        .badge-recomendado {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-uso-moderado {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-evitar {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-especifico {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .comparison-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .comparison-card.recommended {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .comparison-card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .visual-example {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .likert-scale {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .likert-option {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .likert-option:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .likert-option .number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .likert-option .label {
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .pros, .cons {
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .pros {
+            background: #d4edda;
+        }
+        
+        .cons {
+            background: #f8d7da;
+        }
+        
+        .pros h5, .cons h5 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .pros h5 {
+            color: #155724;
+        }
+        
+        .cons h5 {
+            color: #721c24;
+        }
+        
+        ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+        
+        .recommendation-banner {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .recommendation-banner h3 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Análise de Tipos de Perguntas</h1>
+            <p>LIKERT_5 para tudo? Vamos descobrir a melhor abordagem!</p>
+        </header>
+        
+        <div class="content">
+            <!-- Situação Atual -->
+            <div class="section">
+                <h2>📊 Situação Atual</h2>
+                
+                <div class="alert-box">
+                    <strong>⚠️ Problema Identificado:</strong><br>
+                    <p style="margin-top: 10px;">
+                        Você tem <strong>16 tipos de perguntas disponíveis</strong> no sistema, mas está usando 
+                        <strong>LIKERT_5 em ~90% das perguntas</strong>. Isso pode estar limitando a qualidade 
+                        e precisão das avaliações socioemocionais.
+                    </p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">16</div>
+                        <div class="stat-label">Tipos Disponíveis</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">~90%</div>
+                        <div class="stat-label">Usando LIKERT_5</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">~10%</div>
+                        <div class="stat-label">Outros Tipos</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">58</div>
+                        <div class="stat-label">Total de Perguntas</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tipos Disponíveis -->
+            <div class="section">
+                <h2>🗂️ Tipos de Perguntas Disponíveis</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Escala</th>
+                            <th>Recomendação</th>
+                            <th>Melhor Para</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>LIKERT_5</strong></td>
+                            <td>1-5 pontos</td>
+                            <td><span class="badge badge-recomendado">✅ Padrão Geral</span></td>
+                            <td>Frequência, intensidade, concordância</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LIKERT_7</strong></td>
+                            <td>1-7 pontos</td>
+                            <td><span class="badge badge-recomendado">✅ Mais Precisão</span></td>
+                            <td>Emoções complexas, satisfação</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LIKERT_10</strong></td>
+                            <td>0-10 pontos</td>
+                            <td><span class="badge badge-uso-moderado">⚠️ Casos Específicos</span></td>
+                            <td>Escalas NPS, dor, intensidade máxima</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESCALA_VISUAL</strong></td>
+                            <td>Slider contínuo</td>
+                            <td><span class="badge badge-recomendado">✅ Alta Precisão</span></td>
+                            <td>Humor contínuo, circumplex</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MULTIPLA_ESCOLHA</strong></td>
+                            <td>1 opção</td>
+                            <td><span class="badge badge-recomendado">✅ Categorias</span></td>
+                            <td>Sintomas, escolhas discretas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MULTIPLA_SELECAO</strong></td>
+                            <td>N opções</td>
+                            <td><span class="badge badge-especifico">🎯 Sintomas</span></td>
+                            <td>Múltiplos sintomas, atividades</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EMOJI_PICKER</strong></td>
+                            <td>Emojis</td>
+                            <td><span class="badge badge-especifico">🎯 Engajamento</span></td>
+                            <td>Check-in rápido, humor visual</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SLIDER_NUMERICO</strong></td>
+                            <td>Range custom</td>
+                            <td><span class="badge badge-recomendado">✅ Flexível</span></td>
+                            <td>Qualquer escala numérica</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SIM_NAO</strong></td>
+                            <td>Boolean</td>
+                            <td><span class="badge badge-recomendado">✅ Screening</span></td>
+                            <td>Triagem, presença/ausência</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TEXTO_CURTO</strong></td>
+                            <td>Max 200 chars</td>
+                            <td><span class="badge badge-uso-moderado">⚠️ Qualitativo</span></td>
+                            <td>Observações breves</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TEXTO_LONGO</strong></td>
+                            <td>Max 1000 chars</td>
+                            <td><span class="badge badge-evitar">❌ Evitar</span></td>
+                            <td>Narrativas, CAT não funciona bem</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESCALA_FREQUENCIA</strong></td>
+                            <td>Nunca → Sempre</td>
+                            <td><span class="badge badge-recomendado">✅ Comportamentos</span></td>
+                            <td>Frequência de comportamentos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ESCALA_INTENSIDADE</strong></td>
+                            <td>Nada → Extremo</td>
+                            <td><span class="badge badge-recomendado">✅ Sintomas</span></td>
+                            <td>Intensidade de sintomas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DATA</strong></td>
+                            <td>Date picker</td>
+                            <td><span class="badge badge-evitar">❌ Evitar</span></td>
+                            <td>Dados demográficos, não CAT</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HORA</strong></td>
+                            <td>Time picker</td>
+                            <td><span class="badge badge-evitar">❌ Evitar</span></td>
+                            <td>Registros temporais, não CAT</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RANKING</strong></td>
+                            <td>Ordenação</td>
+                            <td><span class="badge badge-uso-moderado">⚠️ Complexo</span></td>
+                            <td>Prioridades, preferências</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Análise Detalhada: LIKERT_5 -->
+            <div class="section">
+                <h2>🔍 LIKERT_5: Quando Usar e Quando NÃO Usar</h2>
+                
+                <div class="visual-example">
+                    <h4>Exemplo Visual de LIKERT_5</h4>
+                    <p><strong>Pergunta:</strong> "Com que frequência você se sentiu ansioso(a) esta semana?"</p>
+                    
+                    <div class="likert-scale">
+                        <div class="likert-option">
+                            <span class="number">1</span>
+                            <span class="label">Nunca</span>
+                        </div>
+                        <div class="likert-option">
+                            <span class="number">2</span>
+                            <span class="label">Raramente</span>
+                        </div>
+                        <div class="likert-option">
+                            <span class="number">3</span>
+                            <span class="label">Às vezes</span>
+                        </div>
+                        <div class="likert-option">
+                            <span class="number">4</span>
+                            <span class="label">Frequentemente</span>
+                        </div>
+                        <div class="likert-option">
+                            <span class="number">5</span>
+                            <span class="label">Sempre</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h5>✅ Vantagens do LIKERT_5</h5>
+                        <ul>
+                            <li>Balanceamento natural (ponto neutro no 3)</li>
+                            <li>Rápido de responder</li>
+                            <li>Familiar para usuários</li>
+                            <li>Boa para escalas validadas (WHO-5, PSS-10)</li>
+                            <li>Suficiente para maioria das situações</li>
+                            <li>Menos fadiga cognitiva</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="cons">
+                        <h5>❌ Limitações do LIKERT_5</h5>
+                        <ul>
+                            <li>Baixa granularidade (apenas 5 níveis)</li>
+                            <li>Tendência ao ponto central (efeito 3)</li>
+                            <li>Não captura nuances sutis</li>
+                            <li>Menos sensível a mudanças pequenas</li>
+                            <li>Pode gerar "teto" e "chão" (extremos)</li>
+                            <li>Não ideal para estados contínuos</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <h3>✅ Quando USAR LIKERT_5</h3>
+                <div class="success-box">
+                    <ul>
+                        <li><strong>Frequência de comportamentos:</strong> "Quantas vezes você..."</li>
+                        <li><strong>Concordância:</strong> "Discordo totalmente → Concordo totalmente"</li>
+                        <li><strong>Escalas validadas:</strong> WHO-5, GAD-7, PHQ-9 (algumas versões)</li>
+                        <li><strong>Perguntas simples:</strong> Onde 5 níveis são suficientes</li>
+                        <li><strong>Público geral:</strong> Usuários sem treinamento específico</li>
+                    </ul>
+                </div>
+                
+                <h3>❌ Quando NÃO Usar LIKERT_5</h3>
+                <div class="warning-box">
+                    <ul>
+                        <li><strong>Estados emocionais complexos:</strong> Use LIKERT_7 ou ESCALA_VISUAL</li>
+                        <li><strong>Intensidade de sintomas graves:</strong> Use ESCALA_INTENSIDADE</li>
+                        <li><strong>Humor no Modelo Circumplex:</strong> Use ESCALA_VISUAL (valencia/ativação)</li>
+                        <li><strong>Múltiplos sintomas simultâneos:</strong> Use MULTIPLA_SELECAO</li>
+                        <li><strong>Triagem rápida (sim/não):</strong> Use SIM_NAO</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Recomendações por Categoria -->
+            <div class="section">
+                <h2>📋 Recomendações por Categoria Emocional</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Tipo Recomendado</th>
+                            <th>Exemplo de Pergunta</th>
+                            <th>Justificativa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Humor Geral</strong></td>
+                            <td><code>ESCALA_VISUAL</code> ou <code>EMOJI_PICKER</code></td>
+                            <td>"Como você está se sentindo agora?"</td>
+                            <td>Humor é contínuo, não discreto. Modelo Circumplex funciona melhor com escalas visuais.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ansiedade</strong></td>
+                            <td><code>LIKERT_7</code> ou <code>ESCALA_INTENSIDADE</code></td>
+                            <td>"Intensidade da ansiedade nas últimas 2 semanas"</td>
+                            <td>Ansiedade tem nuances. 7 pontos captura melhor do que 5. GAD-7 usa escala 0-3 por item.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Depressão</strong></td>
+                            <td><code>ESCALA_FREQUENCIA</code></td>
+                            <td>"Frequência de pensamentos negativos"</td>
+                            <td>PHQ-9 foca em frequência ("Nenhum dia" → "Quase todos os dias").</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Estresse</strong></td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>"Com que frequência você se sentiu estressado?"</td>
+                            <td>PSS-10 usa Likert 5. Estresse é bem capturado em 5 níveis.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sono</strong></td>
+                            <td><code>MULTIPLA_ESCOLHA</code> ou <code>SLIDER_NUMERICO</code></td>
+                            <td>"Qualidade do sono" / "Horas dormidas"</td>
+                            <td>Sono tem categorias (Péssimo, Ruim, Regular, Bom, Ótimo) ou valores numéricos (horas).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Concentração</strong></td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>"Capacidade de manter o foco"</td>
+                            <td>5 níveis suficientes para concentração.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Motivação</strong></td>
+                            <td><code>SLIDER_NUMERICO</code> (0-10)</td>
+                            <td>"Nível de motivação para estudar"</td>
+                            <td>Motivação varia muito. Escala 0-10 permite granularidade.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Relacionamentos</strong></td>
+                            <td><code>LIKERT_7</code></td>
+                            <td>"Qualidade dos relacionamentos sociais"</td>
+                            <td>Relacionamentos são complexos. 7 pontos captam melhor satisfação social.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sintomas Físicos</strong></td>
+                            <td><code>MULTIPLA_SELECAO</code></td>
+                            <td>"Quais sintomas você teve?" (dor cabeça, náusea, fadiga...)</td>
+                            <td>Sintomas podem ocorrer simultaneamente. Checkbox é ideal.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pensamentos Suicidas</strong></td>
+                            <td><code>SIM_NAO</code> seguido de <code>ESCALA_INTENSIDADE</code></td>
+                            <td>"Teve pensamentos de morte?" → "Intensidade"</td>
+                            <td>Triagem com SIM/NÃO, depois escala de intensidade se SIM.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Autoestima</strong></td>
+                            <td><code>LIKERT_7</code></td>
+                            <td>"Concordância: 'Sou uma pessoa valiosa'"</td>
+                            <td>Autoestima tem gradações sutis. 7 pontos é melhor que 5.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Energia/Fadiga</strong></td>
+                            <td><code>SLIDER_NUMERICO</code> (0-100%)</td>
+                            <td>"Nível de energia atual"</td>
+                            <td>Energia é percebida em percentual. Slider permite precisão.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Comparação: 5 vs 7 vs 10 -->
+            <div class="section">
+                <h2>⚖️ Comparação: LIKERT_5 vs LIKERT_7 vs LIKERT_10</h2>
+                
+                <div class="comparison-grid">
+                    <div class="comparison-card recommended">
+                        <h4>LIKERT_5 (Padrão)</h4>
+                        <p><strong>Quando usar:</strong></p>
+                        <ul>
+                            <li>✅ Maioria das perguntas</li>
+                            <li>✅ Público geral</li>
+                            <li>✅ Escalas validadas (WHO-5, PSS-10)</li>
+                            <li>✅ Frequência simples</li>
+                        </ul>
+                        <p><strong>Vantagens:</strong></p>
+                        <ul>
+                            <li>Rápido de responder</li>
+                            <li>Ponto neutro (3)</li>
+                            <li>Menos fadiga</li>
+                        </ul>
+                        <p><strong>Limitações:</strong></p>
+                        <ul>
+                            <li>Baixa granularidade</li>
+                            <li>Efeito do ponto central</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <h4>LIKERT_7 (Mais Precisão)</h4>
+                        <p><strong>Quando usar:</strong></p>
+                        <ul>
+                            <li>✅ Emoções complexas</li>
+                            <li>✅ Satisfação detalhada</li>
+                            <li>✅ Quando 5 pontos parece pouco</li>
+                            <li>✅ Escalas GAD-7 (ajustadas)</li>
+                        </ul>
+                        <p><strong>Vantagens:</strong></p>
+                        <ul>
+                            <li>Mais nuances (7 níveis)</li>
+                            <li>Ainda tem ponto neutro (4)</li>
+                            <li>Melhor sensibilidade</li>
+                        </ul>
+                        <p><strong>Limitações:</strong></p>
+                        <ul>
+                            <li>Mais carga cognitiva</li>
+                            <li>Confusão em labels intermediários</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="comparison-card">
+                        <h4>LIKERT_10 (Máxima Granularidade)</h4>
+                        <p><strong>Quando usar:</strong></p>
+                        <ul>
+                            <li>⚠️ NPS (Net Promoter Score)</li>
+                            <li>⚠️ Escalas de dor (0-10)</li>
+                            <li>⚠️ Intensidade máxima</li>
+                        </ul>
+                        <p><strong>Vantagens:</strong></p>
+                        <ul>
+                            <li>Máxima granularidade</li>
+                            <li>Escala universal (0-10)</li>
+                            <li>Muito sensível</li>
+                        </ul>
+                        <p><strong>Limitações:</strong></p>
+                        <ul>
+                            <li>⚠️ Alta carga cognitiva</li>
+                            <li>⚠️ Difícil rotular 10 níveis</li>
+                            <li>⚠️ Pode ser excessivo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recomendação Final -->
+            <div class="section">
+                <div class="recommendation-banner">
+                    <h3>🎯 Recomendação Final</h3>
+                    <p style="font-size: 1.2em; line-height: 1.8;">
+                        <strong>NÃO, LIKERT_5 não é o melhor para todas as perguntas!</strong><br>
+                        Use uma <strong>abordagem mista estratégica</strong>:
+                    </p>
+                </div>
+                
+                <h3>📊 Distribuição Recomendada</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">40%</div>
+                        <div class="stat-label">LIKERT_5<br>(Base sólida)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">20%</div>
+                        <div class="stat-label">LIKERT_7<br>(Nuances)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">15%</div>
+                        <div class="stat-label">ESCALA_VISUAL<br>(Circumplex)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">10%</div>
+                        <div class="stat-label">ESCALA_FREQUENCIA<br>(Comportamentos)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">10%</div>
+                        <div class="stat-label">MULTIPLA_ESCOLHA<br>(Categorias)</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number">5%</div>
+                        <div class="stat-label">Outros<br>(SIM_NAO, etc)</div>
+                    </div>
+                </div>
+                
+                <h3>✅ Plano de Ação</h3>
+                <div class="success-box">
+                    <h4>1. Revisar Perguntas Atuais (90% LIKERT_5)</h4>
+                    <ul>
+                        <li>Identifique perguntas sobre <strong>humor/emoções complexas</strong> → Trocar para <code>ESCALA_VISUAL</code> ou <code>LIKERT_7</code></li>
+                        <li>Identifique perguntas sobre <strong>frequência</strong> → Trocar para <code>ESCALA_FREQUENCIA</code></li>
+                        <li>Identifique perguntas sobre <strong>intensidade</strong> → Trocar para <code>ESCALA_INTENSIDADE</code></li>
+                        <li>Identifique perguntas sobre <strong>sintomas múltiplos</strong> → Trocar para <code>MULTIPLA_SELECAO</code></li>
+                        <li>Identifique perguntas de <strong>triagem (sim/não)</strong> → Trocar para <code>SIM_NAO</code></li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px;">2. Implementar Modelo Circumplex Corretamente</h4>
+                    <ul>
+                        <li>Para <strong>valencia</strong> (-1.0 a 1.0): Use <code>ESCALA_VISUAL</code> horizontal</li>
+                        <li>Para <strong>ativação</strong> (-1.0 a 1.0): Use <code>ESCALA_VISUAL</code> vertical</li>
+                        <li>Ou use <code>EMOJI_PICKER</code> mapeado para coordenadas do circumplex</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px;">3. Adaptar Banco de Perguntas Adaptativo</h4>
+                    <ul>
+                        <li>Revise <code>prisma/seed-banco-adaptativo.js</code></li>
+                        <li>Diversifique os <code>tipoPergunta</code> conforme a tabela acima</li>
+                        <li>Calibre parâmetros IRT para cada tipo de escala</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px;">4. Atualizar UI para Novos Tipos</h4>
+                    <ul>
+                        <li>Componente para <code>ESCALA_VISUAL</code> (slider contínuo)</li>
+                        <li>Componente para <code>ESCALA_FREQUENCIA</code> (labels específicas)</li>
+                        <li>Componente para <code>ESCALA_INTENSIDADE</code> (labels específicas)</li>
+                        <li>Componente para <code>MULTIPLA_SELECAO</code> (checkboxes)</li>
+                    </ul>
+                </div>
+                
+                <h3>📚 Referências Científicas</h3>
+                <div class="info-box">
+                    <ul>
+                        <li><strong>WHO-5:</strong> Usa LIKERT_5 (0-5) - Bem-estar geral</li>
+                        <li><strong>GAD-7:</strong> Usa escala 0-3 por item (ESCALA_FREQUENCIA) - Ansiedade</li>
+                        <li><strong>PHQ-9:</strong> Usa escala 0-3 por item (ESCALA_FREQUENCIA) - Depressão</li>
+                        <li><strong>PSS-10:</strong> Usa LIKERT_5 (1-5) - Estresse percebido</li>
+                        <li><strong>Modelo Circumplex (Russell):</strong> Usa escalas contínuas bidimensionais</li>
+                        <li><strong>Literatura IRT:</strong> Recomenda LIKERT_7 para maior discriminação</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Exemplo Prático -->
+            <div class="section">
+                <h2>💡 Exemplo Prático de Conversão</h2>
+                
+                <h3>❌ Antes (90% LIKERT_5)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pergunta</th>
+                            <th>Tipo Atual</th>
+                            <th>Problema</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>"Como você está se sentindo agora?"</td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>Humor é contínuo, não discreto</td>
+                        </tr>
+                        <tr>
+                            <td>"Intensidade da ansiedade"</td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>Ansiedade tem nuances sutis</td>
+                        </tr>
+                        <tr>
+                            <td>"Frequência de pensamentos negativos"</td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>Não usa labels de frequência</td>
+                        </tr>
+                        <tr>
+                            <td>"Sintomas físicos que teve"</td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>Pode ter múltiplos sintomas</td>
+                        </tr>
+                        <tr>
+                            <td>"Teve pensamentos de morte?"</td>
+                            <td><code>LIKERT_5</code></td>
+                            <td>Triagem binária é mais clara</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>✅ Depois (Abordagem Mista)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pergunta</th>
+                            <th>Tipo Recomendado</th>
+                            <th>Benefício</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>"Como você está se sentindo agora?"</td>
+                            <td><code>ESCALA_VISUAL</code></td>
+                            <td>Captura valencia/ativação no circumplex</td>
+                        </tr>
+                        <tr>
+                            <td>"Intensidade da ansiedade"</td>
+                            <td><code>LIKERT_7</code> ou <code>ESCALA_INTENSIDADE</code></td>
+                            <td>Mais granularidade, captura nuances</td>
+                        </tr>
+                        <tr>
+                            <td>"Frequência de pensamentos negativos"</td>
+                            <td><code>ESCALA_FREQUENCIA</code></td>
+                            <td>Labels claras: Nunca → Sempre</td>
+                        </tr>
+                        <tr>
+                            <td>"Sintomas físicos que teve"</td>
+                            <td><code>MULTIPLA_SELECAO</code></td>
+                            <td>Permite selecionar vários simultaneamente</td>
+                        </tr>
+                        <tr>
+                            <td>"Teve pensamentos de morte?"</td>
+                            <td><code>SIM_NAO</code></td>
+                            <td>Triagem clara, sem ambiguidade</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Conclusão -->
+            <div class="section">
+                <h2>🎯 Conclusão</h2>
+                
+                <div class="alert-box">
+                    <strong>Resposta Final:</strong><br>
+                    <p style="margin-top: 15px; font-size: 1.1em;">
+                        <strong>NÃO</strong>, LIKERT_5 <strong>NÃO é o melhor para todas as perguntas</strong>. 
+                        Usar 90% das perguntas em LIKERT_5 está <strong>subutilizando</strong> o potencial do sistema 
+                        e <strong>limitando a precisão</strong> das avaliações socioemocionais.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        A recomendação é diversificar para uma <strong>abordagem mista</strong>: 
+                        40% LIKERT_5 (base), 20% LIKERT_7 (nuances), 15% ESCALA_VISUAL (circumplex), 
+                        10% ESCALA_FREQUENCIA, 10% MULTIPLA_ESCOLHA, e 5% outros tipos.
+                    </p>
+                </div>
+                
+                <div class="success-box">
+                    <h4>✅ Benefícios da Diversificação:</h4>
+                    <ul>
+                        <li>📈 <strong>Maior precisão psicométrica</strong> - Tipos adequados para cada construto</li>
+                        <li>🎯 <strong>Melhor experiência do usuário</strong> - Perguntas mais intuitivas</li>
+                        <li>🧠 <strong>CAT mais eficiente</strong> - Informação de Fisher otimizada por tipo</li>
+                        <li>📊 <strong>Dados mais ricos</strong> - Nuances capturadas corretamente</li>
+                        <li>✅ <strong>Alinhamento com escalas validadas</strong> - WHO-5, GAD-7, PHQ-9</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

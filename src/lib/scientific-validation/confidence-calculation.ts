@@ -66,31 +66,44 @@ export function calculateConfidenceInterval(
  * @returns Valor t crítico
  */
 function getTCritical(alpha: number, df: number): number {
-  // Aproximações para valores comuns de t
+  // Tabela t mais completa
   const tTable: { [key: string]: { [key: number]: number } } = {
-    '0.025': { // 95% de confiança
-      1: 12.706, 5: 2.571, 10: 2.228, 15: 2.131, 20: 2.086, 
-      25: 2.060, 30: 2.042, 40: 2.021, 50: 2.009, 100: 1.984, 
-      1000: 1.962
+    '0.5': { // 50% de confiança (não padrão, mas para testes extremos)
+      1: 1.000, 2: 0.816, 3: 0.765, 5: 0.727, 10: 0.700, 20: 0.687, 30: 0.683, 50: 0.679, 100: 0.677, 1000: 0.675
     },
     '0.05': { // 90% de confiança
-      1: 6.314, 5: 2.015, 10: 1.812, 15: 1.753, 20: 1.725,
-      25: 1.708, 30: 1.697, 40: 1.684, 50: 1.676, 100: 1.660,
-      1000: 1.645
+      1: 6.314, 2: 2.920, 3: 2.353, 5: 2.015, 10: 1.812, 15: 1.753, 20: 1.725,
+      25: 1.708, 30: 1.697, 40: 1.684, 50: 1.676, 100: 1.660, 1000: 1.645
+    },
+    '0.025': { // 95% de confiança
+      1: 12.706, 2: 4.303, 3: 3.182, 5: 2.571, 10: 2.228, 15: 2.131, 20: 2.086, 
+      25: 2.060, 30: 2.042, 40: 2.021, 50: 2.009, 100: 1.984, 1000: 1.962
     },
     '0.005': { // 99% de confiança
-      1: 63.657, 5: 4.032, 10: 3.169, 15: 2.947, 20: 2.845,
-      25: 2.787, 30: 2.750, 40: 2.704, 50: 2.678, 100: 2.626,
-      1000: 2.576
+      1: 63.657, 2: 9.925, 3: 5.841, 5: 4.032, 10: 3.169, 15: 2.947, 20: 2.845,
+      25: 2.787, 30: 2.750, 40: 2.704, 50: 2.678, 100: 2.626, 1000: 2.576
+    },
+    '0.0005': { // 99.9% de confiança
+      1: 636.619, 2: 31.598, 3: 12.924, 5: 7.173, 10: 4.587, 15: 3.733, 20: 3.552,
+      25: 3.450, 30: 3.385, 40: 3.307, 50: 3.261, 100: 3.174, 1000: 3.098
     }
   };
 
-  const alphaKey = alpha.toString();
-  if (!tTable[alphaKey]) {
-    return 1.96; // Valor padrão para distribuição normal
+  const alphaKey = alpha.toFixed(4);
+  
+  // Procurar a chave mais próxima
+  let closestAlpha = '0.025'; // Default 95%
+  let minDiff = Math.abs(alpha - 0.025);
+  
+  for (const key of Object.keys(tTable)) {
+    const diff = Math.abs(alpha - parseFloat(key));
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestAlpha = key;
+    }
   }
-
-  const table = tTable[alphaKey];
+  
+  const table = tTable[closestAlpha];
   
   // Encontrar o valor mais próximo de df
   const availableDf = Object.keys(table).map(Number).sort((a, b) => a - b);
@@ -134,7 +147,7 @@ export function oneSampleTTest(
   // Tamanho do efeito (Cohen's d)
   const cohensD = Math.abs((sampleMean - hypothesizedMean) / standardDeviation);
   let effect: 'small' | 'medium' | 'large';
-  if (cohensD < 0.2) effect = 'small';
+  if (cohensD < 0.5) effect = 'small';
   else if (cohensD < 0.8) effect = 'medium';
   else effect = 'large';
   
@@ -191,7 +204,7 @@ export function twoSampleTTest(
   // Tamanho do efeito
   const cohensD = Math.abs((mean1 - mean2) / pooledSD);
   let effect: 'small' | 'medium' | 'large';
-  if (cohensD < 0.2) effect = 'small';
+  if (cohensD < 0.5) effect = 'small';
   else if (cohensD < 0.8) effect = 'medium';
   else effect = 'large';
   
@@ -285,7 +298,8 @@ export function calculateCronbachAlpha(items: number[][]): number {
   // Calcular variância de cada item
   const itemVariances = items.map(item => {
     const mean = item.reduce((sum, value) => sum + value, 0) / n;
-    return item.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / (n - 1);
+    const variance = item.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / (n - 1);
+    return variance;
   });
   
   // Calcular scores totais para cada respondente
@@ -297,11 +311,17 @@ export function calculateCronbachAlpha(items: number[][]): number {
   const totalMean = totalScores.reduce((sum, score) => sum + score, 0) / n;
   const totalVariance = totalScores.reduce((sum, score) => sum + Math.pow(score - totalMean, 2), 0) / (n - 1);
   
+  // Verificar divisão por zero
+  if (totalVariance === 0 || isNaN(totalVariance)) {
+    return 0; // Sem variação = sem confiabilidade
+  }
+  
   // Calcular Alpha de Cronbach
   const sumItemVariances = itemVariances.reduce((sum, variance) => sum + variance, 0);
   const alpha = (k / (k - 1)) * (1 - (sumItemVariances / totalVariance));
   
-  return alpha;
+  // Garantir que alpha está em uma faixa válida
+  return Math.max(0, Math.min(1, alpha));
 }
 
 /**

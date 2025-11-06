@@ -1,28 +1,35 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configurações para melhor hot reload em Docker
-  webpack: (config, { dev }) => {
-    // Habilitar polling para sistemas de arquivos que não suportam inotify
-    if (dev) {
-      config.watchOptions = {
-        poll: 1000, // Verificar mudanças a cada 1 segundo
-        aggregateTimeout: 300, // Aguardar 300ms antes de rebuildar
-      };
-    }
-    return config;
-  },
+  // 🚀 CONFIGURAÇÃO OTIMIZADA PARA TURBOPACK
   
-  // Configurações experimentais para melhor performance
+  // ⚡ OTIMIZAÇÕES DE IMPORTS (principais bibliotecas pesadas)
   experimental: {
-    // Melhor cache e hot reload
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-select',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tooltip',
+      'recharts',
+      'date-fns'
+    ],
+    // 🔧 CONFIGURAÇÕES TURBOPACK PARA HOT RELOAD
+    turbo: {
+      rules: {
+        '*.tsx': {
+          loaders: ['@turbo/loader-typescript'],
+          as: '*.tsx',
+        },
+      },
+    },
   },
   
-  // Configurações de desenvolvimento
-  env: {
-    CUSTOM_KEY: 'my-value',
-  },
+  // ⚡ DEVELOPMENT OTIMIZADO
+  compress: false, // Desabilitar compressão em dev
 };
 
 export default nextConfig;
