@@ -1,17 +1,14 @@
 // ==============================================
-// PRISMA SCHEMA - ClassCheck
-// Sistema de Questionários Adaptativos com Stack Recomendado:
-// - json-rules-engine (motor de regras)
-// - Zod (validação)
-// - Zustand (state management)
-// - React Hook Form (formulários)
-// - TanStack Query (cache/API)
+// PRISMA SCHEMA - ClassCheck (versão limpa pós-merge)
+// Mantida versão completa da branch develop e removidas duplicações.
 // ==============================================
 
+// Gerador do Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
+// Datasource principal (PostgreSQL)
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -21,7 +18,6 @@ datasource db {
 // MODELOS DO CLASSCHECK
 // ==============================================
 
-// Modelo Usuario
 model Usuario {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -63,7 +59,6 @@ model Usuario {
   @@map("usuarios")
 }
 
-// Modelo Professor  
 model Professor {
   id        Int      @id @default(autoincrement())
   nome      String
@@ -81,7 +76,6 @@ model Professor {
   @@map("professores")
 }
 
-// Modelo Aula
 model Aula {
   id          Int        @id @default(autoincrement())
   titulo      String
@@ -107,7 +101,6 @@ model Aula {
   @@map("aulas")
 }
 
-// Modelo Avaliacao (Humor/Feedback da aula)
 model Avaliacao {
   id        Int       @id @default(autoincrement())
   usuarioId Int
@@ -131,22 +124,21 @@ model Avaliacao {
 // NOVOS MODELOS - SISTEMA DE AVALIAÇÃO REESTRUTURADO
 // ==============================================
 
-// Modelo AvaliacaoSocioemocional (Questionário Adaptativo - Circumplex)
 model AvaliacaoSocioemocional {
   id        Int @id @default(autoincrement())
   usuarioId Int
   aulaId    Int
 
   // Dados do Modelo Circumplex
-  valencia       Float // -1.0 (negativo) a 1.0 (positivo)
-  ativacao       Float // -1.0 (baixa energia) a 1.0 (alta energia)
-  estadoPrimario String // "Animado", "Calmo", "Entediado", "Ansioso", etc.
-  confianca      Float // 0.0 a 1.0 (confiança da medição IRT)
+  valencia       Float
+  ativacao       Float
+  estadoPrimario String
+  confianca      Float
 
   // Metadados do questionário adaptativo
-  totalPerguntas Int // 5-12 perguntas
-  tempoResposta  Int // em segundos
-  respostas      String // JSON: [{perguntaId, valor, timestamp}]
+  totalPerguntas Int
+  tempoResposta  Int
+  respostas      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -155,41 +147,36 @@ model AvaliacaoSocioemocional {
   usuario Usuario @relation(fields: [usuarioId], references: [id])
   aula    Aula    @relation(fields: [aulaId], references: [id])
 
-  // Um usuário só pode fazer avaliação socioemocional uma vez por aula
   @@unique([usuarioId, aulaId])
   @@map("avaliacoes_socioemocionais")
 }
 
-// Modelo AvaliacaoDidatica (Avaliação do Conteúdo/Pedagogia)
 model AvaliacaoDidatica {
   id        Int @id @default(autoincrement())
   usuarioId Int
   aulaId    Int
 
   // Critérios didáticos (escala 1-5)
-  compreensaoConteudo Int // O quanto entendeu o conteúdo
-  ritmoAula           Int // Velocidade adequada (1=muito lento, 5=muito rápido, 3=ideal)
-  recursosDidaticos   Int // Qualidade dos slides, exemplos, materiais
-  engajamento         Int // Nível de envolvimento com a aula
+  compreensaoConteudo Int
+  ritmoAula           Int
+  recursosDidaticos   Int
+  engajamento         Int
 
   // Feedback estruturado (opcional)
-  pontoPositivo String? // O que funcionou bem
-  pontoMelhoria String? // O que pode melhorar
-  sugestao      String? // Sugestões específicas
+  pontoPositivo String?
+  pontoMelhoria String?
+  sugestao      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relacionamentos
   usuario Usuario @relation(fields: [usuarioId], references: [id])
   aula    Aula    @relation(fields: [aulaId], references: [id])
 
-  // Um usuário só pode fazer avaliação didática uma vez por aula
   @@unique([usuarioId, aulaId])
   @@map("avaliacoes_didaticas")
 }
 
-// Modelo AvaliacaoProfessor (Avaliação Periódica/Coletiva do Professor)
 model AvaliacaoProfessor {
   id          Int    @id @default(autoincrement())
   usuarioId   Int
@@ -197,29 +184,25 @@ model AvaliacaoProfessor {
   periodo     String // "2025-10" (ano-mês) - limita 1 avaliação por mês
 
   // Critérios de avaliação do professor (escala 1-5)
-  dominioConteudo   Int // Conhecimento da matéria
-  clarezaExplicacao Int // Didática e clareza
-  pontualidade      Int // Pontualidade e assiduidade
-  organizacao       Int // Organização das aulas
-  acessibilidade    Int // Disponibilidade para dúvidas
-  empatia           Int // Empatia com alunos
+  dominioConteudo   Int
+  clarezaExplicacao Int
+  pontualidade      Int
+  organizacao       Int
+  acessibilidade    Int
+  empatia           Int
 
-  // Comentário anônimo (opcional)
   comentario String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relacionamentos
   usuario   Usuario   @relation(fields: [usuarioId], references: [id])
   professor Professor @relation(fields: [professorId], references: [id])
 
-  // Um usuário só pode avaliar um professor uma vez por período
   @@unique([usuarioId, professorId, periodo])
   @@map("avaliacoes_professores")
 }
 
-// Modelo HumorRegistro (Registro diário de humor)
 model HumorRegistro {
   id         Int       @id @default(autoincrement())
   usuarioId  Int
@@ -228,31 +211,25 @@ model HumorRegistro {
   observacao String?
   createdAt  DateTime  @default(now())
 
-  // Relacionamentos
   usuario Usuario @relation(fields: [usuarioId], references: [id])
 
-  // Um usuário só pode registrar humor uma vez por dia
   @@unique([usuarioId, data])
   @@map("humor_registros")
 }
 
-// Modelo AulaFavorita
 model AulaFavorita {
   id        Int      @id @default(autoincrement())
   usuarioId Int
   aulaId    Int
   createdAt DateTime @default(now())
 
-  // Relacionamentos
   usuario Usuario @relation(fields: [usuarioId], references: [id])
   aula    Aula    @relation(fields: [aulaId], references: [id])
 
-  // Um usuário não pode favoritar a mesma aula duas vezes
   @@unique([usuarioId, aulaId])
   @@map("aulas_favoritas")
 }
 
-// Modelo Evento (Calendário)
 model Evento {
   id         Int        @id @default(autoincrement())
   titulo     String
@@ -261,11 +238,10 @@ model Evento {
   dataFim    DateTime?
   cor        String? // Hex color
   tipo       TipoEvento @default(EVENTO)
-  aulaId     Int? // Opcional, pode ser evento não relacionado a aula
+  aulaId     Int? // Opcional
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
-  // Relacionamentos
   aula Aula? @relation(fields: [aulaId], references: [id])
 
   @@map("eventos")
@@ -273,115 +249,71 @@ model Evento {
 
 // ==============================================
 // SISTEMA DE QUESTIONÁRIOS ADAPTATIVOS
-// Base de Perguntas + Motor de Regras (json-rules-engine)
 // ==============================================
 
-// Modelo QuestionarioSocioemocional (Template de Questionário)
 model QuestionarioSocioemocional {
   id        String  @id @default(uuid())
   titulo    String
   descricao String?
   versao    String  @default("1.0")
-
-  // Configurações
   tipo            TipoQuestionario
-  frequencia      FrequenciaQuestionario? // Para questionários recorrentes
-  duracaoEstimada Int? // Em minutos
-
-  // Contexto principal (NOVO!)
+  frequencia      FrequenciaQuestionario?
+  duracaoEstimada Int?
   contextoPrincipal ContextoTipo @default(GERAL)
-
-  // Categorias avaliadas
-  categorias String[] // ["humor", "ansiedade", "motivacao", "relacionamentos"]
-
-  // Configurações de adaptação
+  categorias String[]
   adaptativo     Boolean         @default(false)
   nivelAdaptacao NivelAdaptacao?
-
-  // Instruções e metadados
-  instrucoes       String? // Texto de introdução
-  instrucoesFinais String? // Texto de conclusão
-  tempoMinimo      Int? // Tempo mínimo recomendado (segundos)
-  tempoMaximo      Int? // Tempo máximo recomendado (segundos)
-
-  // Público-alvo
+  instrucoes       String?
+  instrucoesFinais String?
+  tempoMinimo      Int?
+  tempoMaximo      Int?
   idadeMinima Int?
   idadeMaxima Int?
-
-  // Status e controle
   ativo          Boolean @default(true)
-  oficial        Boolean @default(false) // Validado por psicólogos
+  oficial        Boolean @default(false)
   publicado      Boolean @default(false)
-  versaoAnterior String? // UUID do questionário anterior
-
-  // Auditoria
+  versaoAnterior String?
   criadoPorId  Int?
   criadoEm     DateTime  @default(now())
   atualizadoEm DateTime  @updatedAt
   publicadoEm  DateTime?
-
-  // Relacionamentos
   perguntas PerguntaSocioemocional[]
   sessoes   SessaoAdaptativa[]
   alertas   AlertaSocioemocional[]
   regras    RegraAdaptacao[]
-
   @@index([tipo, ativo])
   @@index([publicado, ativo])
-  @@index([contextoPrincipal, ativo]) // Novo índice para contexto
+  @@index([contextoPrincipal, ativo])
   @@map("questionarios_socioemocionais")
 }
 
-// Modelo PerguntaSocioemocional (Banco de Perguntas)
 model PerguntaSocioemocional {
   id             String @id @default(uuid())
   questionarioId String
-
-  // Conteúdo da pergunta
   texto         String
-  textoAuxiliar String? // Texto explicativo ou exemplo
+  textoAuxiliar String?
   categoria     CategoriaPergunta
   dominio       DominioEmocional
-
-  // Tipo e configuração
   tipoPergunta TipoPergunta
   obrigatoria  Boolean      @default(true)
-  ordem        Int // Ordem dentro do questionário
-
-  // Opções de resposta (JSON para flexibilidade)
-  opcoes Json? // Para multiple choice, checkboxes, etc
-  // Exemplo: [{"valor": 1, "label": "Discordo totalmente"}, ...]
-
-  // Validação
+  ordem        Int
+  opcoes Json?
   valorMinimo    Float?
   valorMaximo    Float?
-  padraoResposta String? // Regex para validar texto
-
-  // Metadados para adaptação
-  dificuldade   Float @default(0.5) // 0.0 = fácil, 1.0 = difícil (IRT)
-  discriminacao Float @default(1.0) // Poder discriminatório (IRT)
-  peso          Float @default(1.0) // Peso na pontuação final
-
-  // Escala de referência (se aplicável)
-  escalaNome String? // "WHO-5", "PHQ-9", "GAD-7", "PSS-10"
-  escalaItem String? // "WHO5_1", "PHQ9_2", etc
-
-  // Tags e busca
-  tags          String[] // ["ansiedade", "sono", "concentracao"]
-  palavrasChave String[] // Para busca semântica
-
-  // Status
+  padraoResposta String?
+  dificuldade   Float @default(0.5)
+  discriminacao Float @default(1.0)
+  peso          Float @default(1.0)
+  escalaNome String?
+  escalaItem String?
+  tags          String[]
+  palavrasChave String[]
   ativo    Boolean @default(true)
-  validada Boolean @default(false) // Validada por psicólogos
-
-  // Auditoria
+  validada Boolean @default(false)
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-
-  // Relacionamentos
   questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
   respostas    RespostaSocioemocional[]
-
   @@index([categoria, ativo])
   @@index([dominio, ativo])
   @@index([escalaNome])
@@ -389,214 +321,131 @@ model PerguntaSocioemocional {
   @@map("perguntas_socioemocionais")
 }
 
-// Modelo BancoPerguntasAdaptativo (Perguntas Dinâmicas)
 model BancoPerguntasAdaptativo {
   id String @id @default(uuid())
-
-  // Identificação
-  codigo        String  @unique // "GAD7_001", "PHQ9_005"
+  codigo        String  @unique
   titulo        String
   texto         String
   textoAuxiliar String?
-
-  // Classificação
   categoria    CategoriaPergunta
   dominio      DominioEmocional
-  subcategoria String? // Subcategoria específica
-
-  // Tipo e configuração
+  subcategoria String?
   tipoPergunta TipoPergunta
-  opcoes       Json? // Opções de resposta
-
-  // Metadados IRT (Item Response Theory)
-  parametroA Float @default(1.0) // Discriminação
-  parametroB Float @default(0.0) // Dificuldade
-  parametroC Float @default(0.0) // Chute (para múltipla escolha)
-
-  // Escala de referência
+  opcoes       Json?
+  parametroA Float @default(1.0)
+  parametroB Float @default(0.0)
+  parametroC Float @default(0.0)
   escalaNome   String?
   escalaItem   String?
   escalaVersao String?
-
-  // Condições de uso
-  condicoes Json? // Regras para quando usar esta pergunta
-  // Exemplo: {"minimumScore": 5, "domains": ["ansiedade", "sono"]}
-
-  // Uso e estatísticas
+  condicoes Json?
   vezesUsada         Int    @default(0)
-  taxaResposta       Float? // Taxa de resposta completa
-  tempoMedioResposta Int? // Segundos
-
-  // Status
+  taxaResposta       Float?
+  tempoMedioResposta Int?
   ativo    Boolean @default(true)
   validada Boolean @default(false)
-
-  // Relacionamentos
-  respostas RespostaSocioemocional[] // Respostas que usaram esta pergunta
-
-  // Auditoria
+  respostas RespostaSocioemocional[]
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-
   @@index([categoria, dominio, ativo])
   @@index([escalaNome])
   @@index([codigo])
   @@map("banco_perguntas_adaptativo")
 }
 
-// Modelo RegraAdaptacao (Motor de Regras - json-rules-engine)
 model RegraAdaptacao {
   id             String @id @default(uuid())
   questionarioId String
-
-  // Identificação
   nome       String
   descricao  String?
-  prioridade Int     @default(0) // Maior = mais prioritária
-
-  // Condições (JSON compatível com json-rules-engine)
+  prioridade Int     @default(0)
   condicoes Json
-  // Exemplo: {"all": [{"fact": "ansiedade", "operator": "greaterThan", "value": 7}]}
-
-  // Ações a executar quando regra é ativada
   acoes Json
-  // Exemplo: [{"type": "INSERIR_PERGUNTA", "params": {"perguntaId": "..."}}]
-
-  // Metadados
   tipoCondicao TipoCondicao
   tipoAcao     TipoAcao[]
-
-  // Configurações
   executarUmaVez Boolean @default(false)
   executarSempre Boolean @default(false)
   ordemExecucao  Int     @default(0)
-
-  // Evento que dispara a regra
   eventoGatilho EventoGatilho?
-
-  // Status e estatísticas
   ativo             Boolean   @default(true)
   vezesAcionada     Int       @default(0)
   ultimoAcionamento DateTime?
-
-  // Auditoria
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-
-  // Relacionamento
   questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
-
   @@index([questionarioId, ativo, prioridade])
   @@index([tipoCondicao, tipoAcao])
   @@map("regras_adaptacao")
 }
 
-// Modelo SessaoAdaptativa (Sessão de Resposta em Tempo Real)
 model SessaoAdaptativa {
   id             String @id @default(uuid())
   usuarioId      Int
   questionarioId String
-
-  // Estado da sessão
   status    StatusSessao @default(EM_ANDAMENTO)
-  progresso Float        @default(0.0) // 0.0 a 1.0
-
-  // Contexto da sessão (NOVO!)
+  progresso Float        @default(0.0)
   contextoTipo     ContextoTipo @default(GERAL)
-  contextoMetadata Json? // Dados extras do contexto (origem, detalhes, etc)
-
-  // Perguntas e respostas
-  perguntasApresentadas String[] // Array de UUIDs
-  perguntasRespondidas  String[] // Array de UUIDs
-  perguntaAtual         String? // UUID da pergunta atual
-  proximaPergunta       String? // UUID (pré-calculado)
-
-  // Estimativas adaptativas (IRT)
-  thetaEstimado Float? // Theta atual (nível do traço latente)
-  erroEstimacao Float? // Erro padrão da estimativa
-  confianca     Float? // Confiança da medição (0-1)
-
-  // Alertas em tempo real
+  contextoMetadata Json?
+  perguntasApresentadas String[]
+  perguntasRespondidas  String[]
+  perguntaAtual         String?
+  proximaPergunta       String?
+  thetaEstimado Float?
+  erroEstimacao Float?
+  confianca     Float?
   nivelAlerta    NivelAlerta @default(VERDE)
-  alertasGerados String[] // Array de UUIDs de alertas
-
-  // Tempo e metadata
+  alertasGerados String[]
   iniciadoEm         DateTime  @default(now())
-  pausadoEm          DateTime? // Quando foi pausada
+  pausadoEm          DateTime?
   finalizadoEm       DateTime?
   tempoTotalSegundos Int?
-  tempoMedioResposta Int? // Tempo médio por resposta em segundos
-
-  // Estimativas e scores
-  totalPerguntasEstimado Int? // Total estimado de perguntas (para adaptativos)
-  scoresPorCategoria     Json? // Scores finais por categoria { "BEM_ESTAR": 7, "SONO": 6 }
-
-  // Contexto adicional
-  contexto    Json? // Dados extras (localização, humor prévio, etc) - DEPRECATED, use contextoMetadata
-  dispositivo String? // "mobile", "desktop", "tablet"
-  aulaId      Int? // ID da aula (se contexto = AULA)
-  eventoId    String? // ID do evento (se contexto = EVENTO)
-
-  // Relacionamentos
+  tempoMedioResposta Int?
+  totalPerguntasEstimado Int?
+  scoresPorCategoria     Json?
+  contexto    Json?
+  dispositivo String?
+  aulaId      Int?
+  eventoId    String?
   usuario      Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
   aula         Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
   respostas    RespostaSocioemocional[]
   alertas      AlertaSocioemocional[]
-
   @@index([usuarioId, status])
   @@index([questionarioId, status])
   @@index([nivelAlerta])
-  @@index([contextoTipo, status]) // Novo índice para queries por contexto
+  @@index([contextoTipo, status])
   @@map("sessoes_adaptativas")
 }
 
-// Modelo RespostaSocioemocional (Respostas das Perguntas)
 model RespostaSocioemocional {
   id         String  @id @default(uuid())
   sessaoId   String
-  perguntaId String? // OPCIONAL: pode ser do questionário ou do banco adaptativo
+  perguntaId String?
   usuarioId  Int
-
-  // Referência ao banco adaptativo (alternativa ao perguntaId)
-  perguntaBancoId String? // ID da pergunta no BancoPerguntasAdaptativo
-
-  // Resposta
-  valor            Json // Valor da resposta (pode ser string, number, array, etc)
-  valorNumerico    Float? // Valor numérico quando aplicável
-  valorTexto       String? // Valor texto quando aplicável
-  valorNormalizado Float? // Valor normalizado para cálculos (0.0 a 1.0)
-
-  // Categoria e domínio (denormalizado para queries rápidas)
+  perguntaBancoId String?
+  valor            Json
+  valorNumerico    Float?
+  valorTexto       String?
+  valorNormalizado Float?
   categoria  CategoriaPergunta?
   dominio    DominioEmocional?
-  escalaNome String? // Nome da escala (ex: "WHO5", "PHQ9")
-  escalaItem String? // Item da escala (ex: "PHQ9_9")
-
-  // Metadados da resposta
-  tempoResposta Int // Tempo em segundos para responder
+  escalaNome String?
+  escalaItem String?
+  tempoResposta Int
   tentativas    Int      @default(1)
-  alterada      Boolean  @default(false) // Se mudou a resposta
-  respondidoEm  DateTime @default(now()) // Timestamp de resposta
-
-  // Análise emocional (Modelo Circumplex)
-  valencia Float? // -1.0 (negativo) a 1.0 (positivo)
-  ativacao Float? // -1.0 (baixa energia) a 1.0 (alta energia)
-
-  // IRT - Item Response Theory
-  thetaAposResposta Float? // Theta estimado após esta resposta
-  contribuicaoInfo  Float? // Contribuição de informação desta resposta
-
-  // Contexto
+  alterada      Boolean  @default(false)
+  respondidoEm  DateTime @default(now())
+  valencia Float?
+  ativacao Float?
+  thetaAposResposta Float?
+  contribuicaoInfo  Float?
   timestamp DateTime @default(now())
-  ordem     Int // Ordem da resposta na sessão
-
-  // Relacionamentos
+  ordem     Int
   sessao        SessaoAdaptativa        @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
   pergunta      PerguntaSocioemocional? @relation(fields: [perguntaId], references: [id])
   perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
   usuario       Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
   @@index([sessaoId, ordem])
   @@index([usuarioId, timestamp])
   @@index([perguntaId])
@@ -604,78 +453,53 @@ model RespostaSocioemocional {
   @@map("respostas_socioemocionais")
 }
 
-// Modelo AlertaSocioemocional (Sistema de Alertas)
 model AlertaSocioemocional {
   id             String  @id @default(uuid())
   usuarioId      Int
   sessaoId       String?
   questionarioId String
-
-  // Classificação do alerta
   nivel     NivelAlerta
   tipo      TipoAlerta
   categoria CategoriaPergunta
   dominio   DominioEmocional?
-
-  // Conteúdo
   titulo        String
-  mensagem      String? // Mensagem curta do alerta
+  mensagem      String?
   descricao     String
-  recomendacoes Json? // Array de ações recomendadas
-
-  // Dados que geraram o alerta
-  dadosContexto   Json // Respostas e scores que acionaram
-  regrasAcionadas String[] // UUIDs das regras que geraram o alerta
-
-  // Pontuações
+  recomendacoes Json?
+  dadosContexto   Json
+  regrasAcionadas String[]
   scoreTotal   Float?
   scoreDominio Float?
-  desvioMedia  Float? // Quantos desvios da média do usuário
-
-  // Status e tratamento
+  desvioMedia  Float?
   status       StatusAlerta @default(PENDENTE)
-  ativo        Boolean      @default(true) // Se o alerta ainda está ativo
+  ativo        Boolean      @default(true)
   lido         Boolean      @default(false)
   lidoEm       DateTime?
   notificado   Boolean      @default(false)
   notificadoEm DateTime?
-
-  // Ações tomadas
-  acao         String? // "ENCAMINHADO_PSICOLOGO", "LIGACAO_FEITA", etc
+  acao         String?
   observacoes  String?
   resolvidoEm  DateTime?
-  resolvidoPor Int? // ID do profissional que tratou
-
-  // Auditoria
+  resolvidoPor Int?
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-
-  // Relacionamentos
   usuario      Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   sessao       SessaoAdaptativa?          @relation(fields: [sessaoId], references: [id])
   questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
-
   @@index([usuarioId, nivel, status])
   @@index([nivel, status, criadoEm])
   @@index([categoria, nivel])
   @@map("alertas_socioemocionais")
 }
 
-// Modelo HistoricoEmocional (Evolução Temporal)
 model HistoricoEmocional {
   id        String @id @default(uuid())
   usuarioId Int
-
-  // Período
   data    DateTime
-  periodo PeriodoHistorico // DIA, SEMANA, MES
-
-  // Métricas do Modelo Circumplex
-  valenciaMedia   Float // -1.0 a 1.0
-  ativacaoMedia   Float // -1.0 a 1.0
-  estadoDominante String // "Animado", "Calmo", "Ansioso", etc
-
-  // Domínios emocionais (scores 0-10)
+  periodo PeriodoHistorico
+  valenciaMedia   Float
+  ativacaoMedia   Float
+  estadoDominante String
   scoreHumor           Float?
   scoreAnsiedade       Float?
   scoreEstresse        Float?
@@ -683,28 +507,17 @@ model HistoricoEmocional {
   scoreSono            Float?
   scoreRelacionamentos Float?
   scoreAutoestima      Float?
-
-  // Estatísticas
   totalAvaliacoes Int    @default(0)
-  taxaResposta    Float? // % de questionários respondidos
-
-  // Tendências
-  tendenciaValencia String? // "CRESCENTE", "ESTAVEL", "DECRESCENTE"
+  taxaResposta    Float?
+  tendenciaValencia String?
   tendenciaAtivacao String?
-
-  // Alertas no período
   totalAlertas     Int @default(0)
   alertasVermelhos Int @default(0)
   alertasLaranjas  Int @default(0)
   alertasAmarelos  Int @default(0)
-
-  // Comparação com média
-  desvioValencia Float? // Desvio da média geral
+  desvioValencia Float?
   desvioAtivacao Float?
-
-  // Relacionamento
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
   @@unique([usuarioId, data, periodo])
   @@index([usuarioId, periodo, data])
   @@map("historico_emocional")
@@ -714,136 +527,81 @@ model HistoricoEmocional {
 // SISTEMA DE GAMIFICAÇÃO
 // ==============================================
 
-// Modelo Conquista (Achievements)
 model Conquista {
   id String @id @default(uuid())
-
-  // Identificação
-  codigo    String             @unique // "FIRST_CHECKIN", "STREAK_7_DAYS"
+  codigo    String             @unique
   titulo    String
   descricao String
   categoria CategoriaConquista
-
-  // Recompensas
-  xp    Int // XP ganho ao conquistar
-  icone String // Nome do ícone ou URL
-  cor   String? // Cor associada (hex)
-
-  // Dificuldade
+  xp    Int
+  icone String
+  cor   String?
   raridade Raridade
-
-  // Critérios
-  criterios Json // Condições para desbloquear
-  // Exemplo: {"checkinsTotal": 30, "diasConsecutivos": 7}
-
-  // Status
+  criterios Json
   ativo  Boolean @default(true)
-  oculta Boolean @default(false) // Conquista secreta
-
-  // Relacionamento
+  oculta Boolean @default(false)
   usuarios UsuarioConquista[]
-
   @@index([categoria, raridade])
   @@map("conquistas")
 }
 
-// Modelo UsuarioConquista (Join table)
 model UsuarioConquista {
   id          String @id @default(uuid())
   usuarioId   Int
   conquistaId String
-
-  // Metadata
   conquistadoEm DateTime @default(now())
-  progresso     Float    @default(1.0) // 0.0 a 1.0
+  progresso     Float    @default(1.0)
   notificado    Boolean  @default(false)
-
-  // Relacionamentos
   usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   conquista Conquista @relation(fields: [conquistaId], references: [id])
-
   @@unique([usuarioId, conquistaId])
   @@index([usuarioId])
   @@map("usuarios_conquistas")
 }
 
-// Modelo Badge (Distintivos)
 model Badge {
   id String @id @default(uuid())
-
-  // Identificação
   codigo    String @unique
   titulo    String
   descricao String
-
-  // Visual
   icone    String
   cor      String?
-  animacao String? // URL de animação (Lottie, GIF)
-
-  // Tipo
+  animacao String?
   tipo      TipoBadge
   categoria CategoriaBadge
-
-  // Critérios
   criterios Json
-
-  // Status
   ativo Boolean @default(true)
-
-  // Relacionamento
   usuarios UsuarioBadge[]
-
   @@map("badges")
 }
 
-// Modelo UsuarioBadge (Join table)
 model UsuarioBadge {
   id        String @id @default(uuid())
   usuarioId Int
   badgeId   String
-
-  // Metadata
   conquistadoEm DateTime @default(now())
-  nivel         Int      @default(1) // Alguns badges têm níveis
-
-  // Relacionamentos
+  nivel         Int      @default(1)
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   badge   Badge   @relation(fields: [badgeId], references: [id])
-
   @@unique([usuarioId, badgeId])
   @@index([usuarioId])
   @@map("usuarios_badges")
 }
 
-// Modelo CheckIn (Check-ins diários)
 model CheckIn {
   id        String @id @default(uuid())
   usuarioId Int
-
-  // Data e hora
   data DateTime @default(now())
-  hora String // "08:30", "14:45"
-
-  // Humor rápido (0-10)
+  hora String
   humor Int
-  emoji String? // Emoji escolhido
-
-  // Observações opcionais
+  emoji String?
   observacao String?
-  atividades String[] // ["estudou", "exercicio", "amigos"]
-
-  // Contexto
-  localizacao String? // "casa", "escola", "trabalho"
-  clima       String? // "ensolarado", "chuvoso"
-
-  // Gamificação
+  atividades String[]
+  localizacao String?
+  clima       String?
   xpGanho Int @default(10)
-  streak  Int @default(1) // Dias consecutivos
-
-  // Relacionamento
+  streak  Int @default(1)
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
   @@unique([usuarioId, data])
   @@index([usuarioId, data])
   @@map("checkins")
@@ -853,46 +611,28 @@ model CheckIn {
 // NOTIFICAÇÕES E LEMBRETES
 // ==============================================
 
-// Modelo Notificacao
 model Notificacao {
   id        String @id @default(uuid())
   usuarioId Int
-
-  // Conteúdo
   tipo     TipoNotificacao
   titulo   String
   mensagem String
-  dados    Json? // Dados extras (IDs, links, etc)
-
-  // Visual
+  dados    Json?
   icone      String?
   cor        String?
   prioridade PrioridadeNotificacao @default(NORMAL)
-
-  // Ação
-  acao      String? // Rota para navegar
-  acaoLabel String? // "Ver agora", "Responder", etc
-
-  // Status
+  acao      String?
+  acaoLabel String?
   lida      Boolean   @default(false)
   lidaEm    DateTime?
   enviada   Boolean   @default(false)
   enviadaEm DateTime?
-
-  // Agendamento
   agendadaPara DateTime?
   expiraEm     DateTime?
-
-  // Canais
   pushNotification  Boolean @default(false)
   emailNotification Boolean @default(false)
-
-  // Auditoria
   criadoEm DateTime @default(now())
-
-  // Relacionamento
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
   @@index([usuarioId, lida, criadoEm])
   @@index([tipo, enviada])
   @@map("notificacoes")
@@ -902,31 +642,19 @@ model Notificacao {
 // LOGS E AUDITORIA
 // ==============================================
 
-// Modelo LogAtividade
 model LogAtividade {
   id        String @id @default(uuid())
   usuarioId Int?
-
-  // Atividade
   tipo       TipoLog
-  acao       String // "LOGIN", "RESPOSTA_QUESTIONARIO", "VISUALIZOU_ALERTA"
-  entidade   String? // "Usuario", "Questionario", "Alerta"
-  entidadeId String? // UUID da entidade
-
-  // Dados
+  acao       String
+  entidade   String?
+  entidadeId String?
   dados Json?
-
-  // Contexto técnico
   ipAddress   String?
   userAgent   String?
   dispositivo String?
-
-  // Timestamp
   criadoEm DateTime @default(now())
-
-  // Relacionamento
   usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-
   @@index([usuarioId, tipo, criadoEm])
   @@index([tipo, criadoEm])
   @@map("logs_atividades")
@@ -936,6 +664,12 @@ model LogAtividade {
 // ENUMS
 // ==============================================
 
+// (Enums duplicados removidos - ver seção final do arquivo para definições únicas)
+
+// ==============================================
+// DEFINIÇÕES ÚNICAS DE ENUMS (versão final)
+// ==============================================
+
 enum Role {
   ALUNO
   PROFESSOR
@@ -943,11 +677,11 @@ enum Role {
 }
 
 enum TipoHumor {
-  MUITO_TRISTE // 😢 1
-  TRISTE // 😕 2  
-  NEUTRO // 😐 3
-  FELIZ // 🙂 4
-  MUITO_FELIZ // 😄 5
+  MUITO_TRISTE
+  TRISTE
+  NEUTRO
+  FELIZ
+  MUITO_FELIZ
 }
 
 enum StatusAula {
@@ -965,18 +699,14 @@ enum TipoEvento {
   REUNIAO
 }
 
-// ==============================================
-// ENUMS DO SISTEMA ADAPTATIVO
-// ==============================================
-
 enum TipoQuestionario {
   CHECK_IN_DIARIO
   AVALIACAO_SEMANAL
   AVALIACAO_MENSAL
   AVALIACAO_POS_AULA
-  AVALIACAO_CRITICA // Momento de crise/intervenção
-  QUESTIONARIO_INICIAL // Onboarding
-  QUESTIONARIO_FINAL // Fim do período
+  AVALIACAO_CRITICA
+  QUESTIONARIO_INICIAL
+  QUESTIONARIO_FINAL
   PESQUISA_SATISFACAO
   AUTOAVALIACAO
 }
@@ -993,10 +723,10 @@ enum FrequenciaQuestionario {
 }
 
 enum NivelAdaptacao {
-  BAIXO // Apenas skip logic básico
-  MEDIO // Regras condicionais simples
-  ALTO // Regras complexas + banco de perguntas
-  MUITO_ALTO // IRT + Machine Learning
+  BAIXO
+  MEDIO
+  ALTO
+  MUITO_ALTO
 }
 
 enum CategoriaPergunta {
@@ -1021,73 +751,72 @@ enum CategoriaPergunta {
 }
 
 enum DominioEmocional {
-  // Modelo Circumplex de Russell
-  ANIMADO // Alta ativação + Valência positiva
+  ANIMADO
   ENTUSIASMADO
   EUFÓRICO
   EXCITADO
   FELIZ
   CONTENTE
-  CALMO // Baixa ativação + Valência positiva
+  CALMO
   RELAXADO
   SERENO
   TRANQUILO
-  ENTEDIADO // Baixa ativação + Valência negativa
+  ENTEDIADO
   CANSADO
   DEPRIMIDO
   LETARGICO
   TRISTE
-  ANSIOSO // Alta ativação + Valência negativa
+  ANSIOSO
   ESTRESSADO
   NERVOSO
   TENSO
   IRRITADO
-  NEUTRO // Centro (0,0)
+  NEUTRO
 }
 
 enum TipoPergunta {
-  LIKERT_5 // 1-5 (Discordo totalmente → Concordo totalmente)
-  LIKERT_7 // 1-7
-  LIKERT_10 // 0-10
-  ESCALA_VISUAL // Slider visual
-  MULTIPLA_ESCOLHA // Apenas uma opção
-  MULTIPLA_SELECAO // Múltiplas opções (checkboxes)
-  TEXTO_CURTO // Input text (max 200 chars)
-  TEXTO_LONGO // Textarea (max 1000 chars)
-  SIM_NAO // Boolean
-  EMOJI_PICKER // Seletor de emojis
-  SLIDER_NUMERICO // Range slider
-  ESCALA_FREQUENCIA // "Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"
-  ESCALA_INTENSIDADE // "Nada", "Pouco", "Moderado", "Muito", "Extremamente"
-  DATA // Date picker
-  HORA // Time picker
-  RANKING // Ordenar opções por preferência
+  LIKERT_5
+  LIKERT_7
+  LIKERT_10
+  ESCALA_VISUAL
+  MULTIPLA_ESCOLHA
+  MULTIPLA_SELECAO
+  TEXTO_CURTO
+  TEXTO_LONGO
+  SIM_NAO
+  EMOJI_PICKER
+  SLIDER_NUMERICO
+  ESCALA_FREQUENCIA
+  ESCALA_INTENSIDADE
+  DATA
+  HORA
+  RANKING
 }
 
 enum TipoCondicao {
-  VALOR_EXATO // resposta === valor
-  VALOR_DIFERENTE // resposta !== valor
-  MAIOR_QUE // resposta > valor
-  MENOR_QUE // resposta < valor
-  MAIOR_OU_IGUAL // resposta >= valor
-  MENOR_OU_IGUAL // resposta <= valor
-  RANGE_NUMERICO // valor entre X e Y
-  CONTEM_TEXTO // resposta.includes(texto)
-  MULTIPLAS_RESPOSTAS // array de respostas
-  PADRAO_TEMPORAL // análise de histórico
-  DESVIO_PADRAO // desvio > X da média
-  TENDENCIA // tendência crescente/decrescente
+  VALOR_EXATO
+  VALOR_DIFERENTE
+  MAIOR_QUE
+  MENOR_QUE
+  MAIOR_OU_IGUAL
+  MENOR_OU_IGUAL
+  RANGE_NUMERICO
+  CONTEM_TEXTO
+  MULTIPLAS_RESPOSTAS
+  PADRAO_TEMPORAL
+  DESVIO_PADRAO
+  TENDENCIA
 }
 
 enum TipoAcao {
-  INSERIR_PERGUNTA // Adiciona pergunta específica
-  PULAR_SECAO // Pula próxima seção
-  FINALIZAR_QUESTIONARIO // Encerra questionário
-  BUSCAR_BANCO // Busca pergunta no banco adaptativo
-  CRIAR_ALERTA // Gera alerta socioemocional
-  NOTIFICAR_PROFISSIONAL // Envia notificação para psicólogo
-  ALTERAR_FLUXO // Muda sequência de perguntas
-  RECOMENDAR_RECURSO // Sugere recurso de apoio
+  INSERIR_PERGUNTA
+  PULAR_SECAO
+  FINALIZAR_QUESTIONARIO
+  BUSCAR_BANCO
+  CRIAR_ALERTA
+  NOTIFICAR_PROFISSIONAL
+  ALTERAR_FLUXO
+  RECOMENDAR_RECURSO
 }
 
 enum EventoGatilho {
@@ -1108,17 +837,17 @@ enum StatusSessao {
 }
 
 enum ContextoTipo {
-  GERAL // Questionários especializados (/avaliacoes/*)
-  AULA // Avaliação socioemocional de aula
-  CHECK_IN // Check-in diário
-  EVENTO // Eventos especiais (futuro)
+  GERAL
+  AULA
+  CHECK_IN
+  EVENTO
 }
 
 enum NivelAlerta {
-  VERDE // Tudo OK
-  AMARELO // Atenção leve
-  LARANJA // Preocupação moderada
-  VERMELHO // Urgente - intervenção necessária
+  VERDE
+  AMARELO
+  LARANJA
+  VERMELHO
 }
 
 enum TipoAlerta {
@@ -1151,13 +880,13 @@ enum PeriodoHistorico {
 }
 
 enum CategoriaConquista {
-  ENGAJAMENTO // Check-ins, respostas
-  CONSISTENCIA // Streaks, regularidade
-  PROGRESSO // Melhoras no bem-estar
-  SOCIAL // Interações, ajuda
-  APRENDIZADO // Completar tutoriais
-  ESPECIAL // Eventos especiais
-  SECRETA // Conquistas ocultas
+  ENGAJAMENTO
+  CONSISTENCIA
+  PROGRESSO
+  SOCIAL
+  APRENDIZADO
+  ESPECIAL
+  SECRETA
 }
 
 enum Raridade {
@@ -1169,18 +898,18 @@ enum Raridade {
 }
 
 enum TipoBadge {
-  PERMANENTE // Badge que nunca expira
-  TEMPORARIO // Badge por tempo limitado
-  PROGRESSIVO // Badge com níveis (Bronze → Prata → Ouro)
-  SAZONAL // Badge de eventos especiais
+  PERMANENTE
+  TEMPORARIO
+  PROGRESSIVO
+  SAZONAL
 }
 
 enum CategoriaBadge {
-  FREQUENCIA // "7 dias seguidos"
-  CONQUISTA // "100 check-ins"
-  QUALIDADE // "10 respostas completas"
-  ESPECIAL // Eventos, datas comemorativas
-  ELITE // Top performers
+  FREQUENCIA
+  CONQUISTA
+  QUALIDADE
+  ESPECIAL
+  ELITE
 }
 
 enum TipoNotificacao {
