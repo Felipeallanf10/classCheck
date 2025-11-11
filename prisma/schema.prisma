@@ -18,9 +18,14 @@ datasource db {
 // MODELOS DO CLASSCHECK
 // ==============================================
 
+<<<<<<< HEAD
+=======
+// Modelo Usuario (Unificado: ALUNO, PROFESSOR, ADMIN)
+>>>>>>> feature/auth-and-roles
 model Usuario {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  senha     String   // Hash bcrypt da senha
   nome      String
   avatar    String?
   role      Role     @default(ALUNO)
@@ -28,29 +33,40 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Gamificação
+  // Campos específicos de PROFESSOR (nullable)
+  materia String? // Apenas para role PROFESSOR
+
+  // Gamificação (para ALUNO)
   xpTotal      Int @default(0)
   nivel        Int @default(1)
   proximoNivel Int @default(100)
 
-  // Relacionamentos - Sistema Original
+  // Relacionamentos - Como ALUNO
   avaliacoes                Avaliacao[]
   avaliacoesSocioemocionais AvaliacaoSocioemocional[]
   avaliacoesDidaticas       AvaliacaoDidatica[]
-  avaliacoesProfessores     AvaliacaoProfessor[]
+  avaliacoesProfessores     AvaliacaoProfessor[] // Como aluno avaliando professor
   humorRegistros            HumorRegistro[]
   aulasFavoritas            AulaFavorita[]
-
-  // Relacionamentos - Sistema Adaptativo
-  sessoesAdaptativas       SessaoAdaptativa[]
-  respostasSocioemocionais RespostaSocioemocional[]
-  alertasSocioemocionais   AlertaSocioemocional[]
-  historicoEmocional       HistoricoEmocional[]
+  sessoesAdaptativas        SessaoAdaptativa[]
+  respostasSocioemocionais  RespostaSocioemocional[]
+  alertasSocioemocionais    AlertaSocioemocional[]
+  historicoEmocional        HistoricoEmocional[]
+  logsAdaptativos           LogAdaptativo[]
+  metricasSocioemocionais   MetricaSocioemocional[]
 
   // Relacionamentos - Gamificação
   conquistas UsuarioConquista[]
   badges     UsuarioBadge[]
   checkIns   CheckIn[]
+
+  // Relacionamentos - Como PROFESSOR
+  aulasMinistradas           Aula[]               @relation("ProfessorAulas")
+  avaliacoesRecebidas        AvaliacaoProfessor[] @relation("AvaliacoesProfessor") // Como professor sendo avaliado
+  turmasProfessor            TurmaProfessor[]     // Turmas que leciona (como professor)
+
+  // Relacionamentos - Como ALUNO
+  turmasAluno TurmaAluno[] // Turmas que frequenta (como aluno)
 
   // Relacionamentos - Sistema
   notificacoes Notificacao[]
@@ -59,23 +75,85 @@ model Usuario {
   @@map("usuarios")
 }
 
+<<<<<<< HEAD
 model Professor {
+=======
+// ==============================================
+// MODELOS DE TURMAS E ORGANIZAÇÃO
+// ==============================================
+
+// Modelo Turma
+model Turma {
+>>>>>>> feature/auth-and-roles
   id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  materia   String
-  avatar    String?
+  nome      String // "3º Ano A", "Turma 301", etc.
+  codigo    String   @unique // "3A", "301", etc.
+  ano       String // "2025", "3º Ano", etc.
+  periodo   Periodo  @default(MANHA)
+  ativa     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  aulas      Aula[]
+  alunos     TurmaAluno[]
+  professores TurmaProfessor[]
+
+  @@map("turmas")
+}
+
+// Tabela de junção: Turma ↔ Aluno (N:N)
+model TurmaAluno {
+  id        Int      @id @default(autoincrement())
+  turmaId   Int
+  alunoId   Int
+  matricula String? // Número de matrícula (opcional)
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relacionamentos
-  aulas                 Aula[]
-  avaliacoesProfessores AvaliacaoProfessor[]
+  turma Turma   @relation(fields: [turmaId], references: [id])
+  aluno Usuario @relation(fields: [alunoId], references: [id])
 
-  @@map("professores")
+  @@unique([turmaId, alunoId])
+  @@map("turmas_alunos")
 }
 
+<<<<<<< HEAD
+=======
+// Tabela de junção: Turma ↔ Professor (N:N)
+model TurmaProfessor {
+  id          Int      @id @default(autoincrement())
+  turmaId     Int
+  professorId Int
+  materia     String // Matéria que leciona nessa turma
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  turma     Turma   @relation(fields: [turmaId], references: [id])
+  professor Usuario @relation(fields: [professorId], references: [id])
+
+  @@unique([turmaId, professorId, materia])
+  @@map("turmas_professores")
+}
+
+// Enum para períodos
+enum Periodo {
+  MANHA
+  TARDE
+  NOITE
+  INTEGRAL
+}
+
+// ==============================================
+// MODELO AULA (atualizado com turmaId)
+// ==============================================
+
+// Modelo Aula
+>>>>>>> feature/auth-and-roles
 model Aula {
   id          Int        @id @default(autoincrement())
   titulo      String
@@ -84,13 +162,15 @@ model Aula {
   dataHora    DateTime
   duracao     Int // em minutos
   professorId Int
+  turmaId     Int? // Turma onde a aula acontece (nullable para aulas sem turma definida)
   sala        String?
   status      StatusAula @default(AGENDADA)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   // Relacionamentos
-  professor                 Professor                 @relation(fields: [professorId], references: [id])
+  professor                 Usuario                   @relation("ProfessorAulas", fields: [professorId], references: [id])
+  turma                     Turma?                    @relation(fields: [turmaId], references: [id])
   avaliacoes                Avaliacao[]
   avaliacoesSocioemocionais AvaliacaoSocioemocional[]
   avaliacoesDidaticas       AvaliacaoDidatica[]
@@ -196,8 +276,14 @@ model AvaliacaoProfessor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+<<<<<<< HEAD
   usuario   Usuario   @relation(fields: [usuarioId], references: [id])
   professor Professor @relation(fields: [professorId], references: [id])
+=======
+  // Relacionamentos
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  professor Usuario @relation("AvaliacoesProfessor", fields: [professorId], references: [id])
+>>>>>>> feature/auth-and-roles
 
   @@unique([usuarioId, professorId, periodo])
   @@map("avaliacoes_professores")
@@ -399,6 +485,7 @@ model SessaoAdaptativa {
   pausadoEm          DateTime?
   finalizadoEm       DateTime?
   tempoTotalSegundos Int?
+<<<<<<< HEAD
   tempoMedioResposta Int?
   totalPerguntasEstimado Int?
   scoresPorCategoria     Json?
@@ -411,6 +498,28 @@ model SessaoAdaptativa {
   aula         Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
   respostas    RespostaSocioemocional[]
   alertas      AlertaSocioemocional[]
+=======
+  tempoMedioResposta Int? // Tempo médio por resposta em segundos
+
+  // Estimativas e scores
+  totalPerguntasEstimado Int? // Total estimado de perguntas (para adaptativos)
+  scoresPorCategoria     Json? // Scores finais por categoria { "BEM_ESTAR": 7, "SONO": 6 }
+
+  // Contexto adicional
+  contexto    Json? // Dados extras (localização, humor prévio, etc) - DEPRECATED, use contextoMetadata
+  dispositivo String? // "mobile", "desktop", "tablet"
+  aulaId      Int? // ID da aula (se contexto = AULA)
+  eventoId    String? // ID do evento (se contexto = EVENTO)
+
+  // Relacionamentos
+  usuario         Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  questionario    QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
+  aula            Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
+  respostas       RespostaSocioemocional[]
+  alertas         AlertaSocioemocional[]
+  logsAdaptativos LogAdaptativo[]
+
+>>>>>>> feature/auth-and-roles
   @@index([usuarioId, status])
   @@index([questionarioId, status])
   @@index([nivelAlerta])
@@ -441,11 +550,22 @@ model RespostaSocioemocional {
   thetaAposResposta Float?
   contribuicaoInfo  Float?
   timestamp DateTime @default(now())
+<<<<<<< HEAD
   ordem     Int
   sessao        SessaoAdaptativa        @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
   pergunta      PerguntaSocioemocional? @relation(fields: [perguntaId], references: [id])
   perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
   usuario       Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+=======
+  ordem     Int // Ordem da resposta na sessão
+
+  // Relacionamentos
+  sessao        SessaoAdaptativa          @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
+  pergunta      PerguntaSocioemocional?   @relation(fields: [perguntaId], references: [id])
+  perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
+  usuario       Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+>>>>>>> feature/auth-and-roles
   @@index([sessaoId, ordem])
   @@index([usuarioId, timestamp])
   @@index([perguntaId])
@@ -492,6 +612,141 @@ model AlertaSocioemocional {
   @@map("alertas_socioemocionais")
 }
 
+<<<<<<< HEAD
+=======
+// Modelo LogAdaptativo (Logs Técnicos de Adaptação)
+model LogAdaptativo {
+  id        String @id @default(uuid())
+  sessaoId  String
+  usuarioId Int
+
+  // Informações da pergunta
+  perguntaId      String // UUID da pergunta selecionada
+  perguntaBancoId String? // ID da pergunta no banco adaptativo
+
+  // Decisão adaptativa
+  regraAplicada String // Nome da regra/algoritmo que selecionou esta pergunta
+  motivoSelecao String? // Motivo da seleção (ex: "Máxima informação IRT", "Regra clínica X")
+  algoritmo     String  @default("IRT") // IRT, REGRA, HIBRIDO, ALEATORIO
+
+  // Parâmetros IRT no momento da seleção
+  thetaAtual       Float? // Theta estimado no momento
+  informacaoFisher Float? // Informação de Fisher da pergunta
+  parametroA       Float? // Discriminação
+  parametroB       Float? // Dificuldade
+  parametroC       Float? // Acerto casual
+
+  // Contexto da decisão
+  perguntasDisponiveis Int? // Quantas perguntas estavam disponíveis
+  categoria            String? // Categoria da pergunta selecionada
+  dominio              String? // Domínio emocional
+
+  // Resultado da resposta
+  respostaValor     Json? // Valor da resposta dada
+  thetaAposResposta Float? // Theta após processar esta resposta
+  erroAposResposta  Float? // Erro padrão após esta resposta
+
+  // Gatilhos e condições
+  gatilhosAtivados   String[] // Gatilhos que foram acionados
+  condicoesAvaliadas Json? // Condições que foram avaliadas
+
+  // Metadata
+  ordem        Int // Ordem desta pergunta na sessão
+  timestamp    DateTime @default(now())
+  tempoDecisao Int? // Tempo em ms para tomar a decisão
+
+  // Performance
+  cacheHit Boolean @default(false) // Se a próxima pergunta veio do cache
+  fonte    String? // "BANCO", "QUESTIONARIO_BASE", "REGRA_CLINICA"
+
+  // Relacionamentos
+  sessao  SessaoAdaptativa @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
+  usuario Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([sessaoId, ordem])
+  @@index([usuarioId, timestamp])
+  @@index([regraAplicada, timestamp])
+  @@index([algoritmo, timestamp])
+  @@map("logs_adaptativos")
+}
+
+// Modelo MetricaSocioemocional (Agregações para Performance)
+model MetricaSocioemocional {
+  id        String @id @default(uuid())
+  usuarioId Int
+
+  // Período de agregação
+  periodoInicio DateTime
+  periodoFim    DateTime
+  granularidade GranularidadeMetrica // DIARIA, SEMANAL, MENSAL, TRIMESTRAL
+
+  // Categoria/Domínio
+  categoria CategoriaPergunta?
+  dominio   DominioEmocional?
+
+  // Scores agregados (0-10)
+  scoreMinimo Float
+  scoreMaximo Float
+  scoreMedio  Float
+  scoreMediana Float?
+  desvioPadrao Float?
+
+  // IRT agregado
+  thetaMedio      Float?
+  thetaMinimo     Float?
+  thetaMaximo     Float?
+  confiancaMedia  Float?
+
+  // Modelo Circumplex
+  valenciaMedia  Float? // -1.0 a 1.0
+  ativacaoMedia  Float? // -1.0 a 1.0
+
+  // Estatísticas
+  totalSessoes    Int
+  totalRespostas  Int
+  taxaResposta    Float? // % de perguntas respondidas
+  tempoMedioResposta Float? // segundos
+
+  // Tendências
+  tendencia       String? // "ASCENDENTE", "ESTAVEL", "DESCENDENTE"
+  variacaoPercent Float? // % de mudança em relação ao período anterior
+
+  // Alertas gerados no período
+  alertasVermelhos Int @default(0)
+  alertasLaranjas  Int @default(0)
+  alertasAmarelos  Int @default(0)
+
+  // Escalas clínicas (quando aplicável)
+  scorePHQ9       Float?
+  scoreGAD7       Float?
+  scoreWHO5       Float?
+
+  // Metadata
+  calculadoEm DateTime @default(now())
+  versao      String   @default("1.0") // Para versionamento de cálculos
+
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, categoria, granularidade, periodoInicio], name: "usuarioId_categoria_granularidade_periodoInicio")
+  @@index([usuarioId, periodoInicio, periodoFim])
+  @@index([categoria, periodoInicio])
+  @@index([granularidade, periodoInicio])
+  @@index([calculadoEm])
+  @@map("metricas_socioemocionais")
+}
+
+// Enum para granularidade
+enum GranularidadeMetrica {
+  DIARIA
+  SEMANAL
+  MENSAL
+  TRIMESTRAL
+  ANUAL
+}
+
+// Modelo HistoricoEmocional (Evolução Temporal)
+>>>>>>> feature/auth-and-roles
 model HistoricoEmocional {
   id        String @id @default(uuid())
   usuarioId Int

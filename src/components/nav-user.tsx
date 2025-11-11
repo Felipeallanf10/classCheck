@@ -1,13 +1,15 @@
 "use client"
 
 import {
-  BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
+  Settings,
+  User,
 } from "lucide-react"
+import { signOut } from "next-auth/react"
+import { useSession } from "@/hooks/useSession"
+import Link from "next/link"
 
 import {
   Avatar,
@@ -30,16 +32,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar()
+  const { data: session } = useSession()
+
+  if (!session) return null
+
+  const user = {
+    name: session.user.name || "Usuário",
+    email: session.user.email || "",
+    avatar: session.user.image || "",
+    role: session.user.role,
+    materia: session.user.materia,
+  }
 
   return (
     <SidebarMenu>
@@ -52,7 +57,9 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">FA</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -71,40 +78,48 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs text-muted-foreground capitalize">
+                    {user.role.toLowerCase()}
+                    {user.materia && ` • ${user.materia}`}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+              <DropdownMenuItem asChild>
+                <Link href="/perfil" className="cursor-pointer">
+                  <User />
+                  Perfil
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/configuracoes" className="cursor-pointer">
+                  <Settings />
+                  Configurações
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/notificacoes" className="cursor-pointer">
+                  <Bell />
+                  Notificações
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="text-red-600 focus:text-red-600 cursor-pointer"
+            >
               <LogOut />
-              Log out
+              Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

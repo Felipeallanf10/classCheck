@@ -21,6 +21,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/hooks/useSession';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -39,7 +40,7 @@ interface Contexto {
 
 interface QuestionarioIniciarProps {
   questionarioId: string;
-  usuarioId?: number; // Temporário até implementar autenticação
+  usuarioId?: number; // Opcional, se não fornecido pega da sessão
   contexto?: Contexto;
   titulo?: string;
   descricao?: string;
@@ -49,7 +50,7 @@ interface QuestionarioIniciarProps {
 
 export function QuestionarioIniciar({
   questionarioId,
-  usuarioId = 3, // TODO: Pegar do contexto de autenticação
+  usuarioId: usuarioIdProp,
   contexto = { tipo: 'GERAL' },
   titulo,
   descricao,
@@ -57,10 +58,20 @@ export function QuestionarioIniciar({
   className,
 }: QuestionarioIniciarProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [isIniciando, setIsIniciando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Usa o usuarioId da prop ou pega da sessão
+  const usuarioId = usuarioIdProp || (session?.user?.id ? parseInt(session.user.id) : undefined);
+
   const iniciarSessao = async () => {
+    // Se não tem usuarioId prop e não está autenticado, mostra erro
+    if (!usuarioIdProp && !session?.user?.id) {
+      setErro('Usuário não autenticado');
+      return;
+    }
+
     setIsIniciando(true);
     setErro(null);
 
@@ -70,7 +81,7 @@ export function QuestionarioIniciar({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           questionarioId,
-          usuarioId,
+          ...(usuarioIdProp && { usuarioId: usuarioIdProp }), // Apenas envia se foi passado explicitamente
           contexto,
         }),
       });

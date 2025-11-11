@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       sugestao,
     } = body
 
-    // Pegar ID do usuário atual (temporário - será substituído por auth real)
-    const usuarioId = getCurrentUserId()
+    // Pegar ID do usuário autenticado
+    const usuarioId = await getCurrentUserId()
 
     // Criar avaliação didática
     const avaliacao = await prisma.avaliacaoDidatica.create({
@@ -53,7 +53,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const aulaId = searchParams.get('aulaId')
-    const usuarioId = searchParams.get('usuarioId') || '52' // TODO: pegar do auth
 
     if (!aulaId) {
       return NextResponse.json(
@@ -62,10 +61,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Pegar ID do usuário autenticado
+    const usuarioId = await getCurrentUserId()
+
     const avaliacao = await prisma.avaliacaoDidatica.findUnique({
       where: {
         usuarioId_aulaId: {
-          usuarioId: parseInt(usuarioId),
+          usuarioId,
           aulaId: parseInt(aulaId),
         },
       },

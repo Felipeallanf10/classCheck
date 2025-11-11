@@ -86,32 +86,37 @@ export default function AvaliarProfessorPage() {
       try {
         setLoading(true)
         
-        // Mock data
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Buscar dados do professor
+        const profResponse = await fetch(`/api/usuarios/${professorId}`)
+        if (!profResponse.ok) throw new Error('Professor não encontrado')
+        const profData = await profResponse.json()
         
         setProfessor({
-          id: Number(professorId),
-          nome: 'Prof. Ana Costa',
-          disciplina: 'Geografia',
-          avatar: undefined
+          id: profData.id,
+          nome: profData.nome,
+          disciplina: profData.materia || 'Não informado',
+          avatar: profData.avatar
         })
         
-        // Verificar se já avaliou (mock - seria API)
-        const hoje = new Date()
-        const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`
-        const jaAvaliouKey = `avaliacao-professor-${professorId}-${mesAtual}`
-        const jaAvaliouStorage = localStorage.getItem(jaAvaliouKey)
-        
-        setJaAvaliou(!!jaAvaliouStorage)
+        // Verificar se já avaliou este professor neste mês
+        const checkResponse = await fetch(`/api/avaliacoes/professor?professorId=${professorId}`)
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json()
+          setJaAvaliou(checkData.jaAvaliou)
+        }
       } catch (err) {
         console.error(err)
+        toast.error({
+          title: "Erro",
+          description: "Não foi possível carregar os dados do professor"
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [professorId])
+  }, [professorId, toast])
 
   const handleNotaChange = (criterioId: string, nota: number) => {
     setNotas(prev => ({ ...prev, [criterioId]: nota }))
@@ -135,22 +140,43 @@ export default function AvaliarProfessorPage() {
     setSubmitting(true)
 
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const response = await fetch('/api/avaliacoes/professor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          professorId: Number(professorId),
+          dominioConteudo: notas.dominioConteudo,
+          clarezaExplicacao: notas.clarezaExplicacao,
+          pontualidade: notas.pontualidade,
+          organizacao: notas.organizacao,
+          acessibilidade: notas.acessibilidade,
+          empatia: notas.empatia,
+          comentario: comentario || null,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.erro || 'Erro ao enviar avaliação')
+      }
       
-      // Salvar no localStorage (simulação)
-      const hoje = new Date()
-      const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`
-      const jaAvaliouKey = `avaliacao-professor-${professorId}-${mesAtual}`
-      localStorage.setItem(jaAvaliouKey, JSON.stringify({ notas, comentario, data: hoje.toISOString() }))
-      
-      toast.success("✅ Avaliação enviada com sucesso! Obrigado por contribuir para a melhoria do ensino.")
+      toast.success({
+        title: "✅ Avaliação enviada com sucesso!",
+        description: "Obrigado por contribuir para a melhoria do ensino."
+      })
       
       setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
+        router.push(`/professores/${professorId}/avaliar/sucesso`)
+      }, 1500)
     } catch (err) {
-      toast.error("Erro ao enviar avaliação. Tente novamente mais tarde.")
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao enviar avaliação'
+      toast.error({
+        title: "Erro",
+        description: errorMessage
+      })
     } finally {
       setSubmitting(false)
     }

@@ -2,36 +2,26 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useSession } from "@/hooks/useSession"
 import {
-  AudioWaveform,
   Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
   Home, 
-  Star, 
   Calendar, 
   Heart, 
-  BarChart3, 
   FileText, 
   Trophy, 
   Target, 
   BookOpen, 
   Settings,
-  Bot,
   HelpCircle, 
   Mail, 
   Info, 
-  Shield, 
-  LifeBuoy,
-  Activity,
-  Users,
-  TrendingUp,
+  Shield,
   Brain,
-  AlertTriangle
+  Users,
+  ClipboardList,
+  School,
+  UserCheck,
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -48,180 +38,89 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "Felipe",
-    email: "felipe@classcheck.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+// Navegação por ROLE
+const navItemsByRole = {
+  ALUNO: [
+    { label: "Dashboard", icon: Home, href: "/dashboard" },
+    { label: "Avaliar Aulas", icon: ClipboardList, href: "/aulas" },
+    { label: "Avaliar Professores", icon: UserCheck, href: "/professores" },
+    { label: "Minhas Avaliações", icon: Target, href: "/minhas-avaliacoes" },
+    { label: "Check-in Diário", icon: Heart, href: "/check-in" },
   ],
-  navMain: [
+  PROFESSOR: [
+    { label: "Dashboard", icon: Home, href: "/dashboard" },
+    { label: "Turmas", icon: Users, href: "/professor/turmas" },
+    { label: "Aulas", icon: BookOpen, href: "/aulas" },
+  ],
+  ADMIN: [
+    { label: "Dashboard", icon: Home, href: "/dashboard" },
+    { label: "Usuários", icon: Users, href: "/admin/usuarios" },
+    { label: "Turmas", icon: School, href: "/admin/turmas" },
+  ],
+}
+
+// Relatórios por ROLE
+const relatoriosByRole = {
+  ALUNO: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Relatórios",
+      url: "/relatorios",
+      icon: FileText,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        { title: "Visão Geral", url: "/relatorios" },
+        { title: "Minha Jornada Emocional", url: "/relatorios/meu-estado-emocional" },
       ],
     },
   ],
-  projects: [
+  PROFESSOR: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      title: "Relatórios",
+      url: "/relatorios",
+      icon: FileText,
+      items: [
+        { title: "Visão Geral", url: "/relatorios" },
+        { title: "Relatórios da Turma", url: "/professor/relatorios" },
+      ],
     },
+  ],
+  ADMIN: [
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      title: "Relatórios",
+      url: "/relatorios",
+      icon: FileText,
+      items: [
+        { title: "Visão Geral", url: "/relatorios" },
+        { title: "Relatórios do Sistema", url: "/admin/relatorios" },
+      ],
     },
   ],
 }
 
-
-const navItems = [
-  { label: "Início", icon: Home, href: "/dashboard" },
-  { label: "Aulas", icon: BookOpen, href: "/aulas" },
-  { label: "Professores", icon: Star, href: "/professores" },
-  { label: "Check-in Diário", icon: Heart, href: "/check-in" },
-  { label: "Avaliações", icon: Brain, href: "/avaliacoes/questionarios" },
-  { label: "Minhas Avaliações", icon: Target, href: "/minhas-avaliacoes" },
-  { label: "Gamificação", icon: Trophy, href: "/gamificacao" },
-]
-
-// Itens de relatórios com sub-menu
-const relatoriosItems = [
-  {
-    title: "Relatórios",
-    url: "/relatorios",
-    icon: BarChart3,
-    items: [
-      {
-        title: "Visão Geral",
-        url: "/relatorios",
-      },
-      {
-        title: "Minha Jornada Emocional",
-        url: "/relatorios/meu-estado-emocional",
-      },
-    ],
-  },
-]
-
-// Seção de páginas institucionais
+// Seção de páginas institucionais (igual para todos)
 const institutionalItems = [
+  { label: "Configurações", icon: Settings, href: "/configuracoes" },
   { label: "Central de Ajuda", icon: HelpCircle, href: "/ajuda" },
   { label: "Contato", icon: Mail, href: "/contato" },
   { label: "Sobre", icon: Info, href: "/sobre" },
 ]
 
-// Seção de políticas (no footer)
+// Seção de políticas no footer (igual para todos)
 const policyItems = [
   { label: "Privacidade", icon: Shield, href: "/politica-de-privacidade" },
   { label: "Termos", icon: FileText, href: "/termos-de-uso" },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession()
+  
+  // Se não tiver sessão, não renderiza sidebar
+  if (!session) return null
+  
+  const userRole = session.user.role as keyof typeof navItemsByRole
+  
+  // Pega os itens de navegação baseado no role
+  const navItems = navItemsByRole[userRole] || navItemsByRole.ALUNO
+  const relatoriosItems = relatoriosByRole[userRole] || relatoriosByRole.ALUNO
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -299,7 +198,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
         
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
