@@ -6,7 +6,7 @@
         "dev": "next dev",
         "dev:turbo": "next dev --turbo",
         "dev:fast": "next dev --turbo --port 3000",
-        "dev:poll": "cross-env WATCHPACK_POLLING=true next dev",
+        "dev:poll": "WATCHPACK_POLLING=true next dev",
         "dev:debug": "next dev --inspect",
         "postinstall": "prisma generate",
         "build": "prisma generate && next build",
