@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getCurrentUserId } from '@/lib/auth-temp';
 
 // Força a rota a ser dinâmica
 export const dynamic = 'force-dynamic';
@@ -15,11 +16,8 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    
-    // TODO: Pegar usuário da sessão autenticada
-    // Por enquanto, usar ID fixo do usuário de teste
-    const usuarioId = parseInt(searchParams.get('usuarioId') || '52');
+    // Pegar ID do usuário autenticado
+    const usuarioId = await getCurrentUserId();
     
     if (!usuarioId) {
       return NextResponse.json(

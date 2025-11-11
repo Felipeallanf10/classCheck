@@ -6,6 +6,7 @@ import { z } from 'zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { EmailInput, PasswordInput, LoadingButton } from '@/components/ui'
@@ -50,7 +51,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { toast } = useToast()
+  const { toast: toastHelpers } = useToast()
   
   const {
     register,
@@ -63,38 +64,44 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    console.log('Dados do login:', data)
     
     try {
-      // Simula chamada de API
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast.success("Login realizado com sucesso!")
-      
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
-    } catch {
-      toast.error("Verifique suas credenciais e tente novamente.")
-    } finally {
+      const result = await signIn('credentials', {
+        email: data.email,
+        senha: data.password,
+        redirect: false,
+      })
+
+      console.log('Resultado do signIn:', result)
+
+      if (result?.error) {
+        console.error('Erro no login:', result.error)
+        toastHelpers.error("Email ou senha inválidos")
+        setIsLoading(false)
+      } else if (result?.ok) {
+        toastHelpers.success("Login realizado com sucesso!")
+        
+        // Aguardar um pouco para garantir que a sessão foi criada
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Redirecionamento para dashboard após login bem-sucedido
+        window.location.href = '/dashboard'
+      }
+    } catch (error) {
+      console.error('Erro no login:', error)
+      toastHelpers.error("Erro ao fazer login. Tente novamente.")
       setIsLoading(false)
     }
   }
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true)
-    console.log("Login com Google")
     
     try {
-      // Simula chamada de API do Google
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast.success("Login com Google realizado!")
-      
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
+      // TODO: Configurar Google Provider no NextAuth
+      await signIn('google', { callbackUrl: '/dashboard' })
     } catch {
-      toast.error("Erro no login com Google. Tente novamente.")
-    } finally {
+      toastHelpers.error("Erro no login com Google. Tente novamente.")
       setIsGoogleLoading(false)
     }
   }

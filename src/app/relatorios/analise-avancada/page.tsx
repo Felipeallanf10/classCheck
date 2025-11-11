@@ -29,18 +29,19 @@ import { DashboardAnalise } from '@/components/relatorios/DashboardAnalise';
 import { MetricasAgregadas } from '@/lib/analytics/metricas-avaliacoes';
 import { format, subDays, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-// TODO: Pegar ID do usuário da sessão
-const USUARIO_ID = 52;
+import { useSession } from '@/hooks/useSession';
 
 type PeriodoFiltro = 'ultimos7dias' | 'ultimos30dias' | 'ultimos3meses' | 'todos';
 
 export default function RelatorioAvancadoPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [metricas, setMetricas] = useState<MetricasAgregadas | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [periodoFiltro, setPeriodoFiltro] = useState<PeriodoFiltro>('ultimos30dias');
+
+  const usuarioId = session?.user?.id ? parseInt(session.user.id) : 0;
 
   useEffect(() => {
     fetchMetricas();
@@ -70,9 +71,7 @@ export default function RelatorioAvancadoPage() {
           break;
       }
 
-      const params = new URLSearchParams({
-        usuarioId: USUARIO_ID.toString(),
-      });
+      const params = new URLSearchParams();
 
       if (periodoInicio) {
         params.append('periodoInicio', periodoInicio);

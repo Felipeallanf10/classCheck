@@ -71,13 +71,14 @@ export interface MinhasAvaliacoesData {
 }
 
 /**
- * Hook para buscar todas as avaliações do usuário
+ * Hook para buscar todas as avaliações do usuário autenticado
  */
 export function useMinhasAvaliacoes(usuarioId: number) {
   return useQuery({
     queryKey: ['minhas-avaliacoes', usuarioId],
     queryFn: async (): Promise<MinhasAvaliacoesData> => {
-      const response = await fetch(`/api/avaliacoes/minhas?usuarioId=${usuarioId}`);
+      // A API pega o usuário da sessão automaticamente
+      const response = await fetch(`/api/avaliacoes/minhas`);
 
       if (!response.ok) {
         const error = await response.json();

@@ -73,7 +73,7 @@ async function main() {
 
   // Buscar usuário de teste (ID 52) - ALUNO
   const usuario = await prisma.usuario.findUnique({
-    where: { id: 52 }
+    where: { id: 5}
   });
 
   if (!usuario) {
@@ -84,15 +84,23 @@ async function main() {
   console.log(`✅ Usuário (aluno) encontrado: ${usuario.nome}`);
 
   // Buscar ou criar professor de exemplo
-  let professor = await prisma.professor.findFirst({
-    where: { email: 'prof.teste@classcheck.com' }
+  let professor = await prisma.usuario.findFirst({
+    where: { 
+      email: 'prof.teste@classcheck.com',
+      role: 'PROFESSOR'
+    }
   });
 
   if (!professor) {
-    professor = await prisma.professor.create({
+    const bcrypt = await import('bcryptjs');
+    const senhaHash = await bcrypt.hash('senha123', 10);
+    
+    professor = await prisma.usuario.create({
       data: {
         nome: 'Prof. Maria Silva',
         email: 'prof.teste@classcheck.com',
+        senha: senhaHash,
+        role: 'PROFESSOR',
         materia: 'Geral',
         ativo: true,
       }
