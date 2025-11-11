@@ -28,7 +28,11 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
     '/insights',
     '/relatorios',
     '/ajuda',
-    '/eventos'
+    '/eventos',
+    '/professor', // Rotas do professor (/professor/turmas, etc)
+    '/admin', // Rotas do admin (/admin/usuarios, /admin/turmas, etc)
+    '/perfil', // Página de perfil
+    '/notificacoes', // Página de notificações
   ]
   
   // Rotas que são páginas institucionais (devem ter footer)

@@ -6,14 +6,8 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Redireciona root `/` para dashboard apropriado baseado no role
-    if (path === "/" && token) {
-      if (token.role === "ADMIN" || token.role === "PROFESSOR") {
-        return NextResponse.redirect(new URL("/analytics", req.url))
-      } else {
-        return NextResponse.redirect(new URL("/dashboard", req.url))
-      }
-    }
+    // NÃO redirecionar `/` - é a landing page pública
+    // Usuários logados podem ver a landing page normalmente
 
     return NextResponse.next()
   },
@@ -29,6 +23,7 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for:
+     * - / (landing page pública)
      * - /login (página de login)
      * - /cadastro (página de cadastro)
      * - /reset-password (página de recuperação de senha)
@@ -36,6 +31,6 @@ export const config = {
      * - /_next/* (arquivos do Next.js)
      * - /favicon.ico, /robots.txt (arquivos estáticos)
      */
-    "/((?!login|cadastro|reset-password|api/auth|_next|favicon.ico|robots.txt|emotions).*)",
+    "/((?!^/$|login|cadastro|reset-password|api/auth|_next|favicon.ico|robots.txt|emotions).*)",
   ],
 }

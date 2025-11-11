@@ -51,7 +51,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { toast } = useToast()
+  const { toast: toastHelpers } = useToast()
   
   const {
     register,
@@ -68,22 +68,28 @@ export default function LoginPage() {
     try {
       const result = await signIn('credentials', {
         email: data.email,
-        senha: data.password, // O NextAuth espera 'senha' como definido em authOptions
+        senha: data.password,
         redirect: false,
       })
 
+      console.log('Resultado do signIn:', result)
+
       if (result?.error) {
-        toast.error("Email ou senha inválidos")
-      } else {
-        toast.success("Login realizado com sucesso!")
+        console.error('Erro no login:', result.error)
+        toastHelpers.error("Email ou senha inválidos")
+        setIsLoading(false)
+      } else if (result?.ok) {
+        toastHelpers.success("Login realizado com sucesso!")
         
-        // Redirecionamento após sucesso (o middleware vai redirecionar para o dashboard correto)
-        router.push('/')
-        router.refresh()
+        // Aguardar um pouco para garantir que a sessão foi criada
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Redirecionamento para dashboard após login bem-sucedido
+        window.location.href = '/dashboard'
       }
-    } catch {
-      toast.error("Erro ao fazer login. Tente novamente.")
-    } finally {
+    } catch (error) {
+      console.error('Erro no login:', error)
+      toastHelpers.error("Erro ao fazer login. Tente novamente.")
       setIsLoading(false)
     }
   }
@@ -93,9 +99,9 @@ export default function LoginPage() {
     
     try {
       // TODO: Configurar Google Provider no NextAuth
-      await signIn('google', { callbackUrl: '/' })
+      await signIn('google', { callbackUrl: '/dashboard' })
     } catch {
-      toast.error("Erro no login com Google. Tente novamente.")
+      toastHelpers.error("Erro no login com Google. Tente novamente.")
       setIsGoogleLoading(false)
     }
   }

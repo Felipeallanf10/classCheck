@@ -19,7 +19,7 @@ import { Search, Filter, AlertCircle, Sparkles, FileCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QuestionarioSelectorProps {
-  usuarioId: number;
+  usuarioId?: number; // Opcional - se não fornecido, API pega da sessão
   onQuestionarioSelect?: (questionarioId: string, sessaoId: string) => void;
 }
 
@@ -55,7 +55,7 @@ export function QuestionarioSelector({ usuarioId, onQuestionarioSelect }: Questi
         },
         body: JSON.stringify({
           questionarioId,
-          usuarioId,
+          ...(usuarioId && { usuarioId }), // Apenas envia se foi passado como prop
           contexto: {
             origem: 'questionario-selector',
             dispositivo: 'desktop',

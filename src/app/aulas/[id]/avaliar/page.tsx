@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useSession } from '@/hooks/useSession'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -16,9 +17,6 @@ interface Aula {
   dataHora: string
 }
 
-// TODO: Substituir por autenticação real
-const CURRENT_USER_ID = 52
-
 // ID do questionário adaptativo para avaliação de impacto de aula
 // Referência: prisma/seed-questionario-aula.js
 const QUESTIONARIO_TRIAGEM_ID = 'questionario-impacto-aula'
@@ -27,6 +25,7 @@ export default function AvaliarAulaPage() {
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
+  const { data: session } = useSession()
   const aulaId = params.id as string
   
   const [aula, setAula] = useState<Aula | null>(null)
@@ -57,6 +56,14 @@ export default function AvaliarAulaPage() {
   }, [aulaId, router, toast])
 
   const handleIniciarAvaliacaoAdaptativa = async () => {
+    if (!session?.user?.id) {
+      toast.error({
+        title: "Erro",
+        description: "Você precisa estar autenticado para avaliar uma aula"
+      })
+      return
+    }
+
     setIniciando(true)
 
     try {
@@ -68,7 +75,7 @@ export default function AvaliarAulaPage() {
         },
         body: JSON.stringify({
           questionarioId: QUESTIONARIO_TRIAGEM_ID,
-          usuarioId: CURRENT_USER_ID,
+          // usuarioId não precisa ser enviado, API pega da sessão
           aulaId: parseInt(aulaId), // Vincular à aula
           contexto: {
             origem: 'avaliacao-aula',

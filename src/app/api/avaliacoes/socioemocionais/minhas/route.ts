@@ -9,8 +9,8 @@ const prisma = new PrismaClient()
 
 export async function GET() {
   try {
-    // Pegar ID do usuário atual (temporário - será substituído por auth real)
-    const usuarioId = getCurrentUserId()
+    // Pegar ID do usuário autenticado
+    const usuarioId = await getCurrentUserId()
 
     // Buscar todas as avaliações socioemocionais do usuário
     const avaliacoes = await prisma.avaliacaoSocioemocional.findMany({

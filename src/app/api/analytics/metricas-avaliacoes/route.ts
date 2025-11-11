@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calcularMetricasAgregadas, AvaliacaoAulaCompleta } from '@/lib/analytics/metricas-avaliacoes';
+import { getCurrentUserId } from '@/lib/auth-temp';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/analytics/metricas-avaliacoes
  * 
- * Retorna métricas agregadas e análises avançadas das avaliações do usuário
+ * Retorna métricas agregadas e análises avançadas das avaliações do usuário autenticado
  * 
  * Query params:
- * - usuarioId: number (obrigatório)
  * - periodoInicio: string (opcional, ISO date)
  * - periodoFim: string (opcional, ISO date)
  * - materia: string (opcional, filtrar por matéria)
@@ -18,21 +18,16 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const usuarioId = searchParams.get('usuarioId');
     const periodoInicio = searchParams.get('periodoInicio');
     const periodoFim = searchParams.get('periodoFim');
     const materia = searchParams.get('materia');
 
-    if (!usuarioId) {
-      return NextResponse.json(
-        { erro: 'usuarioId é obrigatório' },
-        { status: 400 }
-      );
-    }
+    // Pegar ID do usuário autenticado
+    const usuarioId = await getCurrentUserId();
 
     // Construir filtros
     const filtros: any = {
-      usuarioId: parseInt(usuarioId),
+      usuarioId,
     };
 
     if (periodoInicio || periodoFim) {
@@ -77,7 +72,7 @@ export async function GET(request: NextRequest) {
     const aulaIds = avaliacoesSocio.map(av => av.aulaId);
     const avaliacoesDidaticas = await prisma.avaliacaoDidatica.findMany({
       where: {
-        usuarioId: parseInt(usuarioId),
+        usuarioId,
         aulaId: { in: aulaIds },
       },
     });

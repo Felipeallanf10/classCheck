@@ -24,16 +24,16 @@ import {
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useMinhasAvaliacoes } from '@/hooks/useMinhasAvaliacoes'
-
-// TODO: Pegar ID do usuário da sessão
-const USUARIO_ID = 52;
+import { useSession } from '@/hooks/useSession'
 
 export default function MinhasAvaliacoesPage() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [tabAtiva, setTabAtiva] = useState('aulas')
+  const { data: session } = useSession()
 
-  const { data, isLoading, error } = useMinhasAvaliacoes(USUARIO_ID);
+  const usuarioId = session?.user?.id ? parseInt(session.user.id) : 0
+  const { data, isLoading, error } = useMinhasAvaliacoes(usuarioId);
 
   // Filtrar avaliações por busca
   const avaliacoesAulasFiltradas = data?.avaliacoesAulas.filter((av) =>
