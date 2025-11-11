@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAuth, checkRole } from '@/lib/auth-helpers'
 import { z } from 'zod'
 
 // Força a rota a ser dinâmica
@@ -8,11 +9,16 @@ export const dynamic = 'force-dynamic';
 const createProfessorSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   email: z.string().email('Email inválido'),
+  senha: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
   materia: z.string().min(1, 'Matéria é obrigatória'),
   avatar: z.string().url().optional()
 })
 
 export async function GET(request: NextRequest) {
+  // Verificar autenticação
+  const { authenticated, userId, userRole, error } = await requireAuth()
+  if (!authenticated) return error!
+
   try {
     const { searchParams } = new URL(request.url)
     
@@ -27,7 +33,33 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
 
     // Construir filtros dinâmicos
-    const where: any = {}
+    const where: any = {
+      role: 'PROFESSOR' // Filtrar apenas usuários com role PROFESSOR
+    }
+    
+    // FILTRO POR USUÁRIO BASEADO NO ROLE
+    if (userRole === 'ALUNO') {
+      // Aluno vê apenas professores das suas turmas
+      const turmasDoAluno = await prisma.turmaAluno.findMany({
+        where: { alunoId: userId! },
+        select: { turmaId: true }
+      })
+      
+      const turmaIds = turmasDoAluno.map(t => t.turmaId)
+      
+      // Buscar professores que lecionam nessas turmas
+      const professoresDasTurmas = await prisma.turmaProfessor.findMany({
+        where: { turmaId: { in: turmaIds } },
+        select: { professorId: true }
+      })
+      
+      const professorIds = [...new Set(professoresDasTurmas.map(tp => tp.professorId))]
+      
+      where.id = {
+        in: professorIds
+      }
+    }
+    // PROFESSOR e ADMIN veem todos os professores (sem filtro adicional)
     
     if (ativo !== undefined) {
       where.ativo = ativo
@@ -49,7 +81,7 @@ export async function GET(request: NextRequest) {
     }
 
     const [professores, total] = await Promise.all([
-      prisma.professor.findMany({
+      prisma.usuario.findMany({
         where,
         select: {
           id: true,
@@ -60,14 +92,16 @@ export async function GET(request: NextRequest) {
           ativo: true,
           createdAt: true,
           _count: {
-            select: { aulas: true }
+            select: { 
+              aulasMinistradas: true // Relação correta para aulas ministradas pelo professor
+            }
           }
         },
         orderBy: { nome: 'asc' },
         skip,
         take: limit
       }),
-      prisma.professor.count({ where })
+      prisma.usuario.count({ where })
     ])
 
     const totalPages = Math.ceil(total / limit)
@@ -93,24 +127,39 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Apenas admins podem criar professores
+  const { authorized, error } = await checkRole(['ADMIN'])
+  if (!authorized) return error!
+
   try {
     const body = await request.json()
     const data = createProfessorSchema.parse(body)
     
     // Verificar se email já existe
-    const existingProfessor = await prisma.professor.findUnique({
+    const existingUser = await prisma.usuario.findUnique({
       where: { email: data.email }
     })
     
-    if (existingProfessor) {
+    if (existingUser) {
       return NextResponse.json(
         { error: 'Email já está em uso' },
         { status: 400 }
       )
     }
     
-    const professor = await prisma.professor.create({
-      data,
+    // Hash da senha
+    const bcrypt = require('bcryptjs')
+    const senhaHash = await bcrypt.hash(data.senha, 10)
+    
+    const professor = await prisma.usuario.create({
+      data: {
+        nome: data.nome,
+        email: data.email,
+        senha: senhaHash,
+        materia: data.materia,
+        avatar: data.avatar,
+        role: 'PROFESSOR'
+      },
       select: {
         id: true,
         nome: true,
