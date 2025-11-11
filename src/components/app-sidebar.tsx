@@ -98,6 +98,7 @@ const relatoriosByRole = {
 
 // Seção de páginas institucionais (igual para todos)
 const institutionalItems = [
+  { label: "Configurações", icon: Settings, href: "/configuracoes" },
   { label: "Central de Ajuda", icon: HelpCircle, href: "/ajuda" },
   { label: "Contato", icon: Mail, href: "/contato" },
   { label: "Sobre", icon: Info, href: "/sobre" },
