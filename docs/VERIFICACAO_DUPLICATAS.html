@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Duplicatas - ClassCheck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: white;
+            color: #28a745;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.2em;
+        }
+        
+        .success-box h2 {
+            color: #155724;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+            border-color: #28a745;
+        }
+        
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        h3 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        
+        .bar-chart {
+            margin: 20px 0;
+        }
+        
+        .bar-item {
+            margin: 15px 0;
+        }
+        
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .bar-bg {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+        
+        .check-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .check-list li {
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-left: 5px solid #28a745;
+            border-radius: 5px;
+            font-size: 1.1em;
+        }
+        
+        .check-list li:before {
+            content: '✅ ';
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✅ Verificação de Duplicatas</h1>
+            <p>Banco de Perguntas Adaptativo - ClassCheck</p>
+            <div class="status-badge">✅ TUDO OK!</div>
+        </header>
+        
+        <div class="content">
+            <div class="success-box">
+                <h2>🎉 Nenhuma Duplicata Encontrada!</h2>
+                <p>
+                    Todas as <strong>94 perguntas</strong> do banco adaptativo foram analisadas e 
+                    <strong>não foram encontradas duplicatas</strong> ou problemas críticos.
+                </p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">94</div>
+                    <div class="stat-label">Perguntas Únicas</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Códigos Duplicados</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Textos Duplicados</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Problemas Críticos</div>
+                </div>
+            </div>
+            
+            <h3>📊 Distribuição por Categoria (18 categorias)</h3>
+            
+            <div class="chart-container">
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>BEM_ESTAR</span>
+                            <span>16 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 100%">17.0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>ANSIEDADE</span>
+                            <span>14 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 87.5%">14.9%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>ESTRESSE</span>
+                            <span>11 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 68.75%">11.7%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>SONO</span>
+                            <span>10 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 62.5%">10.6%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>PENSAMENTOS_NEGATIVOS</span>
+                            <span>6 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 37.5%">6.4%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>SAÚDE_FÍSICA / RELACIONAMENTOS</span>
+                            <span>5 perguntas cada</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 31.25%">5.3%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>AUTOESTIMA / MOTIVAÇÃO</span>
+                            <span>4 perguntas cada</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 25%">4.3%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>Outras 11 categorias</span>
+                            <span>19 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 20%">20.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>📚 Escalas Validadas Incluídas</h3>
+            
+            <div class="chart-container">
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>PANAS (Afeto Positivo/Negativo)</span>
+                            <span>20 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 100%">33.9%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>PSS-10 (Estresse Percebido)</span>
+                            <span>10 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 50%">16.9%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>PHQ-9 (Depressão)</span>
+                            <span>9 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 45%">15.3%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>GAD-7 (Ansiedade) / ISI (Insônia)</span>
+                            <span>7 perguntas cada</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 35%">11.9%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>SWLS (Satisfação com a Vida)</span>
+                            <span>5 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 25%">8.5%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>Circumplex (Russell)</span>
+                            <span>2 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 10%">3.4%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar-label">
+                            <span>Perguntas Customizadas</span>
+                            <span>34 perguntas</span>
+                        </div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: 17%">57.6%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>✅ Verificações Realizadas</h3>
+            
+            <ul class="check-list">
+                <li>Códigos únicos - Todos os 94 códigos são distintos</li>
+                <li>Textos únicos - Nenhum texto duplicado encontrado</li>
+                <li>Títulos verificados - Não há títulos idênticos problemáticos</li>
+                <li>Escalas validadas - Itens de escalas não duplicados</li>
+                <li>Similaridade textual - Nenhuma pergunta com sobreposição problemática</li>
+            </ul>
+            
+            <div class="success-box" style="margin-top: 40px;">
+                <h2>🎯 Conclusão</h2>
+                <p>
+                    O banco de perguntas está <strong>100% livre de duplicatas</strong>. 
+                    As 94 perguntas são únicas, bem distribuídas em 18 categorias emocionais, 
+                    e incluem 60 itens de 6 escalas cientificamente validadas (PHQ-9, GAD-7, PSS-10, 
+                    PANAS, ISI, SWLS) + 34 perguntas customizadas.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

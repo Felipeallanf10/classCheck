@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-// Enum para status da aula
-const StatusAula = z.enum(['AGENDADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA'])
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
 
 const createAulaSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),
@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     
     // Parse manual dos parâmetros
+    const date = searchParams.get('date') || undefined // Novo: filtro por data específica
     const page = parseInt(searchParams.get('page') || '1') || 1
     const limit = parseInt(searchParams.get('limit') || '10') || 10
     const search = searchParams.get('search') || undefined
@@ -49,7 +50,17 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    if (dataInicio || dataFim) {
+    // Novo: filtro por data específica (formato YYYY-MM-DD)
+    if (date) {
+      const targetDate = new Date(date)
+      const nextDate = new Date(targetDate)
+      nextDate.setDate(nextDate.getDate() + 1)
+      
+      where.dataHora = {
+        gte: targetDate,
+        lt: nextDate
+      }
+    } else if (dataInicio || dataFim) {
       where.dataHora = {} as any
       if (dataInicio) {
         where.dataHora.gte = new Date(dataInicio)

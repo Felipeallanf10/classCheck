@@ -27,10 +27,28 @@ import {
 } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, Heart, Brain, Users, Activity } from 'lucide-react';
 
+interface MetricasData {
+  totalAlunos: number;
+  participacaoMedia: number;
+  taxaConclusao: number;
+  distribuicaoEmocional: {
+    energizado_positivo: number;
+    energizado_negativo: number;
+    calmo_positivo: number;
+    calmo_negativo: number;
+  };
+  mediaGeralValencia?: number;
+  mediaGeralArousal?: number;
+  quadrantes?: QuadranteData[];
+  tendencias?: TendenciaData[];
+  alertasAtivos?: number;
+  mediasCategoria?: Record<string, number>;
+}
+
 interface MetricasTurmaProps {
   turmaId: string;
   periodo: 'hoje' | 'semana' | 'mes';
-  metricas: any;
+  metricas: MetricasData;
 }
 
 interface QuadranteData {
@@ -133,7 +151,7 @@ const MetricasTurma: React.FC<MetricasTurmaProps> = ({
                 </span>
                 {getIconeTendencia(metricas?.mediaGeralValencia || 0)}
               </div>
-              <Progress value={(metricas?.mediaGeralValencia + 1) * 50} className="h-2" />
+              <Progress value={((metricas?.mediaGeralValencia || 0) + 1) * 50} className="h-2" />
               <p className="text-xs text-gray-600">
                 Nível geral de prazer/desprazer da turma
               </p>
@@ -156,7 +174,7 @@ const MetricasTurma: React.FC<MetricasTurmaProps> = ({
                 </span>
                 {getIconeTendencia(metricas?.mediaGeralArousal || 0)}
               </div>
-              <Progress value={(metricas?.mediaGeralArousal + 1) * 50} className="h-2" />
+              <Progress value={((metricas?.mediaGeralArousal || 0) + 1) * 50} className="h-2" />
               <p className="text-xs text-gray-600">
                 Nível geral de energia/calma da turma
               </p>

@@ -16,6 +16,15 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
+interface AulaSimples {
+  id: string | number;
+  data: string | Date;
+  titulo: string;
+  professor?: string;
+  avaliada?: boolean;
+  favorita?: boolean;
+}
+
 export function SidebarCalendario({
   dataSelecionada,
   onDataChange,
@@ -23,11 +32,13 @@ export function SidebarCalendario({
 }: {
   dataSelecionada: Date
   onDataChange: (date: Date) => void
-  aulas: any[]
+  aulas: AulaSimples[]
 }) {
   const [expandido, setExpandido] = useState(true)
 
-  const aulasDoDia = aulas.filter(
+  const aulasArray = Array.isArray(aulas) ? aulas : []
+  
+  const aulasDoDia = aulasArray.filter(
     (aula) =>
       format(new Date(aula.data), "yyyy-MM-dd") ===
       format(dataSelecionada, "yyyy-MM-dd")

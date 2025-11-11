@@ -76,6 +76,18 @@ export class AdaptiveAssessmentEngine {
       initialTheta?: number;
     } = {}
   ): AdaptiveSession {
+    // Validar parâmetros
+    const targetPrecision = options.targetPrecision ?? 0.3;
+    const maxQuestions = options.maxQuestions ?? 15;
+    
+    if (targetPrecision <= 0) {
+      throw new Error('targetPrecision deve ser maior que zero');
+    }
+    
+    if (maxQuestions <= 0) {
+      throw new Error('maxQuestions deve ser maior que zero');
+    }
+    
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     // Obter habilidade prévia do estudante ou usar valor inicial
@@ -87,8 +99,8 @@ export class AdaptiveAssessmentEngine {
       studentId,
       startTime: new Date(),
       currentTheta: initialTheta,
-      targetPrecision: options.targetPrecision ?? 0.3,
-      maxQuestions: options.maxQuestions ?? 15,
+      targetPrecision,
+      maxQuestions,
       questionsAnswered: [],
       isComplete: false,
       finalAbility: {
@@ -187,7 +199,11 @@ export class AdaptiveAssessmentEngine {
     session.questionsAnswered.push(responseRecord);
 
     // Atualizar estimativa de habilidade usando MLE (Maximum Likelihood Estimation)
-    const newTheta = this.estimateAbilityMLE(session.questionsAnswered);
+    let newTheta = this.estimateAbilityMLE(session.questionsAnswered);
+    
+    // Clamping: Limitar theta ao intervalo [-4, 4]
+    newTheta = Math.max(-4, Math.min(4, newTheta));
+    
     const standardError = this.calculateStandardError(session.questionsAnswered, newTheta);
     
     session.currentTheta = newTheta;
@@ -211,11 +227,13 @@ export class AdaptiveAssessmentEngine {
   private shouldStopSession(session: AdaptiveSession): boolean {
     // Critério 1: Máximo de questões atingido
     if (session.questionsAnswered.length >= session.maxQuestions) {
+      session.isComplete = true;
       return true;
     }
 
     // Critério 2: Precisão alvo atingida
     if (session.finalAbility.standardError <= session.targetPrecision) {
+      session.isComplete = true;
       return true;
     }
 
@@ -229,6 +247,7 @@ export class AdaptiveAssessmentEngine {
       const recentChanges = this.getRecentThetaChanges(session, 3);
       const avgChange = recentChanges.reduce((sum, change) => sum + Math.abs(change), 0) / recentChanges.length;
       if (avgChange < 0.1) {
+        session.isComplete = true;
         return true;
       }
     }
@@ -371,8 +390,8 @@ export class AdaptiveAssessmentEngine {
     // Atualizar registro permanente da habilidade do estudante
     this.studentAbilities.set(session.studentId, session.finalAbility);
     
-    // Limpar sessão ativa
-    this.activeSessions.delete(sessionId);
+    // Não deletar sessão imediatamente - manter para análise posterior
+    // this.activeSessions.delete(sessionId);
     
     return session.finalAbility;
   }
@@ -394,8 +413,10 @@ export class AdaptiveAssessmentEngine {
     if (!session) return null;
 
     const responses = session.questionsAnswered;
-    const averageTime = responses.length > 0 ? 
-      responses.reduce((sum, r) => sum + r.timeSpent, 0) / responses.length : 0;
+    
+    // Corrigir cálculo da média: soma / quantidade
+    const totalTime = responses.reduce((sum, r) => sum + r.timeSpent, 0);
+    const averageTime = responses.length > 0 ? totalTime / responses.length : 0;
     
     const difficultyProgression = responses.map(r => r.difficulty);
     
@@ -453,13 +474,17 @@ export class AdaptiveAssessmentEngine {
       return counts;
     }, {} as Record<string, number>);
 
+    const minDifficulty = Math.min(...difficulties);
+    const maxDifficulty = Math.max(...difficulties);
+    const difficultyRange = maxDifficulty - minDifficulty;
+
     // Verificar qualidade
     if (this.questionBank.length < 50) {
       issues.push('Banco de questões muito pequeno (< 50 questões)');
     }
     
-    if (Math.max(...difficulties) - Math.min(...difficulties) < 3) {
-      issues.push('Faixa de dificuldade muito restrita');
+    if (difficultyRange < 2) {
+      issues.push('Faixa de dificuldade muito restrita (range < 2)');
     }
     
     if (discriminations.some(d => d < 0.5)) {
@@ -468,7 +493,7 @@ export class AdaptiveAssessmentEngine {
 
     return {
       totalQuestions: this.questionBank.length,
-      difficultyRange: [Math.min(...difficulties), Math.max(...difficulties)],
+      difficultyRange: [minDifficulty, maxDifficulty],
       discriminationRange: [Math.min(...discriminations), Math.max(...discriminations)],
       categoryCoverage: categoryCounts,
       qualityIssues: issues
@@ -491,7 +516,7 @@ export class QuestionFactory {
         id: 'val_01',
         content: 'Como você se sente em relação ao conteúdo desta aula?',
         category: 'valencia',
-        difficulty: -0.5, // Fácil de responder positivamente
+        difficulty: -1.5, // Muito fácil de responder positivamente
         discrimination: 1.2,
         guessing: 0.1,
         scale: [1, 7],
@@ -511,7 +536,7 @@ export class QuestionFactory {
         id: 'val_03',
         content: 'Você considera esta aula interessante?',
         category: 'valencia',
-        difficulty: 0.3,
+        difficulty: 1.2, // Mais difícil
         discrimination: 1.8,
         guessing: 0.1,
         scale: [1, 10],
@@ -533,7 +558,7 @@ export class QuestionFactory {
         id: 'ativ_02',
         content: 'Você se sente alerta e focado nas atividades?',
         category: 'ativacao',
-        difficulty: -0.2,
+        difficulty: -0.8,
         discrimination: 1.6,
         guessing: 0.08,
         scale: [1, 5],
@@ -543,7 +568,7 @@ export class QuestionFactory {
         id: 'ativ_03',
         content: 'O ritmo da aula te mantém engajado?',
         category: 'ativacao',
-        difficulty: 0.5,
+        difficulty: 1.5, // Muito difícil
         discrimination: 1.3,
         guessing: 0.15,
         scale: [1, 10],
@@ -555,7 +580,7 @@ export class QuestionFactory {
         id: 'conc_01',
         content: 'Você consegue manter a atenção durante toda a aula?',
         category: 'concentracao',
-        difficulty: 0.8,
+        difficulty: 2.0, // Muito difícil
         discrimination: 2.0,
         guessing: 0.05,
         scale: [1, 7],
@@ -565,7 +590,7 @@ export class QuestionFactory {
         id: 'conc_02',
         content: 'Quantas vezes sua mente "viajou" durante a explicação?',
         category: 'concentracao',
-        difficulty: -0.3,
+        difficulty: -1.0,
         discrimination: 1.1,
         guessing: 0.2,
         scale: [0, 10],
@@ -587,7 +612,7 @@ export class QuestionFactory {
         id: 'motiv_02',
         content: 'Quão importante você considera o tema da aula?',
         category: 'motivacao',
-        difficulty: -0.4,
+        difficulty: -2.0, // Muito fácil
         discrimination: 1.3,
         guessing: 0.12,
         scale: [1, 10],

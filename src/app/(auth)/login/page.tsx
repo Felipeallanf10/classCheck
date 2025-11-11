@@ -73,7 +73,7 @@ export default function LoginPage() {
       
       // Redirecionamento após sucesso
       setTimeout(() => router.push('/dashboard'), 1000)
-    } catch (error) {
+    } catch {
       toast.error("Verifique suas credenciais e tente novamente.")
     } finally {
       setIsLoading(false)
@@ -92,7 +92,7 @@ export default function LoginPage() {
       
       // Redirecionamento após sucesso
       setTimeout(() => router.push('/dashboard'), 1000)
-    } catch (error) {
+    } catch {
       toast.error("Erro no login com Google. Tente novamente.")
     } finally {
       setIsGoogleLoading(false)

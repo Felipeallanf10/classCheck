@@ -83,7 +83,7 @@ export default function CadastroPage() {
       
       // Redirecionamento após sucesso
       setTimeout(() => router.push('/dashboard'), 1000)
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar conta. Tente novamente.")
     } finally {
       setIsLoading(false)
@@ -102,7 +102,7 @@ export default function CadastroPage() {
       
       // Redirecionamento após sucesso
       setTimeout(() => router.push('/dashboard'), 1000)
-    } catch (error) {
+    } catch {
       toast.error("Erro no cadastro com Google. Tente novamente.")
     } finally {
       setIsGoogleLoading(false)

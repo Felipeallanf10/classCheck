@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Força a rota a ser dinâmica
+export const dynamic = 'force-dynamic';
+
 interface AvaliacaoData {
   usuarioId: number
   respostas: Record<string, unknown>
@@ -11,27 +14,13 @@ interface AvaliacaoData {
   observacoes?: string
 }
 
-interface AvaliacaoResult {
-  id: string
-  estadoEmocional: string
-  valencia: number
-  ativacao: number
-  confianca: number
-  observacoes: string | null
-  dataAvaliacao: Date
-  respostas: string | null
-}
-
 export async function POST(request: NextRequest) {
   try {
     const data: AvaliacaoData = await request.json()
     const { 
       usuarioId, 
       respostas, 
-      estadoEmocional, 
-      valencia, 
-      ativacao, 
-      confianca,
+      estadoEmocional,
       observacoes 
     } = data
 
@@ -43,17 +32,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Salvar avaliação no banco de dados (usando mock)
-    const avaliacao = await prisma.avaliacaoSocioemocional.create({
+    // Mapear estadoEmocional para TipoHumor enum
+    const humorMap: Record<string, 'MUITO_TRISTE' | 'TRISTE' | 'NEUTRO' | 'FELIZ' | 'MUITO_FELIZ'> = {
+      'Muito Triste': 'MUITO_TRISTE',
+      'Triste': 'TRISTE', 
+      'Neutro': 'NEUTRO',
+      'Feliz': 'FELIZ',
+      'Muito Feliz': 'MUITO_FELIZ',
+      // Fallbacks para outros estados
+      'Ansioso': 'TRISTE',
+      'Focado': 'FELIZ',
+      'Motivado': 'MUITO_FELIZ',
+      'Entediado': 'NEUTRO'
+    }
+
+    const humor = humorMap[estadoEmocional] || 'NEUTRO'
+
+    // Salvar avaliação no banco de dados usando HumorRegistro
+    const avaliacao = await prisma.humorRegistro.create({
       data: {
         usuarioId,
-        estadoEmocional,
-        valencia: valencia || 0,
-        ativacao: ativacao || 0,
-        confianca: confianca || 0,
-        observacoes,
-        respostas: JSON.stringify(respostas),
-        dataAvaliacao: new Date()
+        humor,
+        observacao: observacoes || `${estadoEmocional} - ${JSON.stringify(respostas)}`,
+        data: new Date()
       }
     })
 
@@ -85,36 +86,32 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // TODO: Buscar avaliações no banco quando Prisma estiver configurado
-    // const avaliacoes = await prisma.avaliacaoSocioemocional.findMany({...})
-
-    // Por enquanto, retornar dados simulados
-    const avaliacoesSimuladas = [
-      {
-        id: '1',
-        estadoEmocional: 'Focado',
-        valencia: 0.3,
-        ativacao: 0.6,
-        confianca: 0.85,
-        observacoes: 'Concentração durante aula de matemática',
-        dataAvaliacao: new Date(),
-        respostas: { pergunta1: 'resposta1' }
+    // Buscar registros de humor no banco
+    const registrosHumor = await prisma.humorRegistro.findMany({
+      where: {
+        usuarioId: parseInt(usuarioId)
       },
-      {
-        id: '2',
-        estadoEmocional: 'Ansioso',
-        valencia: -0.4,
-        ativacao: 0.7,
-        confianca: 0.78,
-        observacoes: 'Nervosismo antes da apresentação',
-        dataAvaliacao: new Date(Date.now() - 86400000), // 1 dia atrás
-        respostas: { pergunta1: 'resposta2' }
-      }
-    ]
+      orderBy: {
+        data: 'desc'
+      },
+      take: limite
+    })
+
+    // Mapear para o formato esperado pela API
+    const avaliacoes = registrosHumor.map(registro => ({
+      id: registro.id.toString(),
+      estadoEmocional: registro.humor,
+      valencia: 0,
+      ativacao: 0,
+      confianca: 0,
+      observacoes: registro.observacao,
+      dataAvaliacao: registro.data,
+      respostas: null
+    }))
 
     return NextResponse.json({
-      avaliacoes: avaliacoesSimuladas.slice(0, limite),
-      total: avaliacoesSimuladas.length
+      avaliacoes,
+      total: avaliacoes.length
     })
 
   } catch (error) {
