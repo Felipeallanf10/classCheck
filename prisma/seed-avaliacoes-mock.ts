@@ -73,7 +73,7 @@ async function main() {
 
   // Buscar usuário de teste (ID 52) - ALUNO
   const usuario = await prisma.usuario.findUnique({
-    where: { id: 52 }
+    where: { id: 5}
   });
 
   if (!usuario) {
