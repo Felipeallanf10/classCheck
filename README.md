@@ -1,16 +1,47 @@
 # 🎓 ClassCheck
 
-Sistema para avaliação socioemocional de aulas, desenvolvido com **Next.js 15**, **TypeScript**, **MySQL** e **Prisma**, integrando um **Design System v2** completo.
+Sistema completo para avaliação socioemocional de aulas com **questionários adaptativos**, **análise IRT** e **dashboard administrativo**, desenvolvido com **Next.js 15**, **TypeScript**, **PostgreSQL** e **Prisma**.
+
+## ✨ Funcionalidades Principais
+
+### � Sistema de Autenticação
+- **3 Roles**: ALUNO, PROFESSOR, ADMIN
+- **NextAuth.js v4**: Autenticação JWT com sessões
+- **Proteção de Rotas**: Middleware + helpers + componentes
+- **Páginas Protegidas**: Dashboard, perfil, notificações, configurações
+
+### 📊 Avaliações Socioemocionais
+- **Questionários Adaptativos**: WHO-5, PHQ-9, GAD-7, PSS-10
+- **Teoria de Resposta ao Item (IRT)**: Calibração automática
+- **Modelo Circumplexo**: Mapeamento emocional (valencia x ativação)
+- **Alertas Inteligentes**: Detecção de risco emocional
+
+### 👨‍🏫 Painel do Professor
+- **Gestão de Turmas**: Visualização de turmas e estatísticas
+- **Avaliações de Aulas**: Feedback didático e emocional
+- **Relatórios**: Análise longitudinal e métricas agregadas
+
+### 👨‍💼 Painel Administrativo
+- **CRUD de Usuários**: Criar, editar, desativar (alunos, professores, admins)
+- **CRUD de Turmas**: Gerenciar turmas, períodos e vínculos
+- **Relatórios do Sistema**: Gráficos interativos (Recharts)
+- **Estatísticas Globais**: Usuários, avaliações, alertas
+
+### 👨‍🎓 Painel do Aluno
+- **Avaliar Aulas**: Questionários adaptativos por aula
+- **Avaliar Professores**: Feedback sobre didática
+- **Check-in Diário**: Registro de humor e bem-estar
+- **Meu Progresso**: Relatórios individuais e jornada emocional
 
 ## 📋 Stack Tecnológica
 
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
-- **UI Components**: shadcn/ui + Radix UI + Design System v2 Customizado
-- **Design System**: 15 componentes integrados com tokens de design
-- **Notifications**: Sistema de Toast + Confirmações globais
-- **Banco de Dados**: MySQL 8.0 + Prisma ORM
-- **Containerização**: Docker + Docker Compose
-- **Autenticação**: NextAuth.js (configuração futura)
+- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS v4
+- **UI Components**: shadcn/ui + Radix UI + Design System v2
+- **Gráficos**: Recharts para visualizações
+- **Banco de Dados**: PostgreSQL (Neon) + Prisma ORM v6.19
+- **Autenticação**: NextAuth.js v4 com JWT
+- **Validação**: Zod + React Hook Form
+- **State Management**: Zustand + TanStack Query
 
 ## 🎨 Design System v2 Integrado
 
@@ -18,92 +49,78 @@ Sistema para avaliação socioemocional de aulas, desenvolvido com **Next.js 15*
 - **Enhanced Input**: `EmailInput`, `PasswordInput` com estados avançados
 - **Loading States**: `LoadingButton`, `AppLoading`, `PageLoading`
 - **Feedback**: Sistema de Toast com múltiplas variantes
-- **Metrics**: `MetricsProgress`, `ClassCheckMetrics` para dashboards
-- **Confirmations**: Hook `useConfirm` para diálogos globais
+## 🔐 Credenciais de Teste
 
-### Tokens de Design
-- **Colors**: `primary-*`, `success-*`, `warning-*`, `error-*`, `info-*`
-- **Typography**: Gradientes, tamanhos responsivos
-- **Animations**: Transições suaves, hover effects, loading states
-- **Layout**: Grids responsivos, cards com elevação
+Após executar os seeds, use estas contas para testar:
 
-### Integração Completa
-✅ **Páginas de Autenticação**: Login, Cadastro, Reset Password  
-✅ **Layouts**: ConditionalLayout com AppLoading  
-✅ **Landing Page**: Hero, Features com design tokens  
-✅ **Dashboard**: Métricas com ClassCheckMetrics  
-✅ **Sistema de Toasts**: Feedback global integrado  
-✅ **Confirmações**: Diálogos de confirmação reutilizáveis  
+| Papel | Email | Senha | Acesso |
+|-------|-------|-------|--------|
+| **ADMIN** | admin@classcheck.com | senha123 | Dashboard + Relatórios + CRUD completo |
+| **PROFESSOR** | prof.matematica@classcheck.com | senha123 | Gestão de turmas + Avaliações |
+| **ALUNO** | ana.costa@aluno.com | senha123 | Avaliar aulas + Check-in + Progresso |
 
 ## 🚀 Getting Started
 
-### Opção 1: Ambiente Dockerizado (Recomendado)
+### Pré-requisitos
+- Node.js 20+
+- PostgreSQL (Neon recomendado para produção)
+- npm/yarn/pnpm
 
-#### Pré-requisitos
-- Docker e Docker Compose instalados
-- Git
+### 1. Clone e Instale
 
-#### Passos:
-
-1. **Clone o repositório:**
 ```bash
 git clone <repository-url>
 cd classcheck
-```
-
-2. **Configure as variáveis de ambiente:**
-```bash
-# Copie o arquivo de exemplo
-cp .env.example .env.local
-
-# Edite conforme necessário (opcional para desenvolvimento)
-```
-
-3. **Suba o ambiente:**
-```bash
-# Primeira execução (build + start)
-docker-compose up --build
-
-# Execuções seguintes
-docker-compose up
-```
-
-4. **Acesse a aplicação:**
-- **App**: http://localhost:3000
-- **phpMyAdmin**: http://localhost:8080
-- **MySQL**: localhost:3306
-
-### Opção 2: Desenvolvimento Local
-
-#### Pré-requisitos
-- Node.js 20+
-- MySQL 8.0
-- npm/yarn/pnpm
-
-#### Passos:
-
-1. **Instale as dependências:**
-```bash
 npm install
 ```
 
-2. **Configure o banco de dados:**
+### 2. Configure as Variáveis de Ambiente
+
+Crie `.env.local` na raiz do projeto:
+
 ```bash
-# Configure .env.local com sua string de conexão MySQL
-cp .env.example .env.local
+# Database (Neon PostgreSQL)
+DATABASE_URL="postgresql://user:password@host/database?sslmode=require"
+
+# NextAuth
+NEXTAUTH_SECRET="sua-chave-secreta-aleatoria-aqui"
+NEXTAUTH_URL="http://localhost:3000"
 ```
 
-3. **Execute as migrações Prisma:**
+**Gerar `NEXTAUTH_SECRET`:**
 ```bash
-npx prisma migrate dev
+openssl rand -base64 32
 ```
 
-4. **Inicie o servidor:**
+### 3. Configure o Banco de Dados
+
+```bash
+# Executar migrações
+npx prisma migrate deploy
+
+# Popular com dados iniciais (usuários, turmas, questionários)
+npx prisma db seed
+```
+
+### 4. Inicie o Servidor
+
 ```bash
 npm run dev
 ```
 
-Abra [http://localhost:3000](http://localhost:3000) no seu navegador.
+Acesse: [http://localhost:3000](http://localhost:3000)
+
+## 📦 Scripts Disponíveis
+
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run dev:poll     # Dev com polling (WSL/Docker)
+npm run build        # Build de produção
+npm run start        # Servidor de produção
+npm run lint         # Verificar código
+npx prisma studio    # UI para visualizar banco de dados
+npx prisma db seed   # Popular banco de dados
+```
 
 ## 🐳 Comandos Docker Úteis
 
@@ -159,82 +176,111 @@ docker-compose ps
 
 ```
 classcheck/
-├── 🐳 docker/                  # Configurações Docker
-│   └── mysql/
-│       └── init/              # Scripts de inicialização MySQL
-├── 📱 src/
+├── � src/
 │   ├── app/                   # App Router (Next.js 15)
-│   │   ├── (auth)/           # Páginas de autenticação integradas
-│   │   ├── home/             # Dashboard com métricas v2
-│   │   └── aulas/            # Listagem de aulas melhorada
+│   │   ├── (auth)/           # Rotas públicas (login, cadastro)
+│   │   ├── home/             # Dashboard principal
+│   │   ├── perfil/           # Edição de perfil
+│   │   ├── notificacoes/     # Sistema de notificações
+│   │   ├── configuracoes/    # Configurações por role
+│   │   ├── professor/        # Rotas do professor
+│   │   │   └── turmas/       # Gestão de turmas
+│   │   ├── admin/            # Rotas administrativas
+│   │   │   ├── usuarios/     # CRUD de usuários
+│   │   │   ├── turmas/       # CRUD de turmas
+│   │   │   └── relatorios/   # Dashboard com gráficos
+│   │   └── api/              # API Routes protegidas
 │   ├── components/            # Componentes React
-│   │   ├── ui/               # Design System v2 (15 componentes)
-│   │   ├── landing/          # Landing page com design tokens
+│   │   ├── ui/               # Design System v2
+│   │   ├── auth/             # ProtectedRoute
 │   │   └── *.tsx             # Componentes ClassCheck
-│   ├── hooks/                # Custom Hooks
-│   │   ├── use-toast.ts      # Sistema de notificações
-│   │   └── use-confirm.tsx   # Confirmações globais
-│   └── lib/                  # Utilitários
-├── 🔧 prisma/                 # Schema e migrações (a criar)
-├── 📄 Dockerfile             # Imagem Docker da aplicação
-├── 📄 docker-compose.yml     # Orquestração dos serviços
-└── 📄 .env.example          # Exemplo de variáveis de ambiente
+│   ├── lib/                  # Utilitários
+│   │   ├── auth.ts           # NextAuth config
+│   │   ├── auth-helpers.ts   # checkRole, requireAuth
+│   │   └── prisma.ts         # Prisma client
+│   ├── middleware.ts         # Proteção de rotas global
+│   └── types/                # TypeScript types
+├── 🔧 prisma/                 # Banco de dados
+│   ├── schema.prisma         # Modelo do banco
+│   ├── migrations/           # Histórico de migrações
+│   └── seed*.ts              # Scripts de população
+├── � docs/                   # Documentação técnica
+│   ├── GUIA_TESTES.md        # Fluxo de testes
+│   └── GUIA_DEPLOY.md        # Guia de deploy
+├── 📄 CHANGELOG.md           # Histórico de mudanças
+└── 📄 .env.local             # Variáveis de ambiente (não versionado)
 ```
 
-## 🚀 Funcionalidades do Design System
+## � Sistema de Autenticação
 
-### 📝 Componentes de Formulário
+### Roles e Permissões
+
+| Role | Acesso | Funcionalidades |
+|------|--------|----------------|
+| **ALUNO** | `/home`, `/perfil`, `/notificacoes` | Avaliar aulas, check-in, ver progresso |
+| **PROFESSOR** | `+/professor/*` | Gestão de turmas, relatórios de avaliações |
+| **ADMIN** | `+/admin/*` | CRUD completo, relatórios do sistema |
+
+### Proteção de Rotas
+
+#### Middleware (Global)
+```typescript
+// src/middleware.ts
+// Protege todas as rotas exceto: /, /login, /cadastro, /reset-password
+// Redireciona não autenticados para /login
+```
+
+#### Helpers de API
+```typescript
+import { checkRole, requireAuth } from '@/lib/auth-helpers'
+
+// Apenas ADMIN
+const { authorized, userId, userRole, error } = await checkRole(['ADMIN'])
+
+// Qualquer autenticado
+const { authorized, userId, userRole, error } = await requireAuth()
+```
+
+#### Componente Frontend
 ```tsx
-import { EmailInput, PasswordInput } from '@/components/ui/enhanced-input'
-import { LoadingButton } from '@/components/ui/loading-button'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
-// Uso nos formulários de auth
-<EmailInput 
-  label="E-mail" 
-  error={errors.email?.message}
-  loading={isLoading}
-/>
-<LoadingButton loading={isSubmitting}>
-  Entrar
-</LoadingButton>
+export default function Page() {
+  return (
+    <ProtectedRoute allowedRoles={['ADMIN']}>
+      {/* Conteúdo protegido */}
+    </ProtectedRoute>
+  )
+}
 ```
 
-### 📊 Métricas do Dashboard
-```tsx
-import { ClassCheckMetrics } from '@/components/ui/metrics-progress'
+## � Recursos do Sistema
 
-// Dashboard integrado
-<ClassCheckMetrics 
-  userType="aluno"
-  data={{
-    totalAulas: 25,
-    aulasCompletadas: 12,
-    avaliacaoMedia: 4.2
-  }}
-/>
-```
+### Design System v2
+- **15 componentes UI**: Integrados com shadcn/ui + tokens customizados
+- **Toasts**: Sistema de notificações global
+- **Confirmações**: Diálogos reutilizáveis com `useConfirm`
+- **Métricas**: `ClassCheckMetrics` para dashboards
+- **Formulários**: `EmailInput`, `PasswordInput`, `LoadingButton`
 
-### 🔔 Sistema de Notificações
-```tsx
-import { useToast } from '@/hooks/use-toast'
-import { useConfirm } from '@/hooks/use-confirm'
+### Banco de Dados
+- **Modelo Usuario Unificado**: role:Role, senha:String, materia:String?
+- **Relações**: TurmaAluno, TurmaProfessor (junction tables)
+- **Seeds Disponíveis**:
+  - `seed-completo.ts`: Usuários, turmas, vinculos
+  - `seed-adaptativo.ts`: Questionários WHO-5, PHQ-9, GAD-7, PSS-10
+  - `seed-usuarios-auth.ts`: Dados de autenticação
 
-const { toast } = useToast()
-const { confirm } = useConfirm()
+### APIs Protegidas
+- `/api/admin/*` → ADMIN only
+- `/api/professor/*` → PROFESSOR, ADMIN
+- `/api/perfil` → Authenticated (edição de perfil + senha)
+- `/api/notificacoes` → Authenticated (listar, marcar lida)
+- `/api/professores` → Authenticated (filtrado por turma para ALUNO)
+- `/api/alertas` → Authenticated (filtrado por usuarioId)
 
-// Notificações
-toast.success("Ação realizada com sucesso!")
-toast.error("Erro ao processar solicitação")
+## 🎨 Tokens de Design
 
-// Confirmações
-const confirmed = await confirm({
-  title: 'Confirmar exclusão',
-  description: 'Esta ação não pode ser desfeita',
-  variant: 'destructive'
-})
-```
-
-### 🎨 Tokens de Design
 ```tsx
 // Cores primárias
 className="bg-primary-600 text-primary-50"
@@ -246,63 +292,61 @@ className="bg-warning-100 border-warning-500"
 className="bg-error-50 text-error-700"
 ```
 
-## 🌐 URLs do Ambiente
+## 📚 Documentação Adicional
 
-| Serviço | URL | Descrição |
-|---------|-----|-----------|
-| **App** | http://localhost:3000 | Aplicação Next.js |
-| **phpMyAdmin** | http://localhost:8080 | Interface MySQL |
-| **MySQL** | localhost:3306 | Banco de dados |
+- [� CHANGELOG.md](CHANGELOG.md) - Histórico completo de mudanças
+- [🧪 Guia de Testes](docs/GUIA_TESTES.md) - Fluxos de teste por role
+- [� Guia de Deploy](docs/GUIA_DEPLOY.md) - Instruções de implantação
+- [🤝 Como Contribuir](CONTRIBUTING.md) - Guidelines para colaboração
+- [� Arquitetura de Autenticação](docs/GUIA_AUTENTICACAO_FRONTEND.md) - Detalhes técnicos
 
-## 🔧 Configuração de Banco
+## 🎯 Status das Funcionalidades
 
-### Credenciais Docker (desenvolvimento):
-- **Host**: localhost
-- **Port**: 3306  
-- **Database**: classcheck_db
-- **User**: classcheck_user
-- **Password**: classcheck_password
-
-## 📚 Scripts Disponíveis
-
-| Script | Descrição |
-|--------|-----------|
-| `npm run dev` | Desenvolvimento local |
-| `npm run build` | Build para produção |
-| `npm run start` | Executar versão de produção |
-| `npm run lint` | Linting com ESLint |
-
-## 📖 Documentação Adicional
-
-- [📋 Setup Detalhado](docs/SETUP.md) - Guia completo de instalação
-- [🤝 Como Contribuir](CONTRIBUTING.md) - Guidelines para colaboração  
-- [📊 Relatório Técnico](RELATORIO_ANALISE_TECNICA.md) - Análise técnica do projeto
-
-## 🎯 Funcionalidades
-
-### ✅ Implementado
-- **Design System v2**: 15 componentes integrados com tokens de design
-- **Autenticação Melhorada**: Login, cadastro e reset com enhanced inputs
-- **Dashboard Avançado**: Métricas responsivas com ClassCheckMetrics
-- **Sistema de Feedback**: Toasts e confirmações globais
-- **Landing Page v2**: Hero e features com design tokens aplicados
-- **Animações**: Transições suaves e loading states
-- **Modo Escuro**: Tema completo com design tokens
-- **Componentes UI**: shadcn/ui customizados e otimizados
+### ✅ Implementado e Testado
+- **Sistema de Autenticação**: NextAuth.js v4 com 3 roles (ALUNO, PROFESSOR, ADMIN)
+- **Proteção de Rotas**: Middleware + API helpers + componente ProtectedRoute
+- **Páginas Administrativas**: CRUD de usuários, turmas, relatórios com gráficos
+- **Páginas do Professor**: Gestão de turmas com estatísticas
+- **Páginas do Aluno**: Perfil, notificações, configurações
+- **Filtros de Dados**: Dados filtrados por usuário e role
+- **Design System v2**: 15 componentes UI integrados
+- **Banco de Dados**: PostgreSQL com Prisma, migrações aplicadas
+- **Seeds**: Usuários, turmas, questionários adaptativos
 
 ### 🔄 Em Desenvolvimento
-- Sistema de autenticação (NextAuth)
-- Integração com banco MySQL + Prisma
-- APIs REST para CRUD
-- Testes automatizados
-- Cards de Aula v2 (AulaCard, ProfessorCard)
+- Melhorias no sistema de avaliações adaptativas
+- Testes de integração automatizados
+- Refinamento de relatórios e métricas
 
 ### 📋 Roadmap
 - PWA (Progressive Web App)
-- Notificações push
-- Relatórios em PDF com design system
-- Dashboard administrativo
+- Notificações push em tempo real
+- Relatórios em PDF
 - API móvel
+- Testes E2E completos
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma feature branch (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'feat: adicionar nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+Consulte [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes.
+
+## 📄 Licença
+
+Este projeto é parte de um Trabalho de Conclusão de Curso (TCC).
+
+## 👨‍💻 Autor
+
+Desenvolvido com ❤️ por Felipe e Nickollas
+
+---
+
+**Versão:** 3.0.0  
+**Última Atualização:** Novembro 2024
 - Storybook para documentação de componentes
 
 ## 🤝 Contribuição
