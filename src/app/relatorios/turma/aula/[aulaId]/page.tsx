@@ -111,7 +111,7 @@ export default function RelatorioTurmaPage() {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Turma", icon: <Users className="h-4 w-4" /> }
+          { label: "Turma"}
         ]} />
         <RelatorioPageSkeleton />
       </div>
@@ -123,7 +123,7 @@ export default function RelatorioTurmaPage() {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Turma", icon: <Users className="h-4 w-4" /> }
+          { label: "Turma"}
         ]} />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -171,7 +171,7 @@ export default function RelatorioTurmaPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: "Relatórios", href: "/relatorios" },
-        { label: "Turma", icon: <Users className="h-4 w-4" /> },
+        { label: "Turma"},
         { label: dados.aula.titulo }
       ]} />
 

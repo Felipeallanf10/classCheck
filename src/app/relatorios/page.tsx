@@ -13,7 +13,7 @@ const RelatoriosPage: React.FC = () => {
     <div className="container mx-auto p-6 space-y-8 bg-gray-50 dark:bg-gray-950 min-h-screen">
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
-        { label: "Relatórios", icon: <FileText className="h-4 w-4" /> }
+        { label: "Relatórios" }
       ]} />
 
       {/* Cabeçalho com Exportação Integrada */}
