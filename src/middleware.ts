@@ -6,6 +6,11 @@ export default withAuth(
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
+    // Se é a landing page (/) e não está logado, permitir acesso
+    if (path === '/' && !token) {
+      return NextResponse.next()
+    }
+
     // NÃO redirecionar `/` - é a landing page pública
     // Usuários logados podem ver a landing page normalmente
 
@@ -13,24 +18,35 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        const path = req.nextUrl.pathname
+        
+        // Landing page é sempre autorizada
+        if (path === '/') {
+          return true
+        }
+        
+        // Outras rotas precisam de token
+        return !!token
+      },
     },
   }
 )
 
-// Configuração de quais rotas o middleware deve proteger
+// Configuração de quais rotas o middleware deve verificar
 export const config = {
   matcher: [
     /*
      * Match all request paths except for:
-     * - / (landing page pública)
      * - /login (página de login)
      * - /cadastro (página de cadastro)
      * - /reset-password (página de recuperação de senha)
      * - /api/auth/* (rotas de autenticação)
      * - /_next/* (arquivos do Next.js)
-     * - /favicon.ico, /robots.txt (arquivos estáticos)
+     * - /favicon.ico, /robots.txt, etc (arquivos estáticos)
+     * 
+     * Nota: / (landing page) é verificada mas sempre autorizada no callback
      */
-    "/((?!^/$|login|cadastro|reset-password|api/auth|_next|favicon.ico|robots.txt|emotions).*)",
+    "/((?!login|cadastro|reset-password|api/auth|_next|favicon.ico|robots.txt|emotions|.*\\..*).*)",
   ],
 }
