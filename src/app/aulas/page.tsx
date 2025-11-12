@@ -103,7 +103,7 @@ function AulasPageContent() {
           <main className="w-full px-4 sm:px-6 py-6 space-y-4">
             {/* Breadcrumbs */}
             <Breadcrumbs items={[
-              { label: "Aulas", icon: <Calendar className="h-4 w-4" /> }
+              { label: "Aulas" }
             ]} />
 
             {/* Mobile Date Picker */}

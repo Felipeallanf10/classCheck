@@ -10,15 +10,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar permissão de ADMIN
   const { authorized, error } = await checkRole(['ADMIN']);
   if (!authorized) return error!;
 
   try {
-
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
     const body = await request.json();
     const { nome, codigo, ano, periodo, ativa } = body;
 
@@ -89,14 +89,15 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar permissão de ADMIN
   const { authorized, error } = await checkRole(['ADMIN']);
   if (!authorized) return error!;
 
   try {
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
 
     // Verificar se turma existe
     const turmaExistente = await prisma.turma.findUnique({

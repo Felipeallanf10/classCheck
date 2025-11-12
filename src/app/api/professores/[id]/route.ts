@@ -29,8 +29,11 @@ export async function GET(request: NextRequest, context: RouteParams) {
       )
     }
 
-    const professor = await prisma.professor.findUnique({
-      where: { id },
+    const professor = await prisma.usuario.findUnique({
+      where: { 
+        id,
+        role: 'PROFESSOR'
+      },
       select: {
         id: true,
         nome: true,
@@ -40,7 +43,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
         ativo: true,
         createdAt: true,
         updatedAt: true,
-        aulas: {
+        aulasMinistradas: {
           select: {
             id: true,
             titulo: true,
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
         },
         _count: {
           select: {
-            aulas: true
+            aulasMinistradas: true
           }
         }
       }
@@ -92,8 +95,11 @@ export async function PUT(request: NextRequest, context: RouteParams) {
     const data = updateProfessorSchema.parse(body)
 
     // Verificar se professor existe
-    const existingProfessor = await prisma.professor.findUnique({
-      where: { id }
+    const existingProfessor = await prisma.usuario.findUnique({
+      where: { 
+        id,
+        role: 'PROFESSOR'
+      }
     })
 
     if (!existingProfessor) {
@@ -103,9 +109,9 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       )
     }
 
-    // Verificar se email já está em uso por outro professor
+    // Verificar se email já está em uso por outro usuário
     if (data.email && data.email !== existingProfessor.email) {
-      const emailInUse = await prisma.professor.findUnique({
+      const emailInUse = await prisma.usuario.findUnique({
         where: { email: data.email }
       })
 
@@ -117,7 +123,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       }
     }
 
-    const professor = await prisma.professor.update({
+    const professor = await prisma.usuario.update({
       where: { id },
       data,
       select: {
@@ -161,11 +167,14 @@ export async function DELETE(request: NextRequest, context: RouteParams) {
     }
 
     // Verificar se professor existe
-    const existingProfessor = await prisma.professor.findUnique({
-      where: { id },
+    const existingProfessor = await prisma.usuario.findUnique({
+      where: { 
+        id,
+        role: 'PROFESSOR'
+      },
       include: {
         _count: {
-          select: { aulas: true }
+          select: { aulasMinistradas: true }
         }
       }
     })
@@ -178,14 +187,14 @@ export async function DELETE(request: NextRequest, context: RouteParams) {
     }
 
     // Verificar se professor tem aulas associadas
-    if (existingProfessor._count.aulas > 0) {
+    if (existingProfessor._count.aulasMinistradas > 0) {
       return NextResponse.json(
         { error: 'Não é possível deletar professor com aulas associadas. Desative o professor ao invés de deletar.' },
         { status: 400 }
       )
     }
 
-    await prisma.professor.delete({
+    await prisma.usuario.delete({
       where: { id }
     })
 

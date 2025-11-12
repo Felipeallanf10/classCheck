@@ -19,6 +19,7 @@ async function checkUser() {
         id: 52,
         nome: 'Usuário de Teste',
         email: 'teste52@classcheck.com',
+        senha: 'senha123', // Senha padrão para testes
         role: 'ALUNO',
         ativo: true
       }
