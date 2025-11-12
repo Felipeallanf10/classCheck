@@ -15,6 +15,14 @@ export default function DashboardPage() {
     return <DashboardSkeleton />
   }
 
+  // Se não tem sessão após loading, redirecionar para login
+  if (status === 'unauthenticated' || !session) {
+    if (typeof window !== 'undefined') {
+      window.location.replace('/login')
+    }
+    return <DashboardSkeleton />
+  }
+
   const userName = session?.user?.name || 'Usuário'
   const userRole = session?.user?.role || 'ALUNO'
 

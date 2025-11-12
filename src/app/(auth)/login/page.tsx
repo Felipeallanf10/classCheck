@@ -66,27 +66,27 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
+      // Usar redirect: true e callbackUrl - mais simples e confiável
       const result = await signIn('credentials', {
         email: data.email,
         senha: data.password,
-        redirect: false,
+        callbackUrl: '/dashboard',
+        redirect: false, // Manter false para controlar o feedback
       })
-
-      console.log('Resultado do signIn:', result)
 
       if (result?.error) {
         console.error('Erro no login:', result.error)
         toastHelpers.error("Email ou senha inválidos")
         setIsLoading(false)
       } else if (result?.ok) {
+        // Login bem-sucedido
         toastHelpers.success("Login realizado com sucesso!")
         
-        // Aguardar um pouco mais para garantir que a sessão foi criada
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Usar router.push em vez de window.location.href
-        // Isso funciona melhor com Next.js e NextAuth
-        router.push('/dashboard')
+        // Aguardar um pouco para mostrar o toast
+        setTimeout(() => {
+          // Força um reload completo da página para o dashboard
+          window.location.href = '/dashboard'
+        }, 500)
       }
     } catch (error) {
       console.error('Erro no login:', error)
