@@ -81,11 +81,12 @@ export default function LoginPage() {
       } else if (result?.ok) {
         toastHelpers.success("Login realizado com sucesso!")
         
-        // Aguardar um pouco para garantir que a sessão foi criada
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Aguardar um pouco mais para garantir que a sessão foi criada
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Redirecionamento para dashboard após login bem-sucedido
-        window.location.href = '/dashboard'
+        // Usar router.push em vez de window.location.href
+        // Isso funciona melhor com Next.js e NextAuth
+        router.push('/dashboard')
       }
     } catch (error) {
       console.error('Erro no login:', error)
