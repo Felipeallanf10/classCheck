@@ -1,25 +1,26 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { rateLimitMiddleware } from "@/lib/middleware/rate-limit"
+// import { rateLimitMiddleware } from "@/lib/middleware/rate-limit" // Desabilitado temporariamente
 
 export default withAuth(
   async function middleware(req) {
     const token = req.nextauth.token
     const path = req.nextUrl.pathname
 
-    // Debug para produção
-    if (process.env.NODE_ENV === 'production') {
+    // Debug apenas em desenvolvimento
+    if (process.env.NODE_ENV === 'development') {
       console.log('[Middleware] Path:', path, 'Token exists:', !!token)
     }
 
-    // Aplicar rate limiting apenas se não for rota de auth
-    if (!path.startsWith('/api/auth')) {
-      const rateLimitResponse = await rateLimitMiddleware(req as unknown as NextRequest)
-      if (rateLimitResponse) {
-        return rateLimitResponse
-      }
-    }
+    // Rate limiting desabilitado temporariamente até ser testado adequadamente
+    // TODO: Reativar rate limiting após implementar solução com Redis para produção
+    // if (!path.startsWith('/api/auth')) {
+    //   const rateLimitResponse = await rateLimitMiddleware(req as unknown as NextRequest)
+    //   if (rateLimitResponse) {
+    //     return rateLimitResponse
+    //   }
+    // }
 
     // Se é a landing page (/) e não está logado, permitir acesso
     if (path === '/' && !token) {
@@ -36,8 +37,8 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const path = req.nextUrl.pathname
         
-        // Debug para produção
-        if (process.env.NODE_ENV === 'production') {
+        // Debug apenas em desenvolvimento
+        if (process.env.NODE_ENV === 'development') {
           console.log('[Auth] Checking path:', path, 'Token exists:', !!token)
         }
         
