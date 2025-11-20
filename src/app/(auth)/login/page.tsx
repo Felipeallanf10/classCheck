@@ -40,24 +40,21 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      // Deixar NextAuth gerenciar o redirect automaticamente (melhor para produção)
+      // Usar redirect: true e deixar NextAuth gerenciar o redirect completo
+      // Isso garante que a sessão seja estabelecida antes do redirect
       const result = await signIn('credentials', {
         email: data.email,
         senha: data.password,
         callbackUrl: '/dashboard',
-        redirect: false, // Manter false apenas para mostrar mensagem de erro
+        redirect: true, // TRUE para NextAuth gerenciar tudo
       })
 
+      // Este código só será executado se redirect: false
+      // Com redirect: true, o NextAuth faz o redirect antes de retornar
       if (result?.error) {
         console.error('Erro no login:', result.error)
         toastHelpers.error("Email ou senha inválidos")
         setIsLoading(false)
-      } else if (result?.ok) {
-        // Login bem-sucedido - usar router.push do Next.js ao invés de window.location
-        toastHelpers.success("Login realizado com sucesso!")
-        
-        // Usar router.push para navegação client-side adequada
-        window.location.href = '/dashboard'
       }
     } catch (error) {
       console.error('Erro no login:', error)
