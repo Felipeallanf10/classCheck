@@ -1,15 +1,13 @@
 import type { NextConfig } from "next";
-import path from "path";
 
-// Configuração unificada após merge de backend ⨯ develop
-// Mantém: tolerância a erros de build (backend) + otimizações Turbopack/imports (develop)
-// Inclui: melhorias de hot reload em ambientes Docker + compress desabilitado em dev
+// Configuração otimizada para WSL2
+// Foco em velocidade máxima de compilação
 const nextConfig: NextConfig = {
-  // Ignorar erros de ESLint/TypeScript durante build (evita bloquear deploy enquanto issues são tratadas)
+  // Ignorar erros de ESLint/TypeScript durante build
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 
-  // ⚡ Otimização de imports e Turbopack
+  // ⚡ Otimização de imports
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -23,35 +21,21 @@ const nextConfig: NextConfig = {
       'recharts',
       'date-fns'
     ],
-    turbo: {
-      rules: {
-        '*.tsx': {
-          loaders: ['@turbo/loader-typescript'],
-          as: '*.tsx'
-        }
-      }
-    }
+    // Desabilitar Turbo temporariamente (pode causar lentidão em WSL)
+    // Use `npm run dev:turbo` para testar com Turbo
   },
 
-  // Hot reload robusto para Docker / WSL
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300
-      };
-    }
-    return config;
+  // REMOVER webpack poll - muito mais lento
+  // Use Turbopack com `npm run dev:turbo` ou Next.js padrão
+
+  // Desabilitar compressão em dev
+  compress: false,
+
+  // Cache agressivo
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
   },
-
-  // Evita warning sobre múltiplos lockfiles
-  outputFileTracingRoot: path.join(__dirname),
-
-  // Variáveis de ambiente simples (placeholder)
-  env: { CUSTOM_KEY: 'my-value' },
-
-  // Desabilitar compressão em dev para reduzir overhead
-  compress: false
 };
 
 export default nextConfig;

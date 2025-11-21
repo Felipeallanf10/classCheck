@@ -13,14 +13,13 @@ const updateProfessorSchema = z.object({
   ativo: z.boolean().optional()
 })
 
-interface RouteParams {
-  params: Promise<{ id: string }>
-}
-
-export async function GET(request: NextRequest, context: RouteParams) {
-  const params = await context.params
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     
     if (isNaN(id)) {
       return NextResponse.json(
@@ -79,10 +78,13 @@ export async function GET(request: NextRequest, context: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, context: RouteParams) {
-  const params = await context.params
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     
     if (isNaN(id)) {
       return NextResponse.json(
@@ -154,10 +156,13 @@ export async function PUT(request: NextRequest, context: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, context: RouteParams) {
-  const params = await context.params
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     
     if (isNaN(id)) {
       return NextResponse.json(

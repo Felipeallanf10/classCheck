@@ -13,11 +13,10 @@ const updateUserSchema = z.object({
   ativo: z.boolean().optional()
 })
 
-interface RouteParams {
-  params: Promise<{ id: string }>
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam)
@@ -125,7 +124,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam)
@@ -197,7 +199,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id: idParam } = await params
     const id = parseInt(idParam)
