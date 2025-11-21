@@ -1,11 +1,23 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -50,12 +62,55 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Para login com Google
+      if (account?.provider === 'google') {
+        try {
+          // Verificar se usuário já existe
+          const existingUser = await prisma.usuario.findUnique({
+            where: { email: user.email! }
+          });
+          
+          if (!existingUser) {
+            // Criar novo usuário com role ALUNO (padrão)
+            await prisma.usuario.create({
+              data: {
+                email: user.email!,
+                nome: user.name || '',
+                senha: '', // Usuários Google não precisam de senha
+                role: 'ALUNO', // Role padrão para novos usuários
+                ativo: true,
+                avatar: user.image,
+              }
+            });
+          }
+          
+          return true;
+        } catch (error) {
+          console.error('Erro ao criar usuário com Google:', error);
+          return false;
+        }
+      }
+      
+      return true;
+    },
     async jwt({ token, user }) {
       // Adicionar informações extras ao token
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.materia = user.materia;
+      } else if (token.email) {
+        // Buscar dados atualizados do usuário (para pegar mudanças de role)
+        const dbUser = await prisma.usuario.findUnique({
+          where: { email: token.email }
+        });
+        
+        if (dbUser) {
+          token.id = dbUser.id.toString();
+          token.role = dbUser.role;
+          token.materia = dbUser.materia;
+        }
       }
       return token;
     },
