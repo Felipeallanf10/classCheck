@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+// Mapeamento de humor para valores numéricos
+const humorParaNumero: Record<string, number> = {
+  PESSIMO: 1,
+  RUIM: 2,
+  NEUTRO: 3,
+  BOM: 4,
+  OTIMO: 5
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -37,8 +46,8 @@ export async function GET(request: NextRequest) {
       })
 
       // Total de professores
-      const totalProfessores = await prisma.professor.count({
-        where: { ativo: true }
+      const totalProfessores = await prisma.usuario.count({
+        where: { role: 'PROFESSOR', ativo: true }
       })
 
       // Total de aulas
@@ -229,8 +238,8 @@ export async function GET(request: NextRequest) {
       const profId = parseInt(professorId)
 
       // Verificar se professor existe
-      const professor = await prisma.professor.findUnique({
-        where: { id: profId }
+      const professor = await prisma.usuario.findUnique({
+        where: { id: profId, role: 'PROFESSOR' }
       })
 
       if (!professor) {

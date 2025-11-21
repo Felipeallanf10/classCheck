@@ -88,6 +88,7 @@ if (!process.env.DATABASE_URL) {
       data: {
         email: 'teste-resposta-api@test.com',
         nome: 'Teste Resposta API',
+        senha: 'senha123',
         role: 'ALUNO',
       },
     });
