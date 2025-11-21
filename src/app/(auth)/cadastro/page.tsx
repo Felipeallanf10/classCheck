@@ -73,18 +73,40 @@ export default function CadastroPage() {
 
   const onSubmit = async (data: CadastroFormData) => {
     setIsLoading(true)
-    console.log('Dados do cadastro:', data)
     
     try {
-      // Simula chamada de API
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      // Criar usuário via API
+      const response = await fetch('/api/auth/cadastro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome: data.nome,
+          email: data.email,
+          senha: data.password,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao criar conta')
+      }
+
       toast.success("Conta criada com sucesso!")
       
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
-    } catch {
-      toast.error("Erro ao criar conta. Tente novamente.")
+      // Fazer login automaticamente após cadastro
+      const { signIn } = await import('next-auth/react')
+      await signIn('credentials', {
+        email: data.email,
+        senha: data.password,
+        redirect: true,
+        callbackUrl: '/dashboard',
+      })
+    } catch (error: any) {
+      console.error('Erro no cadastro:', error)
+      toast.error(error.message || "Erro ao criar conta. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -92,19 +114,13 @@ export default function CadastroPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true)
-    console.log("Cadastro com Google")
     
     try {
-      // Simula chamada de API do Google
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast.success("Cadastro com Google realizado!")
-      
-      // Redirecionamento após sucesso
-      setTimeout(() => router.push('/dashboard'), 1000)
-    } catch {
+      const { signIn } = await import('next-auth/react')
+      await signIn('google', { callbackUrl: '/dashboard' })
+    } catch (error) {
+      console.error('Erro no cadastro com Google:', error)
       toast.error("Erro no cadastro com Google. Tente novamente.")
-    } finally {
       setIsGoogleLoading(false)
     }
   }
