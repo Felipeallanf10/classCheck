@@ -261,7 +261,7 @@ export async function gerarRelatorioPDF(dados: DadosRelatorioPDF): Promise<Blob>
 
     doc.setFontSize(11);
     doc.setTextColor(220, 38, 38); // red-600
-    doc.text('⚠️ Alertas Críticos', 25, yPosition);
+    doc.text('! Alertas Criticos', 25, yPosition);
 
     yPosition += 6;
 
@@ -325,13 +325,13 @@ export async function gerarRelatorioPDF(dados: DadosRelatorioPDF): Promise<Blob>
 function getTendenciaIcon(tendencia: 'SUBINDO' | 'ESTAVEL' | 'DESCENDO'): string {
   switch (tendencia) {
     case 'SUBINDO':
-      return '↑ Subindo';
+      return '^ Subindo';
     case 'DESCENDO':
-      return '↓ Descendo';
+      return 'v Descendo';
     case 'ESTAVEL':
-      return '→ Estável';
+      return '= Estavel';
     default:
-      return '—';
+      return '-';
   }
 }
 

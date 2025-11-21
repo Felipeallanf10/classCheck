@@ -162,7 +162,7 @@ async function testarExportacaoExcel() {
 
   try {
     console.log('🔧 Gerando Excel...');
-    const buffer = gerarRelatorioExcel(dadosMock);
+    const buffer = await gerarRelatorioExcel(dadosMock);
     
     console.log('✅ Excel gerado com sucesso!');
     console.log(`   - Tamanho: ${(buffer.byteLength / 1024).toFixed(2)} KB\n`);

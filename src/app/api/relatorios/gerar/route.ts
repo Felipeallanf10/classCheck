@@ -279,7 +279,7 @@ export async function GET(request: NextRequest) {
         },
       });
     } else if (formato === 'excel') {
-      const buffer = Buffer.from(gerarRelatorioExcel(dadosExport));
+      const buffer = Buffer.from(await gerarRelatorioExcel(dadosExport));
       
       return new NextResponse(buffer, {
         headers: {

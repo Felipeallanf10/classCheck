@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Arquivos de teste
+test-relatorio.pdf
+test-relatorio.xlsx
