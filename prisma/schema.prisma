@@ -18,10 +18,7 @@ datasource db {
 // MODELOS DO CLASSCHECK
 // ==============================================
 
-<<<<<<< HEAD
-=======
 // Modelo Usuario (Unificado: ALUNO, PROFESSOR, ADMIN)
->>>>>>> feature/auth-and-roles
 model Usuario {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -75,16 +72,12 @@ model Usuario {
   @@map("usuarios")
 }
 
-<<<<<<< HEAD
-model Professor {
-=======
 // ==============================================
 // MODELOS DE TURMAS E ORGANIZAÇÃO
 // ==============================================
 
 // Modelo Turma
 model Turma {
->>>>>>> feature/auth-and-roles
   id        Int      @id @default(autoincrement())
   nome      String // "3º Ano A", "Turma 301", etc.
   codigo    String   @unique // "3A", "301", etc.
@@ -120,8 +113,6 @@ model TurmaAluno {
   @@map("turmas_alunos")
 }
 
-<<<<<<< HEAD
-=======
 // Tabela de junção: Turma ↔ Professor (N:N)
 model TurmaProfessor {
   id          Int      @id @default(autoincrement())
@@ -153,7 +144,6 @@ enum Periodo {
 // ==============================================
 
 // Modelo Aula
->>>>>>> feature/auth-and-roles
 model Aula {
   id          Int        @id @default(autoincrement())
   titulo      String
@@ -276,14 +266,9 @@ model AvaliacaoProfessor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-<<<<<<< HEAD
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
-  professor Professor @relation(fields: [professorId], references: [id])
-=======
   // Relacionamentos
   usuario   Usuario @relation(fields: [usuarioId], references: [id])
   professor Usuario @relation("AvaliacoesProfessor", fields: [professorId], references: [id])
->>>>>>> feature/auth-and-roles
 
   @@unique([usuarioId, professorId, periodo])
   @@map("avaliacoes_professores")
@@ -485,7 +470,6 @@ model SessaoAdaptativa {
   pausadoEm          DateTime?
   finalizadoEm       DateTime?
   tempoTotalSegundos Int?
-<<<<<<< HEAD
   tempoMedioResposta Int?
   totalPerguntasEstimado Int?
   scoresPorCategoria     Json?
@@ -493,24 +477,6 @@ model SessaoAdaptativa {
   dispositivo String?
   aulaId      Int?
   eventoId    String?
-  usuario      Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  questionario QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
-  aula         Aula?                      @relation(fields: [aulaId], references: [id], onDelete: SetNull)
-  respostas    RespostaSocioemocional[]
-  alertas      AlertaSocioemocional[]
-=======
-  tempoMedioResposta Int? // Tempo médio por resposta em segundos
-
-  // Estimativas e scores
-  totalPerguntasEstimado Int? // Total estimado de perguntas (para adaptativos)
-  scoresPorCategoria     Json? // Scores finais por categoria { "BEM_ESTAR": 7, "SONO": 6 }
-
-  // Contexto adicional
-  contexto    Json? // Dados extras (localização, humor prévio, etc) - DEPRECATED, use contextoMetadata
-  dispositivo String? // "mobile", "desktop", "tablet"
-  aulaId      Int? // ID da aula (se contexto = AULA)
-  eventoId    String? // ID do evento (se contexto = EVENTO)
-
   // Relacionamentos
   usuario         Usuario                    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   questionario    QuestionarioSocioemocional @relation(fields: [questionarioId], references: [id])
@@ -519,7 +485,6 @@ model SessaoAdaptativa {
   alertas         AlertaSocioemocional[]
   logsAdaptativos LogAdaptativo[]
 
->>>>>>> feature/auth-and-roles
   @@index([usuarioId, status])
   @@index([questionarioId, status])
   @@index([nivelAlerta])
@@ -550,13 +515,6 @@ model RespostaSocioemocional {
   thetaAposResposta Float?
   contribuicaoInfo  Float?
   timestamp DateTime @default(now())
-<<<<<<< HEAD
-  ordem     Int
-  sessao        SessaoAdaptativa        @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
-  pergunta      PerguntaSocioemocional? @relation(fields: [perguntaId], references: [id])
-  perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
-  usuario       Usuario                 @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-=======
   ordem     Int // Ordem da resposta na sessão
 
   // Relacionamentos
@@ -565,7 +523,6 @@ model RespostaSocioemocional {
   perguntaBanco BancoPerguntasAdaptativo? @relation(fields: [perguntaBancoId], references: [id])
   usuario       Usuario                   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
->>>>>>> feature/auth-and-roles
   @@index([sessaoId, ordem])
   @@index([usuarioId, timestamp])
   @@index([perguntaId])
@@ -612,8 +569,6 @@ model AlertaSocioemocional {
   @@map("alertas_socioemocionais")
 }
 
-<<<<<<< HEAD
-=======
 // Modelo LogAdaptativo (Logs Técnicos de Adaptação)
 model LogAdaptativo {
   id        String @id @default(uuid())
@@ -746,7 +701,6 @@ enum GranularidadeMetrica {
 }
 
 // Modelo HistoricoEmocional (Evolução Temporal)
->>>>>>> feature/auth-and-roles
 model HistoricoEmocional {
   id        String @id @default(uuid())
   usuarioId Int
