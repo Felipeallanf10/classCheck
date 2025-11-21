@@ -26,6 +26,7 @@
     "db:seed": "prisma db seed",
     "db:seed:adaptativo": "tsx prisma/seed-adaptativo.ts",
     "db:seed:avaliacoes": "tsx prisma/seed-avaliacoes-mock.ts",
+    "db:seed:escalas": "tsx prisma/seeds/seed-escalas-clinicas.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
