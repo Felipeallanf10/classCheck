@@ -9,6 +9,9 @@ export const metadata = {
   description: 'Visualize métricas e análise de risco dos alunos',
 };
 
+// Forçar renderização dinâmica (usa headers para autenticação)
+export const dynamic = 'force-dynamic';
+
 export default async function ProfessorRelatoriosPage() {
   const usuario = await requireAuth();
   
