@@ -72,6 +72,18 @@ model Usuario {
   @@map("usuarios")
 }
 
+// Modelo Materia
+model Materia {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique // "Matemática", "Português", etc.
+  descricao String? // Descrição opcional da matéria
+  ativa     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("materias")
+}
+
 // ==============================================
 // MODELOS DE TURMAS E ORGANIZAÇÃO
 // ==============================================

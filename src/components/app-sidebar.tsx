@@ -22,6 +22,7 @@ import {
   ClipboardList,
   School,
   UserCheck,
+  GraduationCap,
 } from "lucide-react"
 
 import { NavUser } from "@/components/nav-user"
@@ -55,6 +56,7 @@ const navItemsByRole = {
   ADMIN: [
     { label: "Dashboard", icon: Home, href: "/dashboard" },
     { label: "Usuários", icon: Users, href: "/admin/usuarios" },
+    { label: "Matérias", icon: GraduationCap, href: "/admin/materias" },
     { label: "Turmas", icon: School, href: "/admin/turmas" },
   ],
 }
