@@ -1,235 +1,201 @@
-# 🧭 GUIA COMPLETO DE EXECUÇÃO — REESTRUTURAÇÃO FUNCIONAL CLASSCHECK v3.0
+Durante o teste do fluxo de avaliação de aula (como aluno), foram identificadas falhas graves de consistência lógica e de integração com o backend.
+Esses problemas afetam a experiência do usuário e a confiabilidade dos relatórios.
 
-**Objetivo:**  
-Aplicar o **Relatório de Coesão Funcional** de forma controlada, organizando e unificando o sistema ClassCheck para eliminar redundâncias, melhorar a clareza funcional e simplificar a navegação — **sem perda de funcionalidades existentes**.
+Abaixo segue um resumo técnico do diagnóstico atual e as instruções de correção estruturadas.
 
----
+🧩 Problemas Identificados
+1. Fluxo de Questionários
 
-## ⚙️ DIRETRIZES GERAIS DE EXECUÇÃO
+O questionário socioemocional inicia corretamente e cria uma sessão no banco, porém:
 
-### 🧩 1. Organização de Branches
-Cada fase da reestruturação deve ser feita em uma **branch separada**, seguindo este padrão:
+Não exibe o questionário didático após a finalização da parte socioemocional.
 
-| Fase | Branch | Objetivo |
-|------|---------|-----------|
-| 1 | `refactor/phase1-dashboard-unification` | Unificação de dashboards e exportação |
-| 2 | `refactor/phase2-forms-and-questionarios` | Unificação de questionários e ajuda/suporte |
-| 3 | `refactor/phase3-help-and-cleanup` | Integração de favoritos, limpeza e refinamentos |
+A lógica de transição entre tipos de questionários (socioemocional → didático → feedback geral) parece incompleta.
 
-> 🧱 **Importante:** Nenhuma branch deve ser mergeada sem validação funcional completa e aprovação do gerente de projeto.
+Quando uma seção é pausada, não há forma clara de retomá-la.
 
----
+Falta persistência do estado da sessão (em andamento, pausada, concluída).
 
-### 🧾 2. Padrão de Commits
-Use **commits semânticos e descritivos**, por exemplo:
+2. Status das Aulas
 
-feat(dashboard): unificação das páginas /home e /dashboard
-refactor(relatorios): integração da exportação dentro da página principal
-fix(routes): ajuste dos redirecionamentos para nova estrutura
-docs(refactor): criação do relatório da fase 1
+Mesmo após avaliar uma aula, o status visual continua como “pendente”.
 
-yaml
-Copiar código
+O sistema não atualiza o campo avaliada = true no banco, ou não reflete isso corretamente no frontend.
 
----
+O estado visual da aula e o estado real no banco estão divergentes.
 
-### 🧱 3. Padrão de Relatórios
-Ao final de cada fase, gerar um arquivo Markdown dentro de:
+3. Dados Mock e Integração Real
 
-/docs/relatorios/refactor-faseX.md
+Módulos como “Minhas Avaliações” ainda usam dados estáticos ou mocks.
 
-markdown
-Copiar código
+Nenhum relatório está sendo alimentado com dados reais do banco.
 
-O relatório deve conter:
-- ✅ Lista de alterações aplicadas  
-- ⚙️ Páginas removidas/unificadas  
-- 🧩 Novos componentes criados  
-- 🔁 Redirecionamentos aplicados  
-- 🧪 Testes executados e status do build
+A persistência de respostas e métricas não está centralizada (parece haver múltiplas fontes de dados).
 
----
+4. Relatórios e Análises
 
-## 🚀 FASE 1 — UNIFICAÇÕES CRÍTICAS (2–3 DIAS)
+Ao finalizar um questionário, o sistema mostra apenas dados genéricos e superficiais (ex: confiança 7/10, estresse 8/10).
 
-### 🎯 Objetivo:
-Eliminar as redundâncias mais impactantes: **/home**, **/dashboard** e **/exportacao**.
+Não há consolidação de dados históricos nem métricas analíticas.
 
-### Passos:
+Falta um painel analítico que relacione as respostas do aluno com:
 
-#### 1. Unificar `/home` e `/dashboard`
-- Consolidar ambas em `/dashboard`.
-- Mover componentes úteis de `/home` (como `PersonalStats`, `QuickActions`, etc.).
-- Estruturar `/dashboard` com as seções:
-  - Resumo pessoal  
-  - Humor e desempenho  
-  - Análises recentes  
-  - Atividades e atalhos rápidos
-- Atualizar `app-sidebar.tsx` e redirecionar `/home` → `/dashboard`.
+A aula avaliada
 
-#### 2. Integrar `/exportacao` dentro de `/relatorios`
-- Criar componente `components/relatorios/ExportDropdown.tsx` com botões:
-  - PDF  
-  - Excel  
-  - CSV
-- Incluir no cabeçalho de `/relatorios`:
-  ```tsx
-  <PageHeader title="Relatórios" actions={<ExportDropdown />} />
-Remover rota /exportacao e ajustar todas as referências.
+O professor
 
-Adicionar redirect /exportacao → /relatorios.
+O contexto socioemocional e didático
 
-📦 Branch: refactor/phase1-dashboard-unification
-📄 Relatório: docs/relatorios/refactor-fase1.md
+⚙️ Instruções de Correção – Prioridades de Implementação
+🔹 Passo 1 – Criação da Branch e Organização
 
-## 🧩 FASE 2 — CONSOLIDAÇÕES DE CONTEÚDO (3–4 DIAS)
-###  Objetivo:
-Unificar páginas conceitualmente idênticas (questionários e suporte).
+Antes de iniciar qualquer modificação:
 
-Passos:
-1. Unificar /questionario + /avaliacao-socioemocional
-Centralizar tudo em /avaliacao-socioemocional.
+git checkout -b refactor/phase3-assessment-improvements
 
-Estruturar com tabs (shadcn/ui):
 
-tsx
-Copiar código
-<Tabs defaultValue="novo">
-  <TabsTrigger value="novo">Nova Avaliação</TabsTrigger>
-  <TabsTrigger value="historico">Histórico</TabsTrigger>
-  <TabsTrigger value="analise">Análise</TabsTrigger>
-</Tabs>
-Mover conteúdos e componentes de /questionario/* para dentro de /avaliacao-socioemocional/.
+Nunca trabalhar direto na develop.
 
-Atualizar rotas e sidebar.
+🔹 Passo 2 – Revisar Estrutura de Sessões e Fluxo de Avaliação
 
-Adicionar redirects /questionario → /avaliacao-socioemocional.
+Centralizar o controle de sessão em um único módulo (ex: useSessionStore via Zustand).
 
-2. Unificar /ajuda + /suporte
-Criar /ajuda como página unificada.
+Garantir que cada sessão tenha:
 
-Estrutura recomendada:
+id_aluno, id_aula, tipo_questionario, status (iniciada, pausada, concluída), respostas, data_inicio, data_fim.
 
-FAQSection: perguntas frequentes
+Ao pausar, salvar o estado parcial no banco.
 
-SupportSection: contato com equipe
+Ao retornar, permitir continuar da última pergunta respondida.
 
-QuickContactCard: formulário rápido
+🔹 Passo 3 – Corrigir Transição entre Questionários
 
-Usar Accordion ou Tabs do shadcn/ui.
+Após o questionário socioemocional, carregar automaticamente o questionário didático correspondente à aula.
 
-Remover /suporte e criar redirect /suporte → /ajuda.
+Implementar lógica adaptativa (usando json-rules-engine) para definir qual próximo questionário deve ser apresentado.
 
-📦 Branch: refactor/phase2-forms-and-questionarios
-📄 Relatório: docs/relatorios/refactor-fase2.md
+Exibir progress bar unificada mostrando o avanço total da avaliação (socioemocional + didática).
 
-## 🧱 FASE 3 — REFINAMENTOS E LIMPEZA (1–2 DIAS)
-🎯 Objetivo:
-Integrar funções menores, remover páginas temporárias e revisar a navegação geral.
+🔹 Passo 4 – Atualizar Status das Aulas
 
-Passos:
-1. Integrar /favoritos em /aulas
-Adicionar filtro “Favoritas” no topo da lista de aulas:
+No backend: ao concluir uma avaliação, atualizar aula.avaliada = true.
 
-tsx
-Copiar código 
-<ToggleFilter name="Favoritas" icon={<Star />} />
-Remover rota /favoritos e atualizar links no menu lateral.
+No frontend: atualizar o estado global para refletir a mudança (sem precisar recarregar a página).
 
-2. Limpar páginas temporárias e dev
-Remover /sprint3, /dev, /test e demais rotas desnecessárias.
+Exibir selo visual “✅ Avaliada” nas aulas finalizadas.
 
-Validar se há arquivos obsoletos em /app.
+🔹 Passo 5 – Substituir Dados Mock por Dados Reais
 
-3. Revisar Navegação e Sidebar
-Atualizar app-sidebar.tsx com nova estrutura:
+Remover completamente mocks dos módulos:
 
-tsx
-Copiar código
-{ title: "Painel", href: "/dashboard" },
-{ title: "Aulas", href: "/aulas" },
-{ title: "Avaliações", href: "/avaliacoes" },
-{ title: "Relatórios", href: "/relatorios" },
-{ title: "Ajuda", href: "/ajuda" },
-Verificar todos os redirecionamentos e rotas nomeadas.
+Minhas Avaliações
 
-📦 Branch: refactor/phase3-help-and-cleanup
-📄 Relatório: docs/relatorios/refactor-fase3.md
+Relatórios
 
-🧪 TESTES E VALIDAÇÕES (após cada fase)
- Build local sem erros (yarn build ou npm run build)
+Resumo Pós-Avaliação
 
- Testar todos os redirects configurados
+Garantir que todas as exibições sejam carregadas via TanStack Query, a partir de dados persistidos no banco.
 
- Verificar funcionamento dos filtros e exportações
+🔹 Passo 6 – Reformular os Relatórios
 
- Validar navegação mobile
+Criar um módulo de análise real das avaliações, alimentado pelos dados de questionários.
 
- Garantir que todos os componentes reutilizados continuam funcionais
+O relatório final deve incluir:
 
-📊 RESULTADO ESPERADO
-Métrica	Situação Atual	Meta Pós-Refatoração
-Total de páginas	60	25
-Páginas redundantes	12	0
-Caminhos duplicados	7	0
-Consistência de navegação	70%	100%
-Build funcional	✅	✅
+Médias ponderadas por dimensão (ex: empatia, motivação, didática)
 
-🧱 ESTRUTURA FINAL ESPERADA
-bash
-Copiar código
-src/app/
-├── dashboard/
-├── aulas/
-│   └── [id]/avaliar/
-├── avaliacoes/
-├── avaliacao-socioemocional/
-├── relatorios/
-├── insights/
-├── gamificacao/
-├── ajuda/
-├── sobre/
-├── contato/
-├── politica-de-privacidade/
-├── termos-de-uso/
-└── (auth)/
-🧠 PÓS-REFATORAÇÃO
-Gerar documento final de estrutura atualizada:
+Comparativo com resultados anteriores do mesmo aluno/professor
 
-/docs/estrutura-final.md
+Gráficos e visualizações reais (usando chart.js ou recharts)
 
-Deve conter todas as rotas e seus componentes.
+Indicadores agregados (ex: evolução emocional, desempenho didático, engajamento)
 
-Criar relatório geral consolidado:
+📊 Banco de Dados – Ajustes Necessários
 
-/docs/relatorios/refactor-consolidado.md
+Tabela questionario_sessao
 
-Resumo das 3 fases, métricas, resultados e melhorias obtidas.
+id
 
-Enviar para revisão do gerente de projeto (Felipe Allan) antes do merge final na branch develop.
+id_aluno
 
-📅 CRONOGRAMA RECOMENDADO
-Fase	Duração	Branch	Responsável
-1	2–3 dias	refactor/phase1-dashboard-unification	[dev responsável]
-2	3–4 dias	refactor/phase2-forms-and-questionarios	[dev responsável]
-3	1–2 dias	refactor/phase3-help-and-cleanup	[dev responsável]
-Total:	6–9 dias úteis	—	—
+id_aula
 
-✅ RESULTADO FINAL DESEJADO
-Sistema funcional, leve e sem redundâncias
+tipo (socioemocional, didatico)
 
-Navegação lógica e simplificada
+status (iniciada, pausada, concluida)
 
-Estrutura de código limpa e documentada
+data_inicio
 
-Todas as rotas semânticas e atualizadas
+data_fim
 
-Base sólida para expansão da versão 3.1
+Tabela questionario_resposta
 
-📍 Responsável pela Execução: [Nome do Desenvolvedor]
-🧑‍💼 Supervisor Técnico: Felipe Allan (Gerente de Projeto)
-🗓️ Data de Início: [preencher]
-🗓️ Data de Entrega Estimada: [preencher]
-📂 Branch Base: develop
+id
 
-Após concluir cada fase, gerar o relatório correspondente e enviar para revisão antes do merge.
+id_sessao
+
+id_pergunta
+
+resposta
+
+peso
+
+tempo_resposta
+
+Tabela avaliacao_resultado
+
+id
+
+id_aula
+
+id_aluno
+
+pontuacao_emocional
+
+pontuacao_didatica
+
+pontuacao_geral
+
+data_avaliacao
+
+Tabela aula (ajuste)
+
+Adicionar campo avaliada (boolean)
+
+Adicionar campo ultima_avaliacao_id (foreign key)
+
+🧠 Melhorias de UX e Feedback
+
+Ao finalizar o questionário, exibir:
+
+Gráficos dinâmicos (ex: radar chart de habilidades socioemocionais)
+
+Mensagens interpretativas (ex: “Seu engajamento aumentou 12% desde a última aula”)
+
+Sugestões personalizadas (ex: “Tente participar mais nas próximas aulas de grupo”)
+
+Adicionar salvamento automático a cada resposta.
+
+Implementar toast notifications quando o progresso for salvo ou retomado.
+
+✅ Checklist de Entregas
+
+ Criar branch refactor/phase3-assessment-improvements
+
+ Revisar fluxo completo de sessões (criação, pausa, retomada)
+
+ Corrigir transição entre questionários
+
+ Atualizar estado visual de aulas avaliadas
+
+ Remover dados mock e integrar TanStack Query
+
+ Alimentar relatórios com dados reais
+
+ Criar análises com gráficos e métricas úteis
+
+ Validar persistência em banco e UX de feedback
+
+🚀 Meta
+
+Garantir que todas as avaliações (socioemocionais e didáticas) sejam totalmente dinâmicas, persistentes e analíticas, gerando relatórios reais, úteis e visualmente consistentes.

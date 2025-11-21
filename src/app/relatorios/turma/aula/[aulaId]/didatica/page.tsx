@@ -181,8 +181,8 @@ export default function RelatorioDidaticoTurmaPage() {
       <div className="min-h-screen bg-background p-6">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`, icon: <Users className="h-4 w-4" /> },
-          { label: "Avaliação Didática", icon: <BookOpen className="h-4 w-4" /> }
+          { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`},
+          { label: "Avaliação Didática"}
         ]} />
         <RelatorioPageSkeleton />
       </div>
@@ -194,8 +194,8 @@ export default function RelatorioDidaticoTurmaPage() {
       <div className="min-h-screen bg-background p-6">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`, icon: <Users className="h-4 w-4" /> },
-          { label: "Avaliação Didática", icon: <BookOpen className="h-4 w-4" /> }
+          { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`},
+          { label: "Avaliação Didática"}
         ]} />
         <Alert variant="destructive" className="max-w-md mt-4">
           <AlertDescription>{error || 'Erro desconhecido'}</AlertDescription>
@@ -220,8 +220,8 @@ export default function RelatorioDidaticoTurmaPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: "Relatórios", href: "/relatorios" },
-        { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`, icon: <Users className="h-4 w-4" /> },
-        { label: "Avaliação Didática", icon: <BookOpen className="h-4 w-4" /> }
+        { label: "Turma", href: `/relatorios/turma/aula/${aulaId}`},
+        { label: "Avaliação Didática"}
       ]} />
 
       {/* Header */}

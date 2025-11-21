@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import bcrypt from 'bcryptjs'
 
 // Força a rota a ser dinâmica
 export const dynamic = 'force-dynamic';
@@ -8,7 +9,9 @@ export const dynamic = 'force-dynamic';
 const createUserSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   email: z.string().email('Email inválido'),
-  role: z.enum(['ALUNO', 'PROFESSOR', 'ADMIN']).default('ALUNO')
+  senha: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+  role: z.enum(['ALUNO', 'PROFESSOR', 'ADMIN']).default('ALUNO'),
+  materia: z.string().optional()
 })
 
 export async function GET() {
@@ -40,11 +43,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const data = createUserSchema.parse(body)
+    const { senha, ...rest } = createUserSchema.parse(body)
     
     // Verificar se email já existe
     const existingUser = await prisma.usuario.findUnique({
-      where: { email: data.email }
+      where: { email: rest.email }
     })
     
     if (existingUser) {
@@ -54,13 +57,20 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // Hash da senha
+    const senhaHash = await bcrypt.hash(senha, 10)
+    
     const usuario = await prisma.usuario.create({
-      data,
+      data: {
+        ...rest,
+        senha: senhaHash
+      },
       select: {
         id: true,
         nome: true,
         email: true,
         role: true,
+        materia: true,
         createdAt: true
       }
     })

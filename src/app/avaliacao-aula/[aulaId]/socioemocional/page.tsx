@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useSession } from '@/hooks/useSession'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -19,6 +20,7 @@ interface Aula {
 export default function AvaliacaoSocioemocionaalPage() {
   const params = useParams()
   const router = useRouter()
+  const { data: session } = useSession()
   const aulaId = params.aulaId as string
   
   const [aula, setAula] = useState<Aula | null>(null)

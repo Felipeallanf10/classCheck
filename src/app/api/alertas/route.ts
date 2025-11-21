@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAuth } from '@/lib/auth-helpers';
 import { z } from 'zod';
 
 // Força a rota a ser dinâmica
@@ -22,9 +23,12 @@ const AlertasQuerySchema = z.object({
  * GET /api/alertas
  * 
  * Lista alertas socioemocionais do usuário
+ * - Alunos veem apenas seus próprios alertas
+ * - Professores veem alertas de alunos das suas turmas
+ * - Admins veem todos os alertas
  * 
  * Query Params:
- * - usuarioId: number (opcional, mas recomendado)
+ * - usuarioId: number (opcional para ADMIN/PROFESSOR, ignorado para ALUNO)
  * - nivel: 'VERDE' | 'AMARELO' | 'LARANJA' | 'VERMELHO' (opcional)
  * - tipo: string (opcional)
  * - ativo: 'true' | 'false' (opcional)
@@ -38,6 +42,10 @@ const AlertasQuerySchema = z.object({
  * GET /api/alertas?sessaoId=abc123&status=ATIVO,VISUALIZADO,EM_ACOMPANHAMENTO
  */
 export async function GET(request: NextRequest) {
+  // Verificar autenticação
+  const { authenticated, userId, userRole, error } = await requireAuth()
+  if (!authenticated) return error!
+
   try {
     // Extrair e validar query params
     const searchParams = request.nextUrl.searchParams;
@@ -65,14 +73,44 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros para Prisma
     const where: any = {};
+    
+    // FILTRO POR USUÁRIO BASEADO NO ROLE
+    if (userRole === 'ALUNO') {
+      // Aluno vê APENAS seus próprios alertas
+      where.usuarioId = userId!
+    } else if (userRole === 'PROFESSOR') {
+      // Professor vê alertas de alunos das suas turmas
+      const turmasDoProfessor = await prisma.turmaProfessor.findMany({
+        where: { professorId: userId! },
+        select: { turmaId: true }
+      })
+      
+      const turmaIds = turmasDoProfessor.map(t => t.turmaId)
+      
+      // Buscar alunos dessas turmas
+      const alunosDasTurmas = await prisma.turmaAluno.findMany({
+        where: { turmaId: { in: turmaIds } },
+        select: { alunoId: true }
+      })
+      
+      const alunoIds = [...new Set(alunosDasTurmas.map(ta => ta.alunoId))]
+      
+      // Se especificou usuarioId e ele está na lista, usar. Caso contrário, todos da lista
+      if (validatedParams.data.usuarioId && alunoIds.includes(validatedParams.data.usuarioId)) {
+        where.usuarioId = validatedParams.data.usuarioId
+      } else {
+        where.usuarioId = { in: alunoIds }
+      }
+    } else if (userRole === 'ADMIN') {
+      // Admin pode especificar usuarioId ou ver todos
+      if (validatedParams.data.usuarioId) {
+        where.usuarioId = validatedParams.data.usuarioId;
+      }
+    }
 
     // Filtro de ativo (padrão: não filtrar, mostrar todos se não especificado)
     if (validatedParams.data.ativo !== undefined && validatedParams.data.ativo !== null) {
       where.ativo = validatedParams.data.ativo === 'true';
-    }
-
-    if (validatedParams.data.usuarioId) {
-      where.usuarioId = validatedParams.data.usuarioId;
     }
 
     if (validatedParams.data.nivel) {

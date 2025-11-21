@@ -201,8 +201,8 @@ export default function RelatorioProfessorPage() {
       <div className="min-h-screen bg-background p-4">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Professores", href: "/professores", icon: <Users className="h-4 w-4" /> },
-          { label: "Avaliação do Professor", icon: <Star className="h-4 w-4" /> }
+          { label: "Professores", href: "/professores"},
+          { label: "Avaliação do Professor"}
         ]} />
         <RelatorioPageSkeleton />
       </div>
@@ -214,8 +214,8 @@ export default function RelatorioProfessorPage() {
       <div className="min-h-screen bg-background p-6">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Professores", href: "/professores", icon: <Users className="h-4 w-4" /> },
-          { label: "Avaliação do Professor", icon: <Star className="h-4 w-4" /> }
+          { label: "Professores", href: "/professores"},
+          { label: "Avaliação do Professor"}
         ]} />
         <Alert variant="destructive" className="max-w-md mt-4">
           <AlertCircle className="h-4 w-4" />
@@ -238,8 +238,8 @@ export default function RelatorioProfessorPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: "Relatórios", href: "/relatorios" },
-        { label: "Professores", href: "/professores", icon: <Users className="h-4 w-4" /> },
-        { label: dados.professor.nome, icon: <Star className="h-4 w-4" /> }
+        { label: "Professores", href: "/professores"},
+        { label: dados.professor.nome}
       ]} />
 
       {/* Header */}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAuth, checkRole } from '@/lib/auth-helpers'
 import { z } from 'zod'
 
 // Força a rota a ser dinâmica
@@ -12,15 +13,20 @@ const createAulaSchema = z.object({
   dataHora: z.string().datetime('Data e hora inválidas'),
   duracao: z.number().min(15, 'Duração mínima de 15 minutos').max(480, 'Duração máxima de 8 horas'),
   professorId: z.number().int().positive('Professor é obrigatório'),
+  turmaId: z.number().int().positive('Turma é obrigatória'),
   sala: z.string().optional()
 })
 
 export async function GET(request: NextRequest) {
+  // Verificar autenticação
+  const { authenticated, userId, userRole, error } = await requireAuth()
+  if (!authenticated) return error!
+
   try {
     const { searchParams } = new URL(request.url)
     
     // Parse manual dos parâmetros
-    const date = searchParams.get('date') || undefined // Novo: filtro por data específica
+    const date = searchParams.get('date') || undefined
     const page = parseInt(searchParams.get('page') || '1') || 1
     const limit = parseInt(searchParams.get('limit') || '10') || 10
     const search = searchParams.get('search') || undefined
@@ -34,6 +40,23 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros dinâmicos
     const where: any = {}
+    
+    // FILTRO POR USUÁRIO BASEADO NO ROLE
+    if (userRole === 'ALUNO') {
+      // Aluno vê apenas aulas das suas turmas
+      const turmasDoAluno = await prisma.turmaAluno.findMany({
+        where: { alunoId: userId! },
+        select: { turmaId: true }
+      })
+      
+      where.turmaId = {
+        in: turmasDoAluno.map(t => t.turmaId)
+      }
+    } else if (userRole === 'PROFESSOR') {
+      // Professor vê apenas suas próprias aulas
+      where.professorId = userId
+    }
+    // ADMIN vê todas as aulas (sem filtro adicional)
     
     if (professorId) {
       where.professorId = professorId
@@ -50,7 +73,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Novo: filtro por data específica (formato YYYY-MM-DD)
+    // Filtro por data específica (formato YYYY-MM-DD)
     if (date) {
       const targetDate = new Date(date)
       const nextDate = new Date(targetDate)
@@ -103,6 +126,8 @@ export async function GET(request: NextRequest) {
           _count: {
             select: {
               avaliacoes: true,
+              avaliacoesSocioemocionais: true,
+              avaliacoesDidaticas: true,
               aulasFavoritas: true
             }
           }
@@ -144,12 +169,16 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Apenas professores e admins podem criar aulas
+  const { authorized, userRole, error } = await checkRole(['PROFESSOR', 'ADMIN'])
+  if (!authorized) return error!
+
   try {
     const body = await request.json()
     const data = createAulaSchema.parse(body)
     
-    // Verificar se professor existe
-    const professor = await prisma.professor.findUnique({
+    // Verificar se professor existe e tem role PROFESSOR
+    const professor = await prisma.usuario.findUnique({
       where: { id: data.professorId }
     })
     
@@ -160,10 +189,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (professor.role !== 'PROFESSOR') {
+      return NextResponse.json(
+        { error: 'Usuário não é um professor' },
+        { status: 400 }
+      )
+    }
+
     // Verificar se professor está ativo
     if (!professor.ativo) {
       return NextResponse.json(
         { error: 'Professor não está ativo' },
+        { status: 400 }
+      )
+    }
+    
+    // Verificar se turma existe
+    const turma = await prisma.turma.findUnique({
+      where: { id: data.turmaId }
+    })
+    
+    if (!turma) {
+      return NextResponse.json(
+        { error: 'Turma não encontrada' },
+        { status: 400 }
+      )
+    }
+    
+    if (!turma.ativa) {
+      return NextResponse.json(
+        { error: 'Turma não está ativa' },
         { status: 400 }
       )
     }

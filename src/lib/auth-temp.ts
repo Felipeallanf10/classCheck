@@ -1,39 +1,46 @@
 /**
- * Configuração temporária de usuário atual
+ * Configuração de autenticação
  * 
- * TODO: Substituir por autenticação real (NextAuth, Clerk, etc.)
- * 
- * Este arquivo centraliza o ID do usuário atual em todas as APIs
- * para facilitar testes e desenvolvimento.
- * 
- * Para trocar de usuário, basta alterar o CURRENT_USER_ID abaixo.
+ * Este arquivo centraliza a obtenção do ID do usuário autenticado
+ * para uso nas APIs.
  */
 
-/**
- * ID do usuário atual (temporário para desenvolvimento)
- * 
- * Opções disponíveis no seed:
- * - ID 1: João Silva (aluno@teste.com) - seed-aulas.js
- * - ID 52: Usuário atual de testes
- */
-export const CURRENT_USER_ID = 52
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 /**
- * Função helper para pegar o ID do usuário atual
- * No futuro, esta função buscará da sessão/auth
+ * Função helper para pegar o ID do usuário atual da sessão
+ * Retorna o ID do usuário autenticado ou lança erro se não autenticado
  */
-export function getCurrentUserId(): number {
-  // TODO: Implementar busca real da sessão
-  // const session = await getServerSession()
-  // return session.user.id
+export async function getCurrentUserId(): Promise<number> {
+  const session = await getServerSession(authOptions)
   
-  return CURRENT_USER_ID
+  if (!session?.user?.id) {
+    throw new Error('Usuário não autenticado')
+  }
+  
+  return parseInt(session.user.id)
+}
+
+/**
+ * Função helper para pegar o ID do usuário com fallback
+ * Útil para testes e desenvolvimento
+ */
+export async function getCurrentUserIdOrDefault(defaultId: number = 52): Promise<number> {
+  try {
+    const session = await getServerSession(authOptions)
+    return session?.user?.id ? parseInt(session.user.id) : defaultId
+  } catch {
+    return defaultId
+  }
 }
 
 /**
  * Informações do usuário para debug
  */
 export const USER_INFO = {
-  1: { nome: 'João Silva', email: 'aluno@teste.com', seed: 'seed-aulas.js' },
-  3: { nome: 'Usuário Atual', email: 'usuario@atual.com', seed: 'database' },
+  1: { nome: 'Admin', email: 'admin@classcheck.com' },
+  2: { nome: 'Prof. Matemática', email: 'prof.matematica@classcheck.com' },
+  3: { nome: 'Aluno Teste', email: 'aluno@teste.com' },
 }
+

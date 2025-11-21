@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import { ToastProvider } from '@/hooks/use-toast'
 import { ConfirmProvider } from '@/hooks/use-confirm'
 import { ToastDisplay } from '@/components/ui/toast-display'
+import { SessionProvider } from '@/components/providers/SessionProvider'
 
 interface ClientProvidersProps {
   children: ReactNode
@@ -23,14 +24,16 @@ export function ClientProviders({ children }: ClientProvidersProps) {
   }))
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <ConfirmProvider>
-          {children}
-          <ToastDisplay />
-          <Toaster position="top-right" richColors />
-        </ConfirmProvider>
-      </ToastProvider>
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <ConfirmProvider>
+            {children}
+            <ToastDisplay />
+            <Toaster position="top-right" richColors />
+          </ConfirmProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   )
 }

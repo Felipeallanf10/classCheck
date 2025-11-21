@@ -8,6 +8,25 @@ import { validarRespostaPorTipo } from '@/lib/validations/resposta-schemas';
 export const dynamic = 'force-dynamic';
 
 /**
+ * Determina estado emocional primário baseado em valência e ativação (Modelo Circumplex)
+ */
+function determinarEstadoEmocional(valencia: number, ativacao: number): string {
+  // Modelo de Russell's Circumplex - 8 quadrantes
+  const angulo = Math.atan2(ativacao, valencia) * (180 / Math.PI);
+  
+  if (angulo >= -22.5 && angulo < 22.5) return 'Calmo';
+  if (angulo >= 22.5 && angulo < 67.5) return 'Relaxado';
+  if (angulo >= 67.5 && angulo < 112.5) return 'Entediado';
+  if (angulo >= 112.5 && angulo < 157.5) return 'Triste';
+  if ((angulo >= 157.5 && angulo <= 180) || (angulo >= -180 && angulo < -157.5)) return 'Estressado';
+  if (angulo >= -157.5 && angulo < -112.5) return 'Ansioso';
+  if (angulo >= -112.5 && angulo < -67.5) return 'Tenso';
+  if (angulo >= -67.5 && angulo < -22.5) return 'Animado';
+  
+  return 'Neutro';
+}
+
+/**
  * Schema de validação para submissão de resposta
  */
 const SubmeterRespostaSchema = z.object({
@@ -297,14 +316,147 @@ export async function POST(
       });
 
       // Finalizar sessão
-      await prisma.sessaoAdaptativa.update({
+      const sessaoFinalizada = await prisma.sessaoAdaptativa.update({
         where: { id: sessaoId },
         data: {
           status: 'FINALIZADA',
           finalizadoEm: new Date(),
           scoresPorCategoria: scoresFinais,
         },
+        include: {
+          respostas: {
+            select: {
+              categoria: true,
+              valorNormalizado: true,
+            },
+          },
+        },
       });
+
+      // Se sessão vinculada a uma aula, criar AvaliacaoSocioemocional
+      if (sessaoFinalizada.aulaId) {
+        try {
+          // Calcular valência e ativação a partir das respostas
+          // Usar categorias de bem-estar geral
+          const respostasEmocao = sessaoFinalizada.respostas.filter(
+            r => r.categoria === 'BEM_ESTAR' || 
+                 r.categoria === 'HUMOR_GERAL' || 
+                 r.categoria === 'SATISFACAO_VIDA' ||
+                 r.categoria === 'ENERGIA'
+          );
+
+          let valencia = 0;
+          let ativacao = 0;
+
+          if (respostasEmocao.length > 0) {
+            // Calcular média de valência (respostas positivas vs negativas)
+            const valoresNormalizados = respostasEmocao
+              .filter(r => r.valorNormalizado !== null)
+              .map(r => r.valorNormalizado!);
+            
+            if (valoresNormalizados.length > 0) {
+              valencia = valoresNormalizados.reduce((sum, val) => sum + val, 0) / valoresNormalizados.length;
+              // Normalizar para -1 a 1
+              valencia = (valencia * 2) - 1;
+
+              // Calcular ativação baseada na dispersão das respostas
+              const mediaQuadrada = valoresNormalizados.reduce((sum, val) => sum + val * val, 0) / valoresNormalizados.length;
+              ativacao = Math.sqrt(mediaQuadrada);
+              // Normalizar para -1 a 1
+              ativacao = (ativacao * 2) - 1;
+            }
+          }
+
+          // Determinar estado emocional primário
+          const estadoPrimario = determinarEstadoEmocional(valencia, ativacao);
+
+          // Criar avaliação socioemocional
+          await prisma.avaliacaoSocioemocional.create({
+            data: {
+              usuarioId: sessao.usuarioId,
+              aulaId: sessaoFinalizada.aulaId,
+              valencia,
+              ativacao,
+              estadoPrimario,
+              confianca: resultado.confianca,
+              totalPerguntas: perguntasRespondidas,
+              tempoResposta: Math.floor(
+                (new Date().getTime() - sessao.iniciadoEm.getTime()) / 1000
+              ),
+              respostas: JSON.stringify(sessaoFinalizada.respostas),
+            },
+          });
+
+          console.log('[API] AvaliacaoSocioemocional criada para aula:', sessaoFinalizada.aulaId);
+        } catch (error) {
+          console.error('[API] Erro ao criar AvaliacaoSocioemocional:', error);
+          // Não falhar a finalização se houver erro ao criar avaliação
+        }
+      }
+
+      // Se for questionário didático, criar AvaliacaoDidatica
+      if (sessaoFinalizada.aulaId && sessao.questionarioId === 'questionario-didatico-aula') {
+        try {
+          // Buscar respostas completas para extrair valores
+          const respostasDidaticas = await prisma.respostaSocioemocional.findMany({
+            where: { sessaoId },
+            orderBy: { ordem: 'asc' },
+          });
+
+          // Mapear respostas por ID da pergunta
+          const respostasPorPergunta = respostasDidaticas.reduce((acc, r) => {
+            const perguntaId = r.perguntaId || r.perguntaBancoId;
+            if (perguntaId) {
+              acc[perguntaId] = r.valorNumerico || 0;
+            }
+            return acc;
+          }, {} as Record<string, number>);
+
+          // Extrair valores das perguntas didáticas
+          const compreensaoConteudo = respostasPorPergunta['didatico-p1-compreensao'] || 3;
+          const ritmoAula = respostasPorPergunta['didatico-p2-ritmo'] || 3;
+          const recursosDidaticos = respostasPorPergunta['didatico-p3-recursos'] || 3;
+          const engajamento = Math.round(respostasPorPergunta['didatico-p4-engajamento'] || 5);
+
+          // Extrair feedbacks textuais (opcional)
+          const respostaPontoPositivo = respostasDidaticas.find(r => r.perguntaId === 'didatico-p5-ponto-positivo');
+          const respostaSugestao = respostasDidaticas.find(r => r.perguntaId === 'didatico-p6-sugestao');
+
+          const pontoPositivo = respostaPontoPositivo?.valorTexto || null;
+          const sugestao = respostaSugestao?.valorTexto || null;
+
+          // Criar avaliação didática
+          await prisma.avaliacaoDidatica.create({
+            data: {
+              usuarioId: sessao.usuarioId,
+              aulaId: sessaoFinalizada.aulaId,
+              compreensaoConteudo,
+              ritmoAula,
+              recursosDidaticos,
+              engajamento,
+              pontoPositivo,
+              pontoMelhoria: sugestao,
+              sugestao: sugestao,
+            },
+          });
+
+          // Marcar aula como avaliada
+          await prisma.aula.update({
+            where: { id: sessaoFinalizada.aulaId },
+            data: { status: 'CONCLUIDA' }, // Ou adicionar campo 'avaliada: true' se existir
+          });
+
+          console.log('[API] AvaliacaoDidatica criada e aula marcada como avaliada:', sessaoFinalizada.aulaId);
+        } catch (error) {
+          console.error('[API] Erro ao criar AvaliacaoDidatica:', error);
+          // Não falhar a finalização se houver erro ao criar avaliação
+        }
+      }
+
+      // Verificar se deve continuar com questionário didático
+      const deveContinuarComDidatico = 
+        sessaoFinalizada.aulaId && // Tem aula vinculada
+        sessao.questionarioId === 'questionario-impacto-aula'; // É o questionário socioemocional de aula
 
       return NextResponse.json({
         success: true,
@@ -320,6 +472,13 @@ export async function POST(
           ),
         },
         alertas: [],
+        // Novo: informar se deve iniciar questionário didático
+        proximoQuestionario: deveContinuarComDidatico ? {
+          id: 'questionario-didatico-aula',
+          titulo: 'Avaliação Didática da Aula',
+          tipo: 'DIDATICO',
+          aulaId: sessaoFinalizada.aulaId,
+        } : null,
       });
     }
 

@@ -12,13 +12,60 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { determinarProximaPergunta } from '@/lib/adaptive/proxima-pergunta-service';
 
-// Testes de integração que requerem banco de dados real
-describe('API de Resposta - Sessão Adaptativa', () => {
+// Se a variável de ambiente DATABASE_URL não estiver definida, ignoramos toda a suíte de integração
+// para permitir execução completa dos demais testes sem infraestrutura de banco (sem Docker / Postgres local).
+if (!process.env.DATABASE_URL) {
+  describe.skip('API de Resposta - Sessão Adaptativa (skip - DATABASE_URL ausente)', () => {
+    it('pulando suíte de integração por ausência de DATABASE_URL', () => {
+      expect(true).toBe(true);
+    });
+  });
+} else {
+  // Testes de integração que requerem banco de dados real
+  describe('API de Resposta - Sessão Adaptativa', () => {
   let usuarioId: number;
   let questionarioId: string;
   let sessaoId: string;
   let perguntaQuestionarioId: string;
   let perguntaBancoId: string;
+
+  // Helpers para reduzir duplicação na criação de respostas
+  const criarRespostaQuestionario = async (valor: number, ordem: number, perguntaId?: string) => {
+    return await prisma.respostaSocioemocional.create({
+      data: {
+        sessaoId,
+        usuarioId,
+        perguntaId: perguntaId ?? perguntaQuestionarioId,
+        valor,
+        valorNumerico: valor,
+        valorNormalizado: (valor - 1) / 4, // normalização LIKERT_5
+        tempoResposta: 5,
+        categoria: 'HUMOR_GERAL',
+        dominio: 'FELIZ',
+        ordem,
+      },
+    });
+  };
+
+  const criarRespostaBanco = async (valor: number, ordem: number) => {
+    return await prisma.respostaSocioemocional.create({
+      data: {
+        sessaoId,
+        usuarioId,
+        perguntaId: null,
+        perguntaBancoId,
+        valor,
+        valorNumerico: valor,
+        valorNormalizado: (valor - 1) / 4,
+        tempoResposta: 7,
+        categoria: 'ANSIEDADE',
+        dominio: 'NERVOSO',
+        escalaNome: 'GAD7',
+        escalaItem: 'GAD7_1',
+        ordem,
+      },
+    });
+  };
 
   beforeAll(async () => {
     // Limpar dados de testes anteriores
@@ -150,22 +197,7 @@ describe('API de Resposta - Sessão Adaptativa', () => {
   });
 
   it('deve salvar resposta de pergunta do questionário e determinar próxima pergunta', async () => {
-    // Salvar resposta
-    const resposta = await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: perguntaQuestionarioId,
-        perguntaBancoId: null,
-        valor: 4,
-        valorNumerico: 4,
-        valorNormalizado: 0.75, // (4-1)/4 = 0.75
-        tempoResposta: 5,
-        categoria: 'HUMOR_GERAL',
-        dominio: 'FELIZ',
-        ordem: 1,
-      },
-    });
+    const resposta = await criarRespostaQuestionario(4, 1);
 
     expect(resposta.perguntaId).toBe(perguntaQuestionarioId);
     expect(resposta.perguntaBancoId).toBeNull();
@@ -180,24 +212,7 @@ describe('API de Resposta - Sessão Adaptativa', () => {
   });
 
   it('deve salvar resposta de pergunta do banco adaptativo sem criar proxy', async () => {
-    // Salvar resposta usando perguntaBancoId
-    const resposta = await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: null, // Nulo quando vem do banco
-        perguntaBancoId: perguntaBancoId,
-        valor: 3,
-        valorNumerico: 3,
-        valorNormalizado: 0.5, // (3-1)/4 = 0.5
-        tempoResposta: 7,
-        categoria: 'ANSIEDADE',
-        dominio: 'NERVOSO',
-        escalaNome: 'GAD7',
-        escalaItem: 'GAD7_1',
-        ordem: 1,
-      },
-    });
+    const resposta = await criarRespostaBanco(3, 1);
 
     expect(resposta.perguntaId).toBeNull();
     expect(resposta.perguntaBancoId).toBe(perguntaBancoId);
@@ -210,22 +225,8 @@ describe('API de Resposta - Sessão Adaptativa', () => {
     expect(perguntaProxy).toBeNull();
   });
 
-  it('deve impedir responder a mesma pergunta duas vezes (questionário)', async () => {
-    // Primeira resposta
-    await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: perguntaQuestionarioId,
-        valor: 4,
-        valorNumerico: 4,
-        valorNormalizado: 0.75,
-        tempoResposta: 5,
-        categoria: 'HUMOR_GERAL',
-        dominio: 'FELIZ',
-        ordem: 1,
-      },
-    });
+  it('deve impedir responder a mesma pergunta duas vezes (questionário) - verificação lógica', async () => {
+    await criarRespostaQuestionario(4, 1);
 
     // Verificar que já foi respondida
     const sessao = await prisma.sessaoAdaptativa.findUnique({
@@ -241,29 +242,15 @@ describe('API de Resposta - Sessão Adaptativa', () => {
     });
 
     const jaRespondida = sessao?.respostas.some(
-      (r) => r.perguntaId === perguntaQuestionarioId || r.perguntaBancoId === perguntaQuestionarioId
+      (resposta: { perguntaId: string | null; perguntaBancoId: string | null }) =>
+        resposta.perguntaId === perguntaQuestionarioId
     );
 
     expect(jaRespondida).toBe(true);
   });
 
-  it('deve impedir responder a mesma pergunta duas vezes (banco)', async () => {
-    // Primeira resposta
-    await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: null,
-        perguntaBancoId: perguntaBancoId,
-        valor: 3,
-        valorNumerico: 3,
-        valorNormalizado: 0.5,
-        tempoResposta: 7,
-        categoria: 'ANSIEDADE',
-        dominio: 'NERVOSO',
-        ordem: 1,
-      },
-    });
+  it('deve impedir responder a mesma pergunta duas vezes (banco) - verificação lógica', async () => {
+    await criarRespostaBanco(3, 1);
 
     // Verificar que já foi respondida
     const sessao = await prisma.sessaoAdaptativa.findUnique({
@@ -279,7 +266,8 @@ describe('API de Resposta - Sessão Adaptativa', () => {
     });
 
     const jaRespondida = sessao?.respostas.some(
-      (r) => r.perguntaId === perguntaBancoId || r.perguntaBancoId === perguntaBancoId
+      (resposta: { perguntaId: string | null; perguntaBancoId: string | null }) =>
+        resposta.perguntaBancoId === perguntaBancoId
     );
 
     expect(jaRespondida).toBe(true);
@@ -308,8 +296,8 @@ describe('API de Resposta - Sessão Adaptativa', () => {
 
     // Salvar 5 respostas
     await Promise.all(
-      perguntas.map(async (pergunta, i) => {
-        return await prisma.respostaSocioemocional.create({
+      perguntas.map((pergunta: { id: string; ordem: number }) => {
+        return prisma.respostaSocioemocional.create({
           data: {
             sessaoId,
             usuarioId,
@@ -320,7 +308,7 @@ describe('API de Resposta - Sessão Adaptativa', () => {
             tempoResposta: 5,
             categoria: 'HUMOR_GERAL',
             dominio: 'FELIZ',
-            ordem: i + 1,
+            ordem: pergunta.ordem,
           },
         });
       })
@@ -348,20 +336,7 @@ describe('API de Resposta - Sessão Adaptativa', () => {
 
   it('deve calcular theta corretamente após múltiplas respostas', async () => {
     // Resposta 1 (valor alto)
-    await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: perguntaQuestionarioId,
-        valor: 5,
-        valorNumerico: 5,
-        valorNormalizado: 1.0,
-        tempoResposta: 5,
-        categoria: 'HUMOR_GERAL',
-        dominio: 'FELIZ',
-        ordem: 1,
-      },
-    });
+    await criarRespostaQuestionario(5, 1);
 
     const resultado1 = await determinarProximaPergunta(sessaoId);
     const theta1 = resultado1.thetaAtualizado;
@@ -383,20 +358,7 @@ describe('API de Resposta - Sessão Adaptativa', () => {
     });
 
     // Resposta 2 (valor alto também)
-    await prisma.respostaSocioemocional.create({
-      data: {
-        sessaoId,
-        usuarioId,
-        perguntaId: pergunta2.id,
-        valor: 5,
-        valorNumerico: 5,
-        valorNormalizado: 1.0,
-        tempoResposta: 5,
-        categoria: 'HUMOR_GERAL',
-        dominio: 'FELIZ',
-        ordem: 2,
-      },
-    });
+    await criarRespostaQuestionario(5, 2, pergunta2.id);
 
     const resultado2 = await determinarProximaPergunta(sessaoId);
     const theta2 = resultado2.thetaAtualizado;
@@ -405,4 +367,5 @@ describe('API de Resposta - Sessão Adaptativa', () => {
     expect(theta2).toBeGreaterThanOrEqual(theta1);
     expect(resultado2.confianca).toBeGreaterThan(resultado1.confianca);
   });
-});
+  });
+}

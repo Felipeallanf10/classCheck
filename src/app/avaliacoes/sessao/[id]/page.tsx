@@ -90,18 +90,61 @@ export default function SessaoPage() {
         tempoResposta,
       },
       {
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
           console.log('[handleSubmeterResposta] Sucesso:', data);
           toast.success('Resposta registrada!');
           
           // Se foi a última pergunta
           if (data.finalizada) {
-            toast.success('Avaliação concluída!', {
-              description: 'Redirecionando para os resultados...',
-            });
-            setTimeout(() => {
-              router.push(`/avaliacoes/resultado/${sessaoId}`);
-            }, 1500);
+            // Verificar se deve iniciar questionário didático
+            if (data.proximoQuestionario) {
+              toast.success('Parte 1 concluída!', {
+                description: 'Iniciando avaliação didática...',
+              });
+              
+              try {
+                // Iniciar sessão do questionário didático
+                const response = await fetch('/api/sessoes/iniciar', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    questionarioId: data.proximoQuestionario.id,
+                    usuarioId: sessao.usuario.id,
+                    aulaId: data.proximoQuestionario.aulaId,
+                    contexto: {
+                      tipo: 'AULA',
+                      aulaId: data.proximoQuestionario.aulaId,
+                      origem: 'continuacao-socioemocional',
+                    },
+                  }),
+                });
+
+                if (!response.ok) {
+                  throw new Error('Erro ao iniciar questionário didático');
+                }
+
+                const novaSessao = await response.json();
+                const novaSessaoId = novaSessao.sessao?.id || novaSessao.sessaoId;
+
+                setTimeout(() => {
+                  router.push(`/avaliacoes/sessao/${novaSessaoId}`);
+                }, 1500);
+              } catch (error) {
+                console.error('Erro ao iniciar questionário didático:', error);
+                toast.error('Erro ao continuar avaliação. Redirecionando...');
+                setTimeout(() => {
+                  router.push(`/avaliacoes/resultado/${sessaoId}`);
+                }, 1500);
+              }
+            } else {
+              // Avaliação totalmente concluída
+              toast.success('Avaliação concluída!', {
+                description: 'Redirecionando para os resultados...',
+              });
+              setTimeout(() => {
+                router.push(`/avaliacoes/resultado/${sessaoId}`);
+              }, 1500);
+            }
           }
         },
         onError: (error) => {
@@ -314,12 +357,71 @@ export default function SessaoPage() {
                   value={respostaAtual}
                   onChange={setRespostaAtual}
                   onComplete={() => {
-                    if (respostaAtual !== null && respostaAtual !== undefined) {
-                      handleSubmeterResposta(respostaAtual);
+                    // Para perguntas opcionais de texto, enviar string vazia se não respondido
+                    let valorFinal = respostaAtual;
+                    
+                    if ((respostaAtual === null || respostaAtual === undefined) && 
+                        sessao?.perguntaAtual && 
+                        !sessao.perguntaAtual.obrigatoria) {
+                      // Pergunta opcional não respondida
+                      const pergunta = sessao.perguntaAtual as any;
+                      if (pergunta.tipoPergunta === 'TEXTO_CURTO' || 
+                          pergunta.tipoPergunta === 'TEXTO_LONGO') {
+                        valorFinal = ''; // Envia string vazia para perguntas de texto
+                      }
+                    }
+                    
+                    if (valorFinal !== null && valorFinal !== undefined) {
+                      handleSubmeterResposta(valorFinal);
                     }
                   }}
                   disabled={submeter.isPending}
                 />
+
+                {/* Botão Voltar para Pergunta Anterior */}
+                {progresso.perguntasRespondidas > 0 && progresso.perguntasRespondidas <= 3 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          // Chama função da store para voltar
+                          const response = await fetch(
+                            `/api/questionario/recalibrar-theta`,
+                            {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ sessaoId }),
+                            }
+                          );
+
+                          if (!response.ok) {
+                            throw new Error('Erro ao voltar para pergunta anterior');
+                          }
+
+                          // Recarregar dados da sessão
+                          window.location.reload();
+                          
+                          toast.success('Voltou para a pergunta anterior');
+                        } catch (error) {
+                          console.error('Erro ao voltar:', error);
+                          toast.error('Não foi possível voltar para a pergunta anterior');
+                        }
+                      }}
+                      className="gap-2"
+                      disabled={submeter.isPending}
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      Voltar (máx. 3 perguntas)
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Você pode voltar até {3 - progresso.perguntasRespondidas} pergunta(s)
+                    </p>
+                  </div>
+                )}
 
                 {submeter.isPending && (
                   <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">

@@ -415,18 +415,125 @@ export const useSessaoAdaptativaStore = create<SessaoAdaptativaState>()(
       },
       
       // Pergunta Anterior
-      perguntaAnterior: () => {
-        set((state) => {
-          const indiceAtual = state.perguntasApresentadas.findIndex(
-            (id: string) => id === state.perguntaAtual?.id
+      perguntaAnterior: async () => {
+        const state = get();
+        
+        // Validações
+        if (!state.sessaoId) {
+          set({ erro: 'Sessão não iniciada' });
+          return;
+        }
+        
+        const indiceAtual = state.perguntasApresentadas.findIndex(
+          (id: string) => id === state.perguntaAtual?.id
+        );
+        
+        // Não pode voltar da primeira pergunta
+        if (indiceAtual <= 0) {
+          set({ erro: 'Já está na primeira pergunta' });
+          return;
+        }
+        
+        // Limitar navegação reversa às últimas 3 perguntas (segurança IRT)
+        const limiteVolta = Math.max(0, state.perguntasApresentadas.length - 3);
+        if (indiceAtual <= limiteVolta) {
+          set({ erro: 'Limite de navegação reversa atingido (últimas 3 perguntas)' });
+          return;
+        }
+        
+        set({ carregando: true, erro: null });
+        
+        try {
+          const perguntaAnteriorId = state.perguntasApresentadas[indiceAtual - 1];
+          
+          // Remover última resposta do array
+          const respostaRemovida = state.respostas.find(r => r.perguntaId === state.perguntaAtual?.id);
+          
+          set((state) => {
+            // Remover resposta atual
+            state.respostas = state.respostas.filter((r: Resposta) => r.perguntaId !== state.perguntaAtual?.id);
+            state.perguntasRespondidas = state.perguntasRespondidas.filter((id: string) => id !== state.perguntaAtual?.id);
+            
+            // Remover pergunta atual das apresentadas
+            state.perguntasApresentadas = state.perguntasApresentadas.slice(0, indiceAtual);
+          });
+          
+          // Recalibrar theta sem a última resposta
+          if (state.sessaoId) {
+            try {
+              const response = await fetch('/api/questionario/recalibrar-theta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  sessaoId: state.sessaoId,
+                  respostasAtuais: get().respostas.map(r => ({
+                    perguntaId: r.perguntaId,
+                    valorNormalizado: r.valorNormalizado
+                  }))
+                })
+              });
+              
+              if (!response.ok) {
+                throw new Error('Erro ao recalibrar theta');
+              }
+              
+              const { theta, erro, confianca } = await response.json();
+              
+              // Atualizar theta recalibrado
+              get().atualizarTheta(theta, erro, confianca);
+              
+            } catch (error) {
+              console.error('Erro ao recalibrar theta:', error);
+              // Continua mesmo com erro de recalibração (usa theta anterior)
+            }
+          }
+          
+          // Buscar pergunta anterior da API
+          const responsePergunta = await fetch(
+            `/api/questionario/pergunta/${perguntaAnteriorId}?sessaoId=${state.sessaoId}`
           );
           
-          if (indiceAtual > 0) {
-            const perguntaAnteriorId = state.perguntasApresentadas[indiceAtual - 1];
-            // TODO: Carregar pergunta anterior
-            console.log('Voltando para pergunta:', perguntaAnteriorId);
+          if (!responsePergunta.ok) {
+            throw new Error('Erro ao carregar pergunta anterior');
           }
-        });
+          
+          const perguntaAnterior = await responsePergunta.json();
+          
+          // Buscar resposta anterior (se existir)
+          const respostaAnterior = get().respostas.find(r => r.perguntaId === perguntaAnteriorId);
+          
+          set((state) => {
+            state.perguntaAtual = perguntaAnterior;
+            state.tempoInicioResposta = Date.now();
+            
+            // Se tinha resposta, recarregar para edição
+            if (respostaAnterior) {
+              state.respostaAtual = {
+                perguntaId: perguntaAnteriorId,
+                valor: respostaAnterior.valor,
+                tentativas: (respostaAnterior.tentativas || 0) + 1,
+                alterada: true // Marca como alterada pois está sendo editada
+              };
+            } else {
+              state.respostaAtual = {
+                perguntaId: perguntaAnteriorId,
+                tentativas: 1,
+                alterada: false
+              };
+            }
+          });
+          
+          // Atualizar progresso
+          get().atualizarProgresso();
+          
+          set({ carregando: false });
+          
+        } catch (error) {
+          set({
+            carregando: false,
+            erro: error instanceof Error ? error.message : 'Erro ao voltar pergunta'
+          });
+        }
       },
       
       // Pausar Sessão

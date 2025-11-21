@@ -49,8 +49,7 @@ export const RespostaEscalaVisualSchema = z.object({
 // Resposta Múltipla Escolha (uma opção)
 export const RespostaMultiplaEscolhaSchema = z.object({
   perguntaId: perguntaIdSchema,
-  valor: z.string(), // ID da opção selecionada
-  valorTexto: z.string().optional(), // Texto da opção
+  valor: z.union([z.string(), z.number()]), // ID da opção (string) ou valor numérico
   tempoResposta: z.number().int().positive()
 });
 
@@ -62,17 +61,17 @@ export const RespostaMultiplaSelecaoSchema = z.object({
   tempoResposta: z.number().int().positive()
 });
 
-// Resposta Texto Curto
+// Resposta Texto Curto (aceita string vazia para perguntas opcionais)
 export const RespostaTextoCurtoSchema = z.object({
   perguntaId: perguntaIdSchema,
-  valor: z.string().min(1).max(200),
+  valor: z.string().max(200),
   tempoResposta: z.number().int().positive()
 });
 
-// Resposta Texto Longo
+// Resposta Texto Longo (aceita string vazia para perguntas opcionais)
 export const RespostaTextoLongoSchema = z.object({
   perguntaId: perguntaIdSchema,
-  valor: z.string().min(1).max(1000),
+  valor: z.string().max(1000),
   tempoResposta: z.number().int().positive()
 });
 
@@ -97,17 +96,23 @@ export const RespostaSliderNumericoSchema = z.object({
   tempoResposta: z.number().int().positive()
 });
 
-// Resposta Escala de Frequência
+// Resposta Escala de Frequência (aceita número 1-5 ou string)
 export const RespostaEscalaFrequenciaSchema = z.object({
   perguntaId: perguntaIdSchema,
-  valor: z.enum(['nunca', 'raramente', 'as_vezes', 'frequentemente', 'sempre']),
+  valor: z.union([
+    z.number().int().min(1).max(5),
+    z.enum(['nunca', 'raramente', 'as_vezes', 'frequentemente', 'sempre'])
+  ]),
   tempoResposta: z.number().int().positive()
 });
 
-// Resposta Escala de Intensidade
+// Resposta Escala de Intensidade (aceita número 1-5 ou string)
 export const RespostaEscalaIntensidadeSchema = z.object({
   perguntaId: perguntaIdSchema,
-  valor: z.enum(['nada', 'pouco', 'moderado', 'muito', 'extremamente']),
+  valor: z.union([
+    z.number().int().min(1).max(5),
+    z.enum(['nada', 'pouco', 'moderado', 'muito', 'extremamente'])
+  ]),
   tempoResposta: z.number().int().positive()
 });
 
@@ -212,6 +217,8 @@ export function validarRespostaPorTipo(
   try {
     const baseData = { perguntaId, valor, tempoResposta };
     
+    console.log('[Validação] Tipo:', tipoPergunta, 'Valor:', valor, 'Tipo do valor:', typeof valor);
+    
     switch (tipoPergunta) {
       case 'LIKERT_5':
         RespostaLikert5Schema.parse(baseData);
@@ -279,10 +286,12 @@ export function validarRespostaPorTipo(
         return true;
       
       default:
+        console.error(`[Validação] Tipo de pergunta desconhecido: ${tipoPergunta}`);
         return false;
     }
   } catch (error) {
-    console.error(`Erro ao validar resposta do tipo ${tipoPergunta}:`, error);
+    console.error(`[Validação] Erro ao validar resposta do tipo ${tipoPergunta}:`, error);
+    console.error('[Validação] Dados recebidos:', { perguntaId, valor, tempoResposta, tipoPergunta });
     return false;
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { getCurrentUserId } from '@/lib/auth-temp';
 
 // Força a rota a ser dinâmica
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic';
  */
 const IniciarSessaoSchema = z.object({
   questionarioId: z.string().min(1, 'ID do questionário é obrigatório'),
-  usuarioId: z.number().int().positive('ID do usuário deve ser positivo'),
+  usuarioId: z.number().int().positive('ID do usuário deve ser positivo').optional(), // Agora opcional
   
   // Novo formato: contexto estruturado (RECOMENDADO)
   contexto: z.object({
@@ -32,7 +33,7 @@ const IniciarSessaoSchema = z.object({
  * 
  * Body:
  * - questionarioId: string (obrigatório)
- * - usuarioId: number (obrigatório)
+ * - usuarioId: number (opcional - se não fornecido, pega da sessão autenticada)
  * - contexto: object (opcional) - Contexto da sessão
  *   - tipo: 'GERAL' | 'AULA' | 'CHECK_IN' | 'EVENTO' (padrão: GERAL)
  *   - aulaId: number (se tipo AULA)
@@ -45,27 +46,24 @@ const IniciarSessaoSchema = z.object({
  * - primeiraPergunta: PerguntaSocioemocional
  * - progresso: { atual: 0, estimado: number }
  * 
- * @example Geral (WHO-5)
+ * @example Geral (WHO-5) - Usuário autenticado
  * POST /api/sessoes/iniciar
  * Body: { 
- *   "questionarioId": "who-5", 
- *   "usuarioId": 1,
+ *   "questionarioId": "who-5",
  *   "contexto": { "tipo": "GERAL", "metadata": { "origem": "dashboard" } }
  * }
  * 
  * @example Check-in Diário
  * POST /api/sessoes/iniciar
  * Body: { 
- *   "questionarioId": "questionario-checkin-diario", 
- *   "usuarioId": 1,
+ *   "questionarioId": "questionario-checkin-diario",
  *   "contexto": { "tipo": "CHECK_IN" }
  * }
  * 
  * @example Avaliação de Aula
  * POST /api/sessoes/iniciar
  * Body: { 
- *   "questionarioId": "questionario-impacto-aula", 
- *   "usuarioId": 1,
+ *   "questionarioId": "questionario-impacto-aula",
  *   "contexto": { "tipo": "AULA", "aulaId": 42, "metadata": { "professor": "João" } }
  * }
  */
@@ -85,7 +83,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { questionarioId, usuarioId, contexto, metadata, aulaId } = validatedData.data;
+    const { questionarioId, usuarioId: usuarioIdBody, contexto, metadata, aulaId } = validatedData.data;
+
+    // Pegar usuário da sessão ou do body (para compatibilidade)
+    const usuarioId = usuarioIdBody || await getCurrentUserId();
 
     // Processar contexto (novo formato vs antigo)
     const contextoTipo = contexto?.tipo || 'GERAL';
