@@ -76,6 +76,7 @@ export default function AdminUsuariosPage() {
   
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [filteredUsuarios, setFilteredUsuarios] = useState<Usuario[]>([])
+  const [materias, setMaterias] = useState<{ id: number; nome: string }[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
@@ -87,6 +88,9 @@ export default function AdminUsuariosPage() {
   const [editingUser, setEditingUser] = useState<Usuario | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<Usuario | null>(null)
+  
+  const [showNovaMateria, setShowNovaMateria] = useState(false)
+  const [novaMateriaNome, setNovaMateriaNome] = useState('')
   
   const [formData, setFormData] = useState({
     nome: '',
@@ -117,9 +121,26 @@ export default function AdminUsuariosPage() {
     }
   }
 
+  // Buscar matérias
+  async function fetchMaterias() {
+    try {
+      const response = await fetch('/api/admin/materias?ativas=true')
+      
+      if (!response.ok) {
+        throw new Error('Erro ao carregar matérias')
+      }
+
+      const data = await response.json()
+      setMaterias(data.materias || [])
+    } catch (err) {
+      console.error('Erro ao carregar matérias:', err)
+    }
+  }
+
   useEffect(() => {
     if (session?.user?.role === 'ADMIN') {
       fetchUsuarios()
+      fetchMaterias()
     }
   }, [session])
 
@@ -161,6 +182,8 @@ export default function AdminUsuariosPage() {
       materia: '',
       ativo: true,
     })
+    setShowNovaMateria(false)
+    setNovaMateriaNome('')
     setDialogOpen(true)
   }
 
@@ -175,7 +198,42 @@ export default function AdminUsuariosPage() {
       materia: usuario.materia || '',
       ativo: usuario.ativo,
     })
+    setShowNovaMateria(false)
+    setNovaMateriaNome('')
     setDialogOpen(true)
+  }
+
+  // Criar nova matéria rapidamente
+  async function handleCriarNovaMateria() {
+    if (!novaMateriaNome.trim()) {
+      toast.error('Digite o nome da matéria')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/admin/materias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: novaMateriaNome.trim() }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.erro || 'Erro ao criar matéria')
+      }
+
+      toast.success('Matéria criada com sucesso!')
+      
+      // Atualizar lista de matérias e selecionar a nova
+      await fetchMaterias()
+      setFormData({ ...formData, materia: novaMateriaNome.trim() })
+      setShowNovaMateria(false)
+      setNovaMateriaNome('')
+
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao criar matéria')
+    }
   }
 
   // Salvar (criar ou editar)
@@ -526,14 +584,81 @@ export default function AdminUsuariosPage() {
               </div>
 
               {formData.role === 'PROFESSOR' && (
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="materia">Matéria</Label>
-                  <Input
-                    id="materia"
-                    value={formData.materia}
-                    onChange={(e) => setFormData({ ...formData, materia: e.target.value })}
-                    placeholder="Ex: Matemática"
-                  />
+                  
+                  {!showNovaMateria ? (
+                    <>
+                      <Select
+                        value={formData.materia}
+                        onValueChange={(value) => {
+                          if (value === '__nova__') {
+                            setShowNovaMateria(true)
+                          } else {
+                            setFormData({ ...formData, materia: value })
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma matéria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {materias.map((materia) => (
+                            <SelectItem key={materia.id} value={materia.nome}>
+                              {materia.nome}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="__nova__" className="text-primary">
+                            <div className="flex items-center">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Cadastrar nova matéria
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {materias.length === 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Nenhuma matéria cadastrada. Clique para cadastrar a primeira.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Nome da nova matéria"
+                          value={novaMateriaNome}
+                          onChange={(e) => setNovaMateriaNome(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleCriarNovaMateria()
+                            }
+                          }}
+                        />
+                        <Button 
+                          size="sm" 
+                          onClick={handleCriarNovaMateria}
+                          disabled={!novaMateriaNome.trim()}
+                        >
+                          Criar
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            setShowNovaMateria(false)
+                            setNovaMateriaNome('')
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Digite o nome e pressione Enter ou clique em Criar
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
