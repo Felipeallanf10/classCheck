@@ -146,8 +146,11 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 
     // Se está alterando professor, verificar se existe e está ativo
     if (data.professorId && data.professorId !== existingAula.professorId) {
-      const professor = await prisma.professor.findUnique({
-        where: { id: data.professorId }
+      const professor = await prisma.usuario.findUnique({
+        where: { 
+          id: data.professorId,
+          role: 'PROFESSOR'
+        }
       })
 
       if (!professor) {

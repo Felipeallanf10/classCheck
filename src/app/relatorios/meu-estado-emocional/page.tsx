@@ -107,7 +107,7 @@ export default function MeuEstadoEmocionalPage() {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Minha Jornada Emocional", icon: <Heart className="h-4 w-4" /> }
+          { label: "Minha Jornada Emocional"}
         ]} />
         <RelatorioPageSkeleton />
       </div>
@@ -119,7 +119,7 @@ export default function MeuEstadoEmocionalPage() {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Minha Jornada Emocional", icon: <Heart className="h-4 w-4" /> }
+          { label: "Minha Jornada Emocional"}
         ]} />
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -134,7 +134,7 @@ export default function MeuEstadoEmocionalPage() {
       <div className="container mx-auto px-4 py-8">
         <Breadcrumbs items={[
           { label: "Relatórios", href: "/relatorios" },
-          { label: "Minha Jornada Emocional", icon: <Heart className="h-4 w-4" /> }
+          { label: "Minha Jornada Emocional"}
         ]} />
         <Card>
           <CardHeader>
@@ -166,7 +166,7 @@ export default function MeuEstadoEmocionalPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: "Relatórios", href: "/relatorios" },
-        { label: "Minha Jornada Emocional", icon: <Heart className="h-4 w-4" /> }
+        { label: "Minha Jornada Emocional"}
       ]} />
 
       {/* Header */}

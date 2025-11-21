@@ -178,7 +178,7 @@ export default function ProfessoresPage() {
           <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
               <Breadcrumbs items={[
-                { label: 'Professores', icon: <Users className="h-4 w-4" /> }
+                { label: 'Professores' }
               ]} />
             </div>
           </div>

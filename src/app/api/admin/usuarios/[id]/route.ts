@@ -11,14 +11,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar permissão de ADMIN
   const { authorized, userId: adminId, error } = await checkRole(['ADMIN']);
   if (!authorized) return error!;
 
   try {
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
     const body = await request.json();
     const { nome, email, senha, role, materia, ativo } = body;
 
@@ -100,14 +101,15 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Verificar permissão de ADMIN
   const { authorized, userId: adminId, error } = await checkRole(['ADMIN']);
   if (!authorized) return error!;
 
   try {
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
 
     // Não pode deletar a si mesmo
     if (id === adminId) {

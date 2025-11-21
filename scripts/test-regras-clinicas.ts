@@ -178,6 +178,7 @@ async function criarOuBuscarUsuarioTeste(
     data: {
       nome,
       email,
+      senha: 'senha123', // Senha padrão para testes
       role: 'ALUNO'
     }
   });
