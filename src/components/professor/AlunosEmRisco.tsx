@@ -95,8 +95,8 @@ export function AlunosEmRisco({ alunos, userRole }: AlunosEmRiscoProps) {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
+        <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
+          <Table className="min-w-[800px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Aluno</TableHead>

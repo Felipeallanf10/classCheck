@@ -6,6 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { VisaoGeralTurma } from './VisaoGeralTurma';
 import { AlunosEmRisco } from './AlunosEmRisco';
+import { VisaoGeralTurmaSkeleton } from './VisaoGeralTurmaSkeleton';
+import { AlunosEmRiscoSkeleton } from './AlunosEmRiscoSkeleton';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -136,10 +138,10 @@ export function DashboardProfessor({ professorId, userRole }: DashboardProfessor
       {turmaId && (
         <>
           {loadingMetricas ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Carregando métricas...</span>
-            </div>
+            <>
+              <VisaoGeralTurmaSkeleton />
+              <AlunosEmRiscoSkeleton />
+            </>
           ) : errorMetricas ? (
             <Card>
               <CardContent className="py-8 text-center">
