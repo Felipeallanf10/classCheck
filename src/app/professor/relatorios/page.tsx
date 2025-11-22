@@ -39,7 +39,7 @@ export default async function ProfessorRelatoriosPage() {
       </div>
       
       {/* Dashboard */}
-      <DashboardProfessor professorId={usuario.id} />
+      <DashboardProfessor professorId={usuario.id} userRole={usuario.role as 'PROFESSOR' | 'ADMIN'} />
     </div>
   );
 }

@@ -11,9 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface DashboardProfessorProps {
   professorId: number;
+  userRole: 'PROFESSOR' | 'ADMIN';
 }
 
-export function DashboardProfessor({ professorId }: DashboardProfessorProps) {
+export function DashboardProfessor({ professorId, userRole }: DashboardProfessorProps) {
   const [turmaId, setTurmaId] = useState<number | null>(null);
   const [periodo, setPeriodo] = useState<string>('mes');
   const { toast } = useToast();
@@ -106,7 +107,7 @@ export function DashboardProfessor({ professorId }: DashboardProfessorProps) {
                   <SelectItem key={turma.id} value={turma.id.toString()}>
                     {turma.nome} ({turma.codigo}) - {turma.materia}
                     <span className="text-xs text-muted-foreground ml-2">
-                      ({turma.totalAlunos} aluno{turma.totalAlunos !== 1 ? 's' : ''})
+                      ({turma.estatisticas.totalAlunos} aluno{turma.estatisticas.totalAlunos !== 1 ? 's' : ''})
                     </span>
                   </SelectItem>
                 ))}
@@ -151,7 +152,7 @@ export function DashboardProfessor({ professorId }: DashboardProfessorProps) {
           ) : dadosTurma?.sucesso ? (
             <>
               <VisaoGeralTurma metricas={dadosTurma.dados.metricsGerais} />
-              <AlunosEmRisco alunos={dadosTurma.dados.metricas} />
+              <AlunosEmRisco alunos={dadosTurma.dados.metricas} userRole={userRole} />
             </>
           ) : (
             <Card>

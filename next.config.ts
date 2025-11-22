@@ -21,12 +21,19 @@ const nextConfig: NextConfig = {
       'recharts',
       'date-fns'
     ],
-    // Desabilitar Turbo temporariamente (pode causar lentidão em WSL)
-    // Use `npm run dev:turbo` para testar com Turbo
   },
 
-  // REMOVER webpack poll - muito mais lento
-  // Use Turbopack com `npm run dev:turbo` ou Next.js padrão
+  // Webpack config para hot reload em WSL
+  webpack: (config, { dev, isServer }) => {
+    // Hot reload otimizado para WSL2
+    if (dev && !isServer) {
+      config.watchOptions = {
+        poll: 1000, // Check for changes every second
+        aggregateTimeout: 300, // Delay before reloading
+      };
+    }
+    return config;
+  },
 
   // Desabilitar compressão em dev
   compress: false,

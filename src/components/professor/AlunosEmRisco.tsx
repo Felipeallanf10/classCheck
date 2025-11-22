@@ -21,7 +21,12 @@ interface Aluno {
   ultimaSessao: Date | null;
 }
 
-export function AlunosEmRisco({ alunos }: { alunos: Aluno[] }) {
+interface AlunosEmRiscoProps {
+  alunos: Aluno[];
+  userRole: 'PROFESSOR' | 'ADMIN';
+}
+
+export function AlunosEmRisco({ alunos, userRole }: AlunosEmRiscoProps) {
   const getBadgeVariant = (nivel: string) => {
     switch (nivel) {
       case 'CRITICO': return 'destructive';
@@ -175,7 +180,10 @@ export function AlunosEmRisco({ alunos }: { alunos: Aluno[] }) {
                   
                   <TableCell>
                     <Link 
-                      href={`/admin/usuarios/${aluno.aluno.id}`}
+                      href={userRole === 'ADMIN' 
+                        ? `/admin/usuarios/${aluno.aluno.id}` 
+                        : `/professor/aluno/${aluno.aluno.id}`
+                      }
                       className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                     >
                       Ver detalhes
