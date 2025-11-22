@@ -233,7 +233,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
                   value={tab.value} 
                   className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary transition-all duration-200 px-3 py-2 sm:px-4 sm:py-3 min-w-0 flex-1 sm:flex-none"
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span className="hidden xs:inline text-sm sm:text-base truncate">{tab.label}</span>
                 </TabsTrigger>
               )
