@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { subDays, subMonths } from 'date-fns';
+import { getCached } from '@/lib/cache/redis-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,8 +48,14 @@ export async function GET(request: NextRequest) {
         dataInicio = subMonths(new Date(), 1);
     }
     
-    // Buscar alunos da turma
-    const turmaAlunos = await prisma.turmaAluno.findMany({
+    // Chave de cache
+    const cacheKey = `dashboard:turma:${turmaId}:${periodo}`;
+    
+    const dados = await getCached(
+      cacheKey,
+      async () => {
+        // Buscar alunos da turma
+        const turmaAlunos = await prisma.turmaAluno.findMany({
       where: { turmaId },
       select: {
         alunoId: true,
@@ -173,12 +180,17 @@ export async function GET(request: NextRequest) {
       return ordem[a.nivelRisco] - ordem[b.nivelRisco];
     });
     
+        return {
+          metricsGerais,
+          metricas: metricasOrdenadas,
+        };
+      },
+      300 // 5 minutos de cache
+    );
+    
     return NextResponse.json({
       sucesso: true,
-      dados: {
-        metricsGerais,
-        metricas: metricasOrdenadas,
-      },
+      dados,
     });
   } catch (erro) {
     console.error('[API Professor Relatórios Turma] Erro:', erro);

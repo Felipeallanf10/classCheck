@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getCached } from '@/lib/cache/redis-cache'
+
+// Forçar dinâmico
+export const dynamic = 'force-dynamic';
 
 // Mapeamento de humor para valores numéricos
 const humorParaNumero: Record<string, number> = {
@@ -34,10 +38,16 @@ export async function GET(request: NextRequest) {
     // RELATÓRIO GERAL (Dashboard Diretoria)
     // ========================================
     if (!tipo || tipo === 'geral') {
-      // Total de usuários
-      const totalUsuarios = await prisma.usuario.count({
-        where: { ativo: true }
-      })
+      // Chave do cache incluindo o período
+      const cacheKey = `relatorios:geral:${periodoInicio.toISOString()}:${periodoFim.toISOString()}`;
+      
+      const dados = await getCached(
+        cacheKey,
+        async () => {
+          // Total de usuários
+          const totalUsuarios = await prisma.usuario.count({
+            where: { ativo: true }
+          })
 
       const totalUsuariosPorRole = await prisma.usuario.groupBy({
         by: ['role'],
@@ -209,26 +219,31 @@ export async function GET(request: NextRequest) {
         }
       })
 
-      return NextResponse.json({
-        tipo: 'geral',
-        periodo: {
-          inicio: periodoInicio,
-          fim: periodoFim
+          return {
+            tipo: 'geral',
+            periodo: {
+              inicio: periodoInicio,
+              fim: periodoFim
+            },
+            resumo: {
+              totalUsuarios,
+              usuariosPorRole: totalUsuariosPorRole,
+              totalProfessores,
+              totalAulas,
+              aulasPorStatus: totalAulasPorStatus,
+              totalAvaliacoes,
+              totalHumorRegistros,
+              mediaNotasGeral: Math.round(mediaNotasGeral * 100) / 100,
+              mediaHumorGeral: Math.round(mediaHumorGeral * 100) / 100
+            },
+            topProfessores,
+            estatisticasPorMateria
+          };
         },
-        resumo: {
-          totalUsuarios,
-          usuariosPorRole: totalUsuariosPorRole,
-          totalProfessores,
-          totalAulas,
-          aulasPorStatus: totalAulasPorStatus,
-          totalAvaliacoes,
-          totalHumorRegistros,
-          mediaNotasGeral: Math.round(mediaNotasGeral * 100) / 100,
-          mediaHumorGeral: Math.round(mediaHumorGeral * 100) / 100
-        },
-        topProfessores,
-        estatisticasPorMateria
-      })
+        600 // 10 minutos de cache para relatório geral
+      );
+
+      return NextResponse.json(dados);
     }
 
     // ========================================
@@ -248,6 +263,13 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         )
       }
+
+      // Chave do cache
+      const cacheKey = `relatorios:professor:${profId}:${periodoInicio.toISOString()}:${periodoFim.toISOString()}`;
+      
+      const dados = await getCached(
+        cacheKey,
+        async () => {
 
       // Buscar todas as aulas do professor
       const aulas = await prisma.aula.findMany({
@@ -318,22 +340,27 @@ export async function GET(request: NextRequest) {
         ? avaliacoesProfessor.reduce((sum, a) => sum + humorParaNumero[a.humor], 0) / totalAvaliacoes
         : 0
 
-      return NextResponse.json({
-        tipo: 'professor',
-        professor,
-        periodo: {
-          inicio: periodoInicio,
-          fim: periodoFim
+          return {
+            tipo: 'professor',
+            professor,
+            periodo: {
+              inicio: periodoInicio,
+              fim: periodoFim
+            },
+            resumo: {
+              totalAulas: aulas.length,
+              totalAvaliacoes,
+              mediaNotas: Math.round(mediaNotas * 100) / 100,
+              mediaHumor: Math.round(mediaHumor * 100) / 100
+            },
+            aulas,
+            avaliacoes: avaliacoesProfessor
+          };
         },
-        resumo: {
-          totalAulas: aulas.length,
-          totalAvaliacoes,
-          mediaNotas: Math.round(mediaNotas * 100) / 100,
-          mediaHumor: Math.round(mediaHumor * 100) / 100
-        },
-        aulas,
-        avaliacoes: avaliacoesProfessor
-      })
+        300 // 5 minutos de cache para relatório de professor
+      );
+
+      return NextResponse.json(dados);
     }
 
     // ========================================
@@ -353,6 +380,13 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         )
       }
+
+      // Chave do cache
+      const cacheKey = `relatorios:aluno:${userId}:${periodoInicio.toISOString()}:${periodoFim.toISOString()}`;
+      
+      const dados = await getCached(
+        cacheKey,
+        async () => {
 
       // Buscar avaliações do aluno
       const avaliacoesAluno = await prisma.avaliacao.findMany({
@@ -425,23 +459,28 @@ export async function GET(request: NextRequest) {
         ? humorRegistros.reduce((sum, h) => sum + humorParaNumero[h.humor], 0) / humorRegistros.length
         : 0
 
-      return NextResponse.json({
-        tipo: 'aluno',
-        usuario,
-        periodo: {
-          inicio: periodoInicio,
-          fim: periodoFim
+          return {
+            tipo: 'aluno',
+            usuario,
+            periodo: {
+              inicio: periodoInicio,
+              fim: periodoFim
+            },
+            resumo: {
+              totalAvaliacoes,
+              totalHumorRegistros: humorRegistros.length,
+              mediaNotas: Math.round(mediaNotas * 100) / 100,
+              mediaHumorAvaliacoes: Math.round(mediaHumorAvaliacoes * 100) / 100,
+              mediaHumorRegistros: Math.round(mediaHumorRegistros * 100) / 100
+            },
+            avaliacoes: avaliacoesAluno,
+            humorRegistros
+          };
         },
-        resumo: {
-          totalAvaliacoes,
-          totalHumorRegistros: humorRegistros.length,
-          mediaNotas: Math.round(mediaNotas * 100) / 100,
-          mediaHumorAvaliacoes: Math.round(mediaHumorAvaliacoes * 100) / 100,
-          mediaHumorRegistros: Math.round(mediaHumorRegistros * 100) / 100
-        },
-        avaliacoes: avaliacoesAluno,
-        humorRegistros
-      })
+        300 // 5 minutos de cache para relatório de aluno
+      );
+
+      return NextResponse.json(dados);
     }
 
     return NextResponse.json(
