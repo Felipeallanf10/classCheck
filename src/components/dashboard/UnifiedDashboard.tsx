@@ -154,7 +154,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
         title: "Minhas Turmas",
         description: "Gerencie suas turmas",
         icon: <Users className="w-5 h-5" />,
-        href: "/professor/turmas",
+        href: "/professor/relatorios",
         color: "hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950"
       },
       {
@@ -260,7 +260,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
                   <h2 className="text-2xl font-bold mb-4">Minhas Turmas</h2>
                   <p className="text-muted-foreground">
                     Conteúdo das turmas em desenvolvimento. 
-                    <a href="/professor/turmas" className="text-primary hover:underline ml-1">Ver lista completa</a>
+                    <a href="/professor/relatorios" className="text-primary hover:underline ml-1">Ver relatórios completos</a>
                   </p>
                 </div>
               </TabsContent>

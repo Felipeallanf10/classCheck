@@ -50,7 +50,7 @@ const navItemsByRole = {
   ],
   PROFESSOR: [
     { label: "Dashboard", icon: Home, href: "/dashboard" },
-    { label: "Turmas", icon: Users, href: "/professor/turmas" },
+    { label: "Relatórios da Turma", icon: Users, href: "/professor/relatorios" },
     { label: "Aulas", icon: BookOpen, href: "/aulas" },
   ],
   ADMIN: [
