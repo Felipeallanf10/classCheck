@@ -154,7 +154,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
         title: "Minhas Turmas",
         description: "Gerencie suas turmas",
         icon: <Users className="w-5 h-5" />,
-        href: "/professor/turmas",
+        href: "/professor/relatorios",
         color: "hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950"
       },
       {
@@ -233,7 +233,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
                   value={tab.value} 
                   className="flex items-center gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary transition-all duration-200 px-3 py-2 sm:px-4 sm:py-3 min-w-0 flex-1 sm:flex-none"
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span className="hidden xs:inline text-sm sm:text-base truncate">{tab.label}</span>
                 </TabsTrigger>
               )
@@ -260,7 +260,7 @@ export function UnifiedDashboard({ userName = "Usuário", userRole = 'ALUNO' }: 
                   <h2 className="text-2xl font-bold mb-4">Minhas Turmas</h2>
                   <p className="text-muted-foreground">
                     Conteúdo das turmas em desenvolvimento. 
-                    <a href="/professor/turmas" className="text-primary hover:underline ml-1">Ver lista completa</a>
+                    <a href="/professor/relatorios" className="text-primary hover:underline ml-1">Ver relatórios completos</a>
                   </p>
                 </div>
               </TabsContent>
