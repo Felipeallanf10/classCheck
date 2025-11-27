@@ -767,6 +767,53 @@ Ao criar nova funcionalidade, verificar:
 - [ ] Error handling com try/catch
 - [ ] Commits semânticos (conventional commits)
 - [ ] Documentação atualizada (se necessário)
+- [ ] **CHANGELOG.md atualizado com as mudanças**
+
+---
+
+## 📝 Atualização do CHANGELOG
+
+**REGRA OBRIGATÓRIA**: Sempre que implementar, corrigir ou modificar algo no projeto, **ATUALIZAR O ARQUIVO `CHANGELOG.md`** com uma entrada sucinta seguindo o formato:
+
+### Formato do CHANGELOG:
+```markdown
+## 🔄 Branch: [nome-da-branch]
+
+### 📅 [Data]
+
+#### [Tipo]: **[Título da Mudança]**
+- **Commit**: `[tipo]: [mensagem do commit]`
+- **Arquivos**: [principais arquivos modificados/criados]
+- **Descrição**: [descrição sucinta em 1-3 linhas do que foi feito]
+```
+
+### Tipos de Entrada:
+- `✅ IMPLEMENTAÇÃO` - Nova funcionalidade
+- `🔧 CORREÇÃO` - Bug fix
+- `📚 DOCUMENTAÇÃO` - Atualizações de docs
+- `♻️ REFATORAÇÃO` - Refatoração de código
+- `🧪 TESTES` - Adição/correção de testes
+- `⚡ PERFORMANCE` - Otimizações
+- `🔀 MERGE` - Merges entre branches
+
+### Exemplo de Entrada:
+```markdown
+## 🔄 Branch: feature/redis-caching
+
+### 📅 27 de Novembro de 2025
+
+#### ✅ IMPLEMENTAÇÃO: **Sistema de Cache Distribuído com Redis**
+- **Commit**: `feat: implementar cache distribuído com Upstash Redis`
+- **Arquivos**: `src/lib/cache/redis-cache.ts`, `src/app/api/admin/cache/route.ts`, APIs de relatórios
+- **Descrição**: Implementado sistema de cache com Redis/Upstash e fallback automático para memória. TTL de 300-600s em relatórios. Invalidação automática ao finalizar sessões.
+```
+
+### Quando Atualizar:
+- ✅ Após cada implementação significativa
+- ✅ Após correções importantes
+- ✅ Após merges entre branches
+- ✅ Ao final de sprints
+- ❌ Não precisa para mudanças triviais (typos, formatação)
 
 ---
 
