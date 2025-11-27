@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { determinarProximaPergunta } from '@/lib/adaptive/proxima-pergunta-service';
 import { validarRespostaPorTipo } from '@/lib/validations/resposta-schemas';
+import { invalidarCache } from '@/lib/cache/redis-cache';
 
 // Força a rota a ser dinâmica
 export const dynamic = 'force-dynamic';
@@ -457,6 +458,17 @@ export async function POST(
       const deveContinuarComDidatico = 
         sessaoFinalizada.aulaId && // Tem aula vinculada
         sessao.questionarioId === 'questionario-impacto-aula'; // É o questionário socioemocional de aula
+
+      // Invalidar caches relacionados
+      const cachesToInvalidate = [
+        `relatorios:aluno:${sessao.usuarioId}`,
+        `dashboard:turma:${sessaoFinalizada.aulaId}`,
+      ];
+      
+      await invalidarCache(cachesToInvalidate).catch((err) => {
+        console.error('[API] Erro ao invalidar cache:', err);
+        // Não falhar a finalização se houver erro ao invalidar cache
+      });
 
       return NextResponse.json({
         success: true,
