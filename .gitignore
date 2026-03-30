@@ -43,3 +43,4 @@ next-env.d.ts
 # Arquivos de teste
 test-relatorio.pdf
 test-relatorio.xlsx
+__pycache__/
